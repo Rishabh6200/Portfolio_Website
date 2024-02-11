@@ -1,0 +1,60 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
+:root {
+    --accent-color: rebeccapurple;
+    --main-transition: all 0.3s ease-in-out;
+}
+
+.nav {
+    background-color: black;
+}
+
+.nav-links .logo a {
+    font-size: 20px;
+    color: rebeccapurple;
+    font-weight: 500;
+}
+
+.nav-links .logo a span {
+    font-weight: 500;
+    font-size: 27px;
+    color: white;
+    background-color: rebeccapurple;
+    border-radius: 50%;
+    padding: 8px;
+}
+
+.nav .nav-links {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--main-transition);
+}
+
+.nav ul {
+    display: flex;
+    list-style-type: none;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.nav a {
+    font-size: 18px;
+    font-weight: 600;
+    position: relative;
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+    padding: 5px 10px;
+    font-weight: 500;
+    transition: var(--main-transition);
+    border-radius: 30px;
+}
+
+.nav a.current,
+.nav .nav-links ul a:hover {
+    color: var(--accent-color);
+}

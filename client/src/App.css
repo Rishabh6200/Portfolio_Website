@@ -1,0 +1,18 @@
+body {
+  background-image: url(./assets/images/bgimg.jpeg);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-attachment: fixed;
+}
+
+.res-box {
+  height: auto;
+  width: 76%;
+  margin: auto;
+  margin-top: 20px;
+  background-color: rgba(255, 255, 255, 0.082);
+  backdrop-filter: blur(16px);
+  border-radius: 10px;
+  box-shadow: 0 0 5px sienna;
+  padding: 20px;
+}

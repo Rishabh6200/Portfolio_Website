@@ -1,0 +1,61 @@
+.headers {
+    height: 90.3vh;
+    width: 100%;
+    /* background-image: url(../images/bgimg.jpeg); */
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-attachment: fixed;
+}
+
+.headers .to-blue {
+    height: 25em;
+    width: 50em;
+    position: relative;
+    top: 2em;
+}
+
+.to-blue .p1 {
+    font-size: 40px;
+    font-weight: 500;
+    animation: flow 2s infinite linear;
+}
+
+.to-blue .p2 {
+    font-size: 60px;
+    animation: flows 4s infinite linear;
+}
+.to-blue .p3{
+    font-size: 25px;
+}
+
+@keyframes flow{
+    0%{
+        /* color: red; */
+        text-shadow: 0 0 10px  green;
+    }
+    50%{
+        /* color: green; */
+        text-shadow: 0 0 10px blue;
+    }
+    100%{
+        /* color: blue; */
+        text-shadow: 0 0 10px red;
+    }
+}
+@keyframes flows{
+    0%{
+        color: red;
+        text-shadow: 0 0 10px  green;
+    }
+    50%{
+        color: green;
+        text-shadow: 0 0 10px blue;
+    }
+    100%{
+        color: blue;
+        text-shadow: 0 0 10px red;
+    }
+}

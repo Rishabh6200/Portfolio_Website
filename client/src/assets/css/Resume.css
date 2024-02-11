@@ -1,0 +1,93 @@
+:root {
+    --mainColor: rgb(75, 0, 94);
+}
+
+/* heading components CSS */
+.cc {
+    display: flex;
+    justify-content: center;
+}
+
+.head {
+    padding: 10px;
+    width: 40%;
+    margin-top: 10px;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.214);
+    background-color: rgba(255, 255, 255, 0.082);
+    backdrop-filter: blur(16px);
+    border-radius: 10px;
+}
+
+.head h2 {
+    color: rgb(30, 25, 25);
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+/* reasume page css */
+
+.dot {
+    height: 15px;
+    width: 15px;
+    background-color: var(--mainColor);
+    border-radius: 50%;
+}
+
+.line {
+    height: 100px;
+    width: 4px;
+    background-color: var(--mainColor);
+    margin-left: 5px;
+}
+
+.l {
+    height: 40px;
+    width: 4px;
+    background-color: var(--mainColor);
+    margin-left: 6px;
+}
+
+.main-box {
+    display: flex;
+}
+
+.box-one {
+    width: 50%;
+    height: auto;
+}
+
+.box-two {
+    width: 50%;
+    height: auto;
+}
+
+.eduction {
+    font-size: 25px;
+    font-weight: bold;
+    padding: 10px 10px;
+    color: var(--mainColor);
+}
+
+.edu-box {
+    margin-left: 10px;
+}
+
+.edu-detail h2 {
+    font-size: 20px;
+    color: var(--mainColor);
+    font-weight: 700;
+}
+
+.edu-detail h4 {
+    padding: 3px 10px;
+    background-color: rgba(240, 248, 255, 0.664);
+    width: 105px;
+    border-radius: 5px;
+}
+
+.edu-detail p {
+    font-style: italic;
+    color: var(--mainColor);
+    padding: 3px 0;
+}
