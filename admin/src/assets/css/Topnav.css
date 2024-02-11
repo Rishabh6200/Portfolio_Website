@@ -1,0 +1,8 @@
+.topnav{
+    background-color: var(--navbg-color);
+    padding: 26px;
+    width: 85%;
+    position: absolute;
+    bottom: 92.7%;
+    right: 0;
+}

@@ -1,0 +1,39 @@
+.cont {
+    position: absolute;
+    left: 15em;
+    top: 8%;
+    width: 84%;
+    height: 91vh;
+}
+
+.for-grid {
+    display: flex;
+    grid-template-columns: auto auto;
+}
+
+.col-one {
+    height: 12em;
+    width: 20em;
+    border-radius: 10px;
+    background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+    box-shadow: 0 0 10px blueviolet;
+    cursor: pointer;
+    margin: 8em auto;
+    border: 1px solid black;
+    transition: 200ms;
+}
+
+.col-one h4{
+    font-weight: bold;
+    font-size: 20px;
+    margin: 10px 20px;
+}
+
+
+.col-one:hover{
+    transform: translateY(-20px);
+}
+
+.col-one h4 :hover .arrow{
+    display: block;
+}

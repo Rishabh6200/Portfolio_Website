@@ -1,0 +1,46 @@
+:root {
+    --navbg-color: rgb(8, 8, 80);
+}
+
+.side-nav {
+    width: 15%;
+    height: 100vh;
+    background-color: var(--navbg-color);
+}
+
+.title {
+    display: flex;
+    gap: 10px;
+    padding: 10px 20px;
+}
+
+.title img {
+    height: 20px;
+    margin-top: 5px;
+}
+
+.side-nav h1 {
+    color: white;
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 0px;
+}
+
+.dash-links{
+    color: white;
+    padding: 15px;
+}
+.dash-links i{
+    margin-right: 10px;
+}
+.dash-links li{
+    padding: 5px;
+    border-radius: 10px;
+}
+.dash-links li a{
+    padding: 4px;
+}
+.dash-links li:hover{
+    background-color: rgb(92, 82, 82);
+    cursor: pointer;
+}
