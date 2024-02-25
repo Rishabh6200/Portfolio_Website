@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import '../assets/css/Header.css'
 import httpComman from '../api/httpComman'
-import { Link } from 'react-router-dom'
+import Download from '../services/Download'
 
 const Header = () => {
   const [data, setData] = useState();
@@ -39,11 +39,7 @@ const Header = () => {
             <p className='p1'>Hello, Everyone</p> <br />
             <p className='p2'>{name}</p>
             <p className='p3'>{prof}</p>
-            <Link to='/about'
-              className='text-white relative top-20 bg-slate-900 p-3 rounded-md'>
-                Download CV &nbsp; 
-                <i class="fa-solid fa-download"></i>
-            </Link>
+            <Download />
           </div>
         </div>
       </div>

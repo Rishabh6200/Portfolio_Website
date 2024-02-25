@@ -1,16 +1,18 @@
 import express from 'express'
+import dotenv from 'dotenv'
+dotenv.config()
 import { connectDatabase } from './src/config/db.js';
 import { router } from './src/routes/userRoutes.js';
 import cors from 'cors'
 import bodyParser from 'body-parser';
 const app = express();
-const port = 5000;
+const port = process.env.PORT;
 
 connectDatabase();
 
 app.use(cors())
 app.use(bodyParser.json());
-app.use('/api', router)
+app.use('/v1', router)
 
 app.get('/', (req, res) => {
     res.send("Hello World!")

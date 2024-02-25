@@ -1,9 +1,10 @@
 import axios from 'axios'
+const perfix = '/v1'
 
 const httpComman = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: process.env.REACT_APP_SERVER_URL + perfix,
     headers: {
-        'Content-Type':'application/json'
+        'Content-Type': 'application/json'
     }
 })
 
