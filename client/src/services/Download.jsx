@@ -5,7 +5,7 @@ const Download = () => {
 
     const handleDownload = () => {
         const link = document.createElement('a')
-        link.href = process.env.REACT_APP_URL + '/assets/download/mycv.pdf';
+        link.href = process.env.REACT_APP_URL + 'assets/download/mycv.pdf';
         link.download = 'mycv.pdf';
         document.body.appendChild(link)
         link.click();
