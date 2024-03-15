@@ -15,12 +15,7 @@ app.use(bodyParser.json());
 app.use('/v1', router)
 
 app.get('/', (req, res) => {
-    const data = {
-        s: "hello",
-        a: "jfvhjkdfv",
-        x: "lkdhvd"
-    }
-    res.send(data)
+    res.send("Hello World!")
 })
 
 app.listen(port, () => {
