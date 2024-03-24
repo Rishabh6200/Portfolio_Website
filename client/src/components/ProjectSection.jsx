@@ -7,7 +7,7 @@ const ProjectSection = ({ imgP, heading, link }) => {
   return (
     <>
       <div className='main-con'>
-        <a href={link} >
+        <a href={link} target="_blank" >
           <div className="max-w-sm w-60  border-2 border-gray-200 rounded-lg shadow">
             <div className='img-box'>
               <img className="imgg rounded-t-lg p-2 h-40 m-auto" src={imgP} alt="" />

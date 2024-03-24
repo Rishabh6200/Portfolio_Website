@@ -10,17 +10,17 @@ const Project = () => {
     {
       img: pokiImg,
       heading: 'Pokemon Characters Details',
-      link: 'https://pokipro.netlify.app/',
+      link: 'https://pokemonchar.netlify.app/',
     },
     {
       img: pokiImg,
       heading: 'Pokemon Characters Details',
-      link: 'https://pokipro.netlify.app/',
+      link: 'https://pokemonchar.netlify.app/',
     },
     {
       img: pokiImg,
       heading: 'Pokemon Characters Details',
-      link: 'https://pokipro.netlify.app/',
+      link: 'https://pokemonchar.netlify.app/',
     },
   ]
 

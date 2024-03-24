@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import InputBox from './InputBox'
 import Buttton from './Buttton'
-import httpComman from '../api/httpComman';
+import httpComman from '../../api/httpComman';
 
 const PersonalDetail = () => {
 

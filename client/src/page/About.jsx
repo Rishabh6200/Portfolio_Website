@@ -32,7 +32,7 @@ const About = () => {
 
   return (
     <>
-      <div className="cont">
+      <div className="conts">
         <div className="abs">
           
           <PageHeading heading='ABOUT' />

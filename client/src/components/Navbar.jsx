@@ -1,13 +1,16 @@
-import React from 'react'
-import '../assets/css/Navbar.css'
-import { Link, Outlet } from 'react-router-dom';
-const Navbar = () => {
+import React from 'react';
+import '../assets/css/Navbar.css';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 
+const Navbar = () => {
     const navData = ['Home', 'About', 'Resume', 'Projects', 'Contact'];
     const navLink = ['', 'about', 'resume', 'project', 'contact'];
-    const activeClass = ['current'];
-    const value = [1,2,3,4,5,6,7,8,9]
-    
+
+    const location = useLocation();
+
+    const isActive = (link) => {
+        return location.pathname === `/${link}`;
+    };
 
     return (
         <>
@@ -18,8 +21,13 @@ const Navbar = () => {
                     </h1>
                     <ul>
                         {navData.map((item, i) => (
-                            <li className='text-black' key={value[i]} >
-                                <Link to={`/${navLink[i]}`} className={activeClass[i]}>{navData[i]}</Link>
+                            <li className='text-black' key={i}>
+                                <Link
+                                    to={`/${navLink[i]}`}
+                                    className={isActive(navLink[i]) ? 'current' : ''}
+                                >
+                                    {navData[i]}
+                                </Link>
                             </li>
                         ))}
                     </ul>
@@ -27,7 +35,7 @@ const Navbar = () => {
             </nav>
             <Outlet />
         </>
-    )
-}
+    );
+};
 
-export default Navbar
+export default Navbar;
