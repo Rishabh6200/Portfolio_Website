@@ -44,7 +44,7 @@ export const getAddress = async (req, res) => {
         }
         return res.status(404).json({ message: "No data find" })
     } catch (error) {
-        res.status(500).json('Error retrieving users:', error);
+        res.status(500).json('Error retrieving users');
     }
 }
 
@@ -74,7 +74,7 @@ export const getResume = async (req, res) => {
         }
         return res.status(404).json({ message: "No data find" })
     } catch (error) {
-        res.status(500).json('Error retrieving users:', error);
+        res.status(500).json('Error retrieving users')
     }
 }
 
@@ -88,7 +88,7 @@ export const getSkill = async (req, res) => {
         }
         return res.status(404).json({ message: "No data find" })
     } catch (error) {
-        res.status(500).json('Error retrieving users:', error);
+        res.status(500).json('Error retrieving users');
     }
 }
 
@@ -100,6 +100,6 @@ export const postSkill = async (req, res) => {
         console.log('Data Saved to database', newData);
         res.status(201).json({ message: 'data received' })
     } catch (error) {
-        res.status(500).json('Error retrieving users:', error);
+        res.status(500).json('Error retrieving users');
     }
 }
