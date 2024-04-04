@@ -7,19 +7,19 @@ const Download = () => {
         const link = document.createElement('a')
         link.href = process.env.REACT_APP_URL + 'assets/download/mycv.pdf';
         link.download = 'mycv.pdf';
+        link.target = '_blank';
         document.body.appendChild(link)
         link.click();
         document.body.removeChild(link)
     }
     return (
         <>
-            <button onClick={handleDownload}
-                className='text-white relative flex top-14 left-80 bg-slate-900 p-3 gap-3 rounded-md'
+            <button className="bg-blue-900 hover:bg-blue-600 text-gray-800 font-bold
+             py-3 px-14 rounded-lg inline-flex items-center gap-3"
+                onClick={handleDownload}
             >
-                <div className="mt-1">
-                    <FaDownload />
-                </div>
-                Download CV
+                <FaDownload size={20} color='#fff' />
+                <span className='text-sm text-white'>Check CV</span>
             </button>
         </>
     )

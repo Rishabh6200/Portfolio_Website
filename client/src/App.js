@@ -1,9 +1,8 @@
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Navbar from './components/common/Navbar';
 import About from './page/About';
 import Resume from './page/Resume';
-import Footer from './components/Footer';
-import Navbar from './components/Navbar';
 import Header from './components/Header';
 import Contact from './page/Contact';
 import Project from './page/Project';
@@ -28,7 +27,7 @@ function App() {
             <Route path="/contact" element={<Contact />} />
           </Route>
           <Route path="/admin-login" element={<AdminLogin />} />
-          <Route path="/admin-dashboard" element={<DashboardLayout />}>
+          <Route path="/admin" element={<DashboardLayout />}>
             <Route index element={<Home />} />
             <Route path="addskill" element={<Addskill />} />
             <Route path="education" element={<AddEdu />} />

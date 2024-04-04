@@ -1,5 +1,5 @@
 body {
-  background-image: url(./assets/images/bgimg.jpeg);
+  background-image: url(./assets/images/bg_one.jpeg);
   background-repeat: no-repeat;
   background-size: 100% 100%;
   background-attachment: fixed;
@@ -15,4 +15,12 @@ body {
   border-radius: 10px;
   box-shadow: 0 0 5px sienna;
   padding: 20px;
+}
+
+::-webkit-scrollbar {
+  width: 4px; 
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: orangered;
 }

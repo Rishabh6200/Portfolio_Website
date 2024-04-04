@@ -1,3 +1,4 @@
+/* Navbar.css */
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap");
 
 :root {
@@ -11,7 +12,7 @@
 
 .nav-links .logo a {
     font-size: 20px;
-    color: rebeccapurple;
+    color: var(--accent-color);
     font-weight: 500;
 }
 
@@ -19,7 +20,7 @@
     font-weight: 500;
     font-size: 27px;
     color: white;
-    background-color: rebeccapurple;
+    background-color: var(--accent-color);
     border-radius: 50%;
     padding: 8px;
 }
@@ -32,6 +33,7 @@
     justify-content: space-between;
     align-items: center;
     transition: var(--main-transition);
+    position: relative;
 }
 
 .nav ul {
@@ -57,4 +59,68 @@
 .nav a.current,
 .nav .nav-links ul a:hover {
     color: var(--accent-color);
+}
+
+.nav-btn {
+    display: none;
+}
+
+@media (max-width: 400px) {
+    .nav-btn {
+        display: block;
+        position: absolute;
+        left: 18em;
+        top: 25px;
+    }
+
+    .nav ul {
+        display: none;
+    }
+
+    #responsive {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 5em;
+        background: rgba(230, 230, 230, 0.895);
+        width: 90%;
+        border-radius: 10px;
+        z-index: 1;
+        margin-top: 10px;
+        animation: aa 100ms linear;
+    }
+
+    .nav .nav-links {
+        flex-direction: column;
+    }
+
+    .nav a {
+        color: black;
+    }
+
+    .nav-links .logo {
+        margin-left: -13em;
+        padding: 11px;
+    }
+
+    #responsive.open {
+        display: flex;
+    }
+
+    #responsive.closed {
+        display: none;
+    }
+}
+
+@keyframes aa {
+    0% {
+        position: absolute;
+        left: 10em;
+        top: 2em;
+    }
+
+    100% {
+        position: absolute;
+        left: 0;
+    }
 }
