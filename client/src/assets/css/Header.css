@@ -1,61 +1,113 @@
 .headers {
-    height: 90.3vh;
+    height: 88vh;
     width: 100%;
-    /* background-image: url(../images/bgimg.jpeg); */
     background-repeat: no-repeat;
     background-size: 100% 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
     background-attachment: fixed;
 }
 
-.headers .to-blue {
-    height: 25em;
-    width: 50em;
-    position: relative;
-    top: 2em;
+@property --angle {
+    syntax: '<angle>';
+    initial-value: 90deg;
+    inherits: true;
 }
 
-.to-blue .p1 {
-    font-size: 40px;
-    font-weight: 500;
-    animation: flow 2s infinite linear;
+@property --gradX {
+    syntax: '<percentage>';
+    initial-value: 50%;
+    inherits: true;
 }
 
-.to-blue .p2 {
-    font-size: 60px;
-    animation: flows 4s infinite linear;
-}
-.to-blue .p3{
-    font-size: 25px;
+@property --gradY {
+    syntax: '<percentage>';
+    initial-value: 0%;
+    inherits: true;
 }
 
-@keyframes flow{
-    0%{
-        /* color: red; */
-        text-shadow: 0 0 10px  green;
-    }
-    50%{
-        /* color: green; */
-        text-shadow: 0 0 10px blue;
-    }
-    100%{
-        /* color: blue; */
-        text-shadow: 0 0 10px red;
+:root {
+    --d: 4500ms;
+    --angle: 90deg;
+    --gradX: 100%;
+    --gradY: 50%;
+    --c1: rgba(168, 239, 255, 1);
+    --c2: rgba(168, 239, 255, 0.1);
+}
+
+.wrapper {
+    min-width: min(40rem, 100%);
+}
+
+.box {
+    font-size: 3vw;
+    /* margin: max(1rem, 3vw); */
+    border: 0.35rem solid;
+    padding: 3vw;
+    border-image: conic-gradient(from var(--angle), var(--c2), var(--c1) 0.1turn, var(--c1) 0.15turn, var(--c2) 0.25turn) 30;
+    animation: borderRotate var(--d) linear infinite forwards;
+    background-color: rgba(0, 0, 0, 0.796);
+    margin: 2em 1em;
+}
+
+.box:nth-child(2) {
+    border-image: radial-gradient(ellipse at var(--gradX) var(--gradY), var(--c1), var(--c1) 10%, var(--c2) 40%) 30;
+    animation: borderRadial var(--d) linear infinite forwards;
+}
+
+@keyframes borderRotate {
+    100% {
+        --angle: 420deg;
     }
 }
-@keyframes flows{
-    0%{
-        color: red;
-        text-shadow: 0 0 10px  green;
+
+@keyframes borderRadial {
+    20% {
+        --gradX: 100%;
+        --gradY: 50%;
     }
-    50%{
-        color: green;
-        text-shadow: 0 0 10px blue;
+
+    40% {
+        --gradX: 100%;
+        --gradY: 100%;
     }
-    100%{
-        color: blue;
-        text-shadow: 0 0 10px red;
+
+    60% {
+        --gradX: 50%;
+        --gradY: 100%;
+    }
+
+    80% {
+        --gradX: 0%;
+        --gradY: 50%;
+    }
+
+    100% {
+        --gradX: 50%;
+        --gradY: 0%;
+    }
+}
+
+
+@media (max-width: 400px) {
+    #headers {
+        flex-direction: column-reverse;
+    }
+
+    #headers .outer-box {
+        width: 100%;
+    }
+
+    #headers .outer-box .box {
+        width: 30.5em;
+    }
+
+    .wrapper {
+        width: 10em;
+    }
+
+    #man-float {
+        width: 100%;
+        height: 100vh;
     }
 }
