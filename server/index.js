@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 app.use('/v1', router)
 
 app.get('/', (req, res) => {
-    res.send("Hello World!")
+    res.send("App is running...")
 })
 
 app.listen(port, () => {
