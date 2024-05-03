@@ -37,4 +37,5 @@ yarn-error.log*
 .vercel
 
 # Local Netlify folder
-.netlify
+.firebaserc
+firebase.json
