@@ -1,56 +1,54 @@
 import React from 'react'
 import '../assets/css/Sidenav.css'
-import titleImg from '../assets/images/dashboard.png'
 import { Link, Outlet } from 'react-router-dom';
+import { AiFillHome, AiFillSetting } from "react-icons/ai";
+import { RiGraduationCapFill } from "react-icons/ri";
+import { IoIosInformationCircle } from "react-icons/io";
+import { FaAddressCard } from "react-icons/fa";
 
 const SideNav = () => {
+    const navLink = ['', 'skill', 'education', 'detail', 'address']
 
-  const title = 'Deshboard';
+    const dashLink = [
+        {
+            name: "Home",
+            skillicon: AiFillHome,
+        },
+        {
+            name: "Skills",
+            skillicon: AiFillSetting,
+        },
+        {
+            name: 'Add Education',
+            skillicon: RiGraduationCapFill,
+        },
+        {
+            name: 'Update Personal Info.',
+            skillicon: IoIosInformationCircle,
+        },
+        {
+            name: 'Update Address',
+            skillicon: FaAddressCard,
+        },
+    ]
 
-  const navLink = ['','addskill','education', 'detail','address']
-
-  const dashLink = [
-    {    
-      name: "Home",
-      skillicon: 'fa-solid fa-house-chimney'
-    },
-    {
-      name: "Add Skill",
-      skillicon: 'fa-solid fa-gear'
-    },
-    {
-      name: 'Add Education',
-      skillicon: 'fa-solid fa-user-graduate'
-    },
-    {
-      name: 'Update Personal Info.',
-      skillicon: 'fa-regular fa-user'
-    },
-    {
-      name: 'Update Address',
-      skillicon: 'fa-solid fa-location-crosshairs'
-    },
-  ]
-
-  return (
-    <>
-      <nav className='side-nav'>
-        <div className="title">
-          <img src={titleImg} alt="" />
-          <h1 className='dash-heading'>{title}</h1>
-        </div>
-        <hr />
-        <ul className='dash-links'>
-          {dashLink.map((item, i) => (
-            <li key={item.i}>
-              <Link to={navLink[i]} key={i} > <i className={item.skillicon} style={{ "color": "#ffffff" }}></i>{item.name} </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <Outlet />
-    </>
-  )
+    return (
+        <>
+            <nav className='side-nav' style={{ "height": '92vh' }}>
+                <hr />
+                <ul className='dash-links'>
+                    {dashLink.map((item, i) => (
+                        <Link to={navLink[i]} key={i} >
+                            <li key={item.i} className='flex gap-3 mt-2'>
+                                <item.skillicon size={25} />{item.name}
+                            </li>
+                        </Link>
+                    ))}
+                </ul>
+            </nav>
+            <Outlet />
+        </>
+    )
 }
 
 export default SideNav

@@ -12,7 +12,7 @@ import Home from './admin/pages/Home';
 import Address from './admin/pages/Address';
 import PersonalDetail from './admin/pages/PersonalDetail';
 import AddEdu from './admin/pages/AddEdu';
-import Addskill from './admin/pages/Addskill';
+import SkillList from './admin/pages/SkillList';
 
 function App() {
   return (
@@ -29,7 +29,7 @@ function App() {
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin" element={<DashboardLayout />}>
             <Route index element={<Home />} />
-            <Route path="addskill" element={<Addskill />} />
+            <Route path="skill" element={<SkillList />} />
             <Route path="education" element={<AddEdu />} />
             <Route path="detail" element={<PersonalDetail />} />
             <Route path="address" element={<Address />} />

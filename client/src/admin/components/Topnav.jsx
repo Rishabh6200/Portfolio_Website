@@ -1,19 +1,24 @@
 import React from 'react'
 import '../assets/css/Topnav.css'
-import { FaHome } from "react-icons/fa";
-import { useNavigate } from 'react-router-dom'
+import titleImg from '../assets/images/dashboard.png'
 
 const Topnav = () => {
-  const navigate = useNavigate()
-
   return (
     <>
-      <div className='topnav'>
-        <span
-          onClick={() => navigate('/')}
-          className='text-white float-end bg-green-600 -my-5 mr-5 p-2 pt-1 rounded-lg inline-flex items-center gap-2 cursor-pointer'
-        >
-          <FaHome /> Home</span>
+      <div className='w-100 p-1 bg-blue-950 flex justify-between'>
+        <div className="">
+          <div className="title">
+            <img src={titleImg} alt="" />
+            <h1 className='p-0.5 text-white'>Deshboard</h1>
+          </div>
+        </div>
+        <div className="">
+          <span
+            className='text-white bg-green-600 p-2 mr-10 mt-1 rounded-lg inline-flex items-center gap-2 cursor-pointer'
+          >
+            User
+          </span>
+        </div>
       </div>
 
     </>

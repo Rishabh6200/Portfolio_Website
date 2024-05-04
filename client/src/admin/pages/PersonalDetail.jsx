@@ -11,7 +11,6 @@ const PersonalDetail = () => {
         prof: '',
     };
     const [formData, setFormData] = useState(initialFormData);
-    console.log(formData)
     const handleChange = (e) => {
         setFormData({
             ...formData,

@@ -54,11 +54,11 @@ const resumeSchema = new mongoose.Schema({
 export const ResumeModel = mongoose.model('resume', resumeSchema)
 
 const skillScheme = new mongoose.Schema({
-    percentage: {
-        type: Number,
+    name: {
+        type: String,
         require: true
     },
-    color: {
+    skill_img: {
         type: String,
         require: true
     },
