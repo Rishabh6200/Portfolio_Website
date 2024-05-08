@@ -6,15 +6,15 @@ import Resume from './page/Resume';
 import Header from './components/Header';
 import Contact from './page/Contact';
 import Project from './page/Project';
-import AdminLogin from './admin/components/AdminLogin';
+import AdminLogin from './admin/pages/AdminLogin';
 import DashboardLayout from './admin/layout/DashboadLayout';
 import Home from './admin/pages/Home';
 import Address from './admin/pages/Address';
 import PersonalDetail from './admin/pages/PersonalDetail';
-import AddEdu from './admin/pages/AddEdu';
 import SkillList from './admin/pages/SkillList';
+import EducationList from './admin/pages/EducationList';
 
-function App() {
+const App = () => {
   return (
     <>
       <Router>
@@ -30,7 +30,7 @@ function App() {
           <Route path="/admin" element={<DashboardLayout />}>
             <Route index element={<Home />} />
             <Route path="skill" element={<SkillList />} />
-            <Route path="education" element={<AddEdu />} />
+            <Route path="education" element={<EducationList />} />
             <Route path="detail" element={<PersonalDetail />} />
             <Route path="address" element={<Address />} />
           </Route>

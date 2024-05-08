@@ -22,7 +22,7 @@ router.patch('/address', async (req, res) => {
 
 
 /* -------------------------Resume Route------------------------------ */
-router.get('/resume', async (req, res) => {
+router.get('/education', async (req, res) => {
     await getResume(req, res);
 })
 

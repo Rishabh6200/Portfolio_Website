@@ -6,7 +6,7 @@ import { CiSquareRemove } from "react-icons/ci";
 const SkillCard = ({ name, img }) => {
     return (
         <>
-            <div className="block w-[18rem] rounded-lg bg-white text-surface shadow-xl border">
+            <div className="block w-[18rem] rounded-lg bg-white text-surface shadow-xl border filter grayscale hover:grayscale-0 cursor-pointer hover:scale-105 transition">
                 <div className="relative overflow-hidden bg-cover bg-no-repeat flex justify-center">
                     <img
                         class="rounded-t-lg p-3 h-32"

@@ -19,22 +19,22 @@ const SideNav = () => {
             skillicon: AiFillSetting,
         },
         {
-            name: 'Add Education',
+            name: 'Education',
             skillicon: RiGraduationCapFill,
         },
         {
-            name: 'Update Personal Info.',
+            name: 'Personal Info.',
             skillicon: IoIosInformationCircle,
         },
         {
-            name: 'Update Address',
+            name: 'Address',
             skillicon: FaAddressCard,
         },
     ]
 
     return (
         <>
-            <nav className='side-nav' style={{ "height": '92vh' }}>
+            <nav className='side-nav h-[92vh]'>
                 <hr />
                 <ul className='dash-links'>
                     {dashLink.map((item, i) => (

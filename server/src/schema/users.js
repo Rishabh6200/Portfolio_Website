@@ -34,7 +34,7 @@ const addressSchema = new mongoose.Schema({
 export const AddressModel = mongoose.model('address', addressSchema);
 
 const resumeSchema = new mongoose.Schema({
-    degree: {
+    name: {
         type: String,
         require: true,
     },
@@ -43,10 +43,6 @@ const resumeSchema = new mongoose.Schema({
         require: true,
     },
     college: {
-        type: String,
-        require: true,
-    },
-    hobbie: {
         type: String,
         require: true,
     }
