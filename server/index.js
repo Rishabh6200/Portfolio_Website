@@ -19,5 +19,5 @@ app.get('/', (req, res) => {
 })
 
 app.listen(port, () => {
-    console.log(`The Website is live on http://localhost:${port}/`)
+    console.log(`The Website is live on ${process.env.APP_SERVER_URL}`)
 })
