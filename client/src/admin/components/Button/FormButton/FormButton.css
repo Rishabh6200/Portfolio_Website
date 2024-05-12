@@ -1,0 +1,9 @@
+.formbtn Button{
+   margin: 10px 0;
+   background-color: red;
+   height: 3em;
+   width: 100%;
+}
+:where(.css-dev-only-do-not-override-1okl62o).ant-btn-primary:not(:disabled):not(.ant-btn-disabled):hover{
+   background-color: rgba(255, 0, 0, 0.47);
+}
