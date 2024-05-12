@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import '../assets/css/style.css'
-import SkillCard from '../components/SkillCard'
-import httpComman from '../../api/httpComman'
-import Heading from '../components/Heading'
+import '../../../style/style.css'
+import SkillCard from '../../../components/Card/SkillCard/SkillCard'
+import httpComman from '../../../../api/httpComman'
+import Heading from '../../../components/Heading/Heading'
 
 const SkillList = () => {
     const [skill, setSkill] = useState([]);

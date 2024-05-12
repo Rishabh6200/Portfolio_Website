@@ -1,6 +1,6 @@
 import React from 'react'
-import '../assets/css/Topnav.css'
-import titleImg from '../assets/images/dashboard.png'
+import './TopNav.css'
+import titleImg from '../../assets/images/dashboard.png'
 
 const Topnav = () => {
   return (

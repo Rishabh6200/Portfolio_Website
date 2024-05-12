@@ -1,6 +1,6 @@
 import React from 'react'
-import InputBox from './InputBox'
-import Buttton from './Buttton';
+import InputBox from '../../InputBox'
+import Buttton from '../../../components/Button/Buttton';
 
 const AddEdu = () => {
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import Heading from '../components/Heading'
-import EductionCard from '../components/EducationCard'
-import httpComman from '../../api/httpComman'
+import Heading from '../../../components/Heading/Heading'
+import EductionCard from '../../../components/Card/EducationCard/EducationCard'
+import httpComman from '../../../../api/httpComman'
 
 const EducationList = () => {
    const [education, setEduction] = useState([]);

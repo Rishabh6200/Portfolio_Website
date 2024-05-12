@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import InputBox from './InputBox';
-import Buttton from './Buttton';
-import httpComman from '../../api/httpComman';
+import React, { useState } from 'react'
+import InputBox from '../../components/Input/InputBox'
+import Buttton from '../../components/Button/Buttton'
+import httpComman from '../../../api/httpComman';
 
-const Address = () => {
+const PersonalDetail = () => {
+
     const initialFormData = {
-        address: '',
-        email: '',
-        phono: '',
+        name: '',
+        detail: '',
+        prof: '',
     };
     const [formData, setFormData] = useState(initialFormData);
-
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -21,7 +21,7 @@ const Address = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await httpComman.patch('/address', formData);
+            const res = await httpComman.patch('/about', formData);
             console.log('Data successfully posted:', res.data);
             setFormData(initialFormData);
         } catch (error) {
@@ -31,31 +31,26 @@ const Address = () => {
 
     const inputData = [
         {
-            name: 'address',
+            name: 'name',
             inputValue: 'text',
-            placeholderValue: 'New Address',
-        },
+            placeholderValue: 'Name',
+        }, 
         {
-            name: 'email',
+            name: 'prof',
             inputValue: 'text',
-            placeholderValue: 'New E-mail',
+            placeholderValue: 'Profession',
         },
-        {
-            name: 'phono',
-            inputValue: 'text',
-            placeholderValue: 'New Mobile Number',
-        },
-    ];
+    ]
 
     return (
         <>
             <div className="addskill">
-                <h1 className="text-3xl text-center">Update Address</h1>
+                <h1 className='text-3xl text-center'>Update Personal Detail</h1>
                 <br />
                 <form onSubmit={handleSubmit}>
                     <div className="input">
                         {inputData.map((item, i) => (
-                            <div className="input-box" key={i}>
+                            <div className="input-box">
                                 <p>{item.name} :</p>
                                 <InputBox
                                     name={item.name}
@@ -66,12 +61,21 @@ const Address = () => {
                                 />
                             </div>
                         ))}
-                        <Buttton name="Update Address" />
+                        <div className="input-box w-full">
+                            <p>About Detail :</p>
+                            <textarea className='rounded-md p-2' cols="47" rows="5" 
+                            placeholder='About Detail'
+                            name='detail'
+                            value={formData.detail}
+                            onChange={handleChange}
+                            ></textarea>
+                        </div>
+                        <Buttton name='Update Detail' />
                     </div>
                 </form>
             </div>
         </>
-    );
-};
+    )
+}
 
-export default Address;
+export default PersonalDetail

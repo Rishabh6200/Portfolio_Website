@@ -6,13 +6,13 @@ import Resume from './page/Resume';
 import Header from './components/Header';
 import Contact from './page/Contact';
 import Project from './page/Project';
-import AdminLogin from './admin/pages/AdminLogin';
+import AdminLogin from './admin/Auth/Login/Login';
 import DashboardLayout from './admin/layout/DashboadLayout';
-import Home from './admin/pages/Home';
-import Address from './admin/pages/Address';
-import PersonalDetail from './admin/pages/PersonalDetail';
-import SkillList from './admin/pages/SkillList';
-import EducationList from './admin/pages/EducationList';
+import Home from './admin/pages/Home/Home';
+import Address from './admin/pages/Address/EditAddress/Address';
+import PersonalDetail from './admin/pages/Personal/PersonalDetail';
+import EducationList from './admin/pages/Education/EucationList/EducationList';
+import SkillList from './admin/pages/Skill/SkillList/SkillList';
 
 const App = () => {
   return (

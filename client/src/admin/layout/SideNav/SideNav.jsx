@@ -1,5 +1,5 @@
 import React from 'react'
-import '../assets/css/Sidenav.css'
+import './SideNav.css'
 import { Link, Outlet } from 'react-router-dom';
 import { AiFillHome, AiFillSetting } from "react-icons/ai";
 import { RiGraduationCapFill } from "react-icons/ri";

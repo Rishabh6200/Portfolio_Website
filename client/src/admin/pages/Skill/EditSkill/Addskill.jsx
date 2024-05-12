@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import '../assets/css/Addskill.css'
-import InputBox from './InputBox'
-import Buttton from './Buttton'
-import httpComman from '../../api/httpComman';
+import './Addskill.css'
+import InputBox from '../../InputBox'
+import Buttton from '../../Buttton'
+import httpComman from '../../../../api/httpComman';
 
 const Addskill = () => {
   const initialFormData = {
