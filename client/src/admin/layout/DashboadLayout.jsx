@@ -1,6 +1,6 @@
 import React from 'react'
-import SideNav from '../components/SideNav'
-import Topnav from '../components/Topnav'
+import Topnav from './TopNav/Topnav'
+import SideNav from './SideNav/SideNav'
 
 const DashboadLayout = () => {
     return (

@@ -1,0 +1,11 @@
+.admin-container {
+    position: absolute;
+    top: 56px;
+    left: 14.3em;
+    width: 81.4em;
+    height: 92vh;
+    overflow: scroll;
+}
+.admin-container::-webkit-scrollbar{
+    display: none;
+}

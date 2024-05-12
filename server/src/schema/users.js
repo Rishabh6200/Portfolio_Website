@@ -34,7 +34,7 @@ const addressSchema = new mongoose.Schema({
 export const AddressModel = mongoose.model('address', addressSchema);
 
 const resumeSchema = new mongoose.Schema({
-    degree: {
+    name: {
         type: String,
         require: true,
     },
@@ -45,20 +45,16 @@ const resumeSchema = new mongoose.Schema({
     college: {
         type: String,
         require: true,
-    },
-    hobbie: {
-        type: String,
-        require: true,
     }
 })
 export const ResumeModel = mongoose.model('resume', resumeSchema)
 
 const skillScheme = new mongoose.Schema({
-    percentage: {
-        type: Number,
+    name: {
+        type: String,
         require: true
     },
-    color: {
+    skill_img: {
         type: String,
         require: true
     },

@@ -6,15 +6,15 @@ import Resume from './page/Resume';
 import Header from './components/Header';
 import Contact from './page/Contact';
 import Project from './page/Project';
-import AdminLogin from './admin/components/AdminLogin';
+import AdminLogin from './admin/Auth/Login/Login';
 import DashboardLayout from './admin/layout/DashboadLayout';
-import Home from './admin/pages/Home';
-import Address from './admin/pages/Address';
-import PersonalDetail from './admin/pages/PersonalDetail';
-import AddEdu from './admin/pages/AddEdu';
-import Addskill from './admin/pages/Addskill';
+import Home from './admin/pages/Home/Home';
+import Address from './admin/pages/Address/EditAddress/Address';
+import PersonalDetail from './admin/pages/Personal/PersonalDetail';
+import EducationList from './admin/pages/Education/EucationList/EducationList';
+import SkillList from './admin/pages/Skill/SkillList/SkillList';
 
-function App() {
+const App = () => {
   return (
     <>
       <Router>
@@ -29,8 +29,8 @@ function App() {
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin" element={<DashboardLayout />}>
             <Route index element={<Home />} />
-            <Route path="addskill" element={<Addskill />} />
-            <Route path="education" element={<AddEdu />} />
+            <Route path="skill" element={<SkillList />} />
+            <Route path="education" element={<EducationList />} />
             <Route path="detail" element={<PersonalDetail />} />
             <Route path="address" element={<Address />} />
           </Route>
