@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import './Login.css'
 import { Form } from 'antd'
 import InputText from '../../components/Input/InputText/InputText'
@@ -11,6 +11,7 @@ import { loginUser } from '../feature/authSlice'
 const Login = () => {
    const navigate = useNavigate();
    const dispatch = useDispatch();
+   const [loading, setLoading] = useState(false);
    const { user } = useSelector((state) => state.auth);
 
    const field = [
@@ -29,20 +30,21 @@ const Login = () => {
    ]
 
    const onFinish = async (value) => {
+      setLoading(true)
       const res = await httpComman.post('/login', value)
       const apiData = res.data;
       if (apiData.status === false) {
          console.log(apiData.message)
+         setLoading(false)
       } else {
          dispatch(loginUser(apiData))
+         setLoading(false)
       }
    }
 
    useEffect(() => {
       if (user) {
-         return (
-            navigate('/admin')
-         )
+         navigate('/admin')
       }
    })
 
@@ -65,7 +67,7 @@ const Login = () => {
                   <InputText {...item} key={i} />
                ))}
 
-               <FormButton title="Login" />
+               <FormButton title="Login" loading={loading} />
             </Form>
          </div >
       </>
