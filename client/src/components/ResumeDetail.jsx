@@ -11,7 +11,7 @@ const ResumeDetail = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await httpcomman.get('/resume');
+        const res = await httpcomman.get('/education');
         const apiData = res.data;
         setData(apiData);
       } catch (error) {
