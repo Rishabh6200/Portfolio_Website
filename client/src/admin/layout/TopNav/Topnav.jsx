@@ -3,6 +3,7 @@ import './TopNav.css'
 import titleImg from '../../assets/images/dashboard.png'
 import { useDispatch } from 'react-redux'
 import { logOutUser } from '../../Auth/feature/authSlice'
+import { IoMdLogOut } from "react-icons/io";
 
 const Topnav = () => {
   const dispatch = useDispatch();
@@ -17,9 +18,9 @@ const Topnav = () => {
         </div>
         <div className="">
           <span onClick={() => dispatch(logOutUser())}
-            className='text-white bg-green-600 p-2 mr-10 mt-1 rounded-lg inline-flex items-center gap-2 cursor-pointer'
+            className='text-white bg-red-600 p-2 mr-10 mt-1 rounded-lg inline-flex items-center gap-2 cursor-pointer'
           >
-            Logout
+            <IoMdLogOut size={25} className='hover:scale-125 duration-500' />
           </span>
         </div>
       </div>

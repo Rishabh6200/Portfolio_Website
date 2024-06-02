@@ -6,15 +6,16 @@ const Home = () => {
     {
       name: 'Add Skill',
     },
-    {
-      name: 'Add Eduction',
-    },
+    // {
+    //   name: 'Add Eduction',
+    // },
   ]
 
   return (
     <>
-      <div className="cont">
-        <h1 className='text-center text-4xl mt-5 text-blue-700 underline'>Welcome To DashBoard</h1>
+      <div className="admin-container">
+        sddfl
+        {/* <h1 className='text-center text-4xl mt-5 text-blue-700 underline'>Welcome To DashBoard</h1>
         <div className="for-grid">
           {data.map((item, i) => (
             <div className={`col-one ${item.classA}`} key={i}>
@@ -24,7 +25,7 @@ const Home = () => {
               </div>
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
     </>
   )

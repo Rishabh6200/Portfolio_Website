@@ -1,7 +1,7 @@
 import { Form, Input } from 'antd'
 import React from 'react'
 import './InputText.css'
-const InputText = ({ label, name, type, message }) => {
+const InputText = ({ label, name, type, message, style }) => {
    return (
       <>
          <Form.Item
@@ -14,7 +14,7 @@ const InputText = ({ label, name, type, message }) => {
                },
             ]}
          >
-            <Input type={type} placeholder={label} />
+            <Input type={type} className={style} placeholder={label} />
          </Form.Item >
       </>
    )

@@ -1,78 +1,88 @@
-import React, { useState } from 'react'
-import InputBox from '../../components/Input/InputBox'
-import Buttton from '../../components/Button/Buttton'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import httpComman from '../../../api/httpComman';
+import Heading from '../../components/Heading/Heading';
+import { Form, Input } from 'antd';
+import FormButton from '../../components/Button/FormButton/FormButton';
+import InputText from '../../components/Input/InputText/InputText';
+import { setinfo} from '../../slices/mainSlice'
 
 const PersonalDetail = () => {
+    const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
+    const { info } = useSelector((s) => s.all)
+    
+    const value = {
+            name: info.name,
+            profession: info.prof,
+            about: info.detail,
+    }
 
-    const initialFormData = {
-        name: '',
-        detail: '',
-        prof: '',
-    };
-    const [formData, setFormData] = useState(initialFormData);
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const res = await httpComman.patch('/about', formData);
-            console.log('Data successfully posted:', res.data);
-            setFormData(initialFormData);
-        } catch (error) {
-            console.log('Error:', error);
-        }
-    };
-
-    const inputData = [
+    const field = [
         {
-            name: 'name',
-            inputValue: 'text',
-            placeholderValue: 'Name',
-        }, 
+            name: "name",
+            label: "Name",
+            type: "text",
+            message: "Please, Enter your name !"
+        },
         {
-            name: 'prof',
-            inputValue: 'text',
-            placeholderValue: 'Profession',
+            name: "profession",
+            label: "Profession",
+            type: "text",
+            message: "Please, Enter your Profession !"
         },
     ]
 
+    const onFinish = async () => {
+        setLoading(true)
+
+        setLoading(false)
+    }
+    useEffect(() => {
+        const fetchinfo = async () => {
+            const res = await httpComman.get('/about')
+            const apiData = res.data;
+            if (apiData && apiData.length > 0) {
+                const fetchedData = apiData[0];
+                dispatch(setinfo(fetchedData))
+            }
+        }
+        fetchinfo();
+    }, [])
+
+
     return (
         <>
-            <div className="addskill">
-                <h1 className='text-3xl text-center'>Update Personal Detail</h1>
-                <br />
-                <form onSubmit={handleSubmit}>
-                    <div className="input">
-                        {inputData.map((item, i) => (
-                            <div className="input-box">
-                                <p>{item.name} :</p>
-                                <InputBox
-                                    name={item.name}
-                                    type={item.inputValue}
-                                    placeholder={item.placeholderValue}
-                                    value={formData[item.name]}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        ))}
-                        <div className="input-box w-full">
-                            <p>About Detail :</p>
-                            <textarea className='rounded-md p-2' cols="47" rows="5" 
-                            placeholder='About Detail'
-                            name='detail'
-                            value={formData.detail}
-                            onChange={handleChange}
-                            ></textarea>
+            <div className="admin-container">
+                <Heading heading="My Address" />
+                <div className="w-full">
+                    <Form
+                        onFinish={onFinish}
+                        layout="vertical"
+                        autoComplete="off"
+                        className='p-5 py-10 mx-auto'
+                        initialValues={value}
+                    >
+                        <div className="grid grid-cols-2 gap-4">
+                            {field.map((item, i) => (
+                                <InputText {...item} key={i} style="focus:border-2 font-semibold text-lg focus:border-gray-800 placeholder:text-gray-600" />
+                            ))}
                         </div>
-                        <Buttton name='Update Detail' />
-                    </div>
-                </form>
+                        <Form.Item
+                            label="About"
+                            name="about"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please, Enter your Address !",
+                                },
+                            ]}
+                        >
+                            <Input.TextArea className='focus:border-2 font-semibold text-lg focus:border-gray-800 placeholder:text-gray-600' placeholder="About" rows={4} />
+                        </Form.Item >
+                        <FormButton title="Update" loading={loading} />
+                    </Form>
+                </div>
             </div>
         </>
     )

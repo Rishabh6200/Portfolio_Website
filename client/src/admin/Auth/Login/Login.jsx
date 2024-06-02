@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import './Login.css'
+import style from './Login.module.css'
 import { Form } from 'antd'
 import InputText from '../../components/Input/InputText/InputText'
 import FormButton from '../../components/Button/FormButton/FormButton'
@@ -59,7 +59,7 @@ const Login = () => {
                onFinish={onFinish}
                layout="vertical"
                autoComplete="off"
-               className='p-5 py-10 text-white '
+               className={`p-5 py-10 ${style.form}`}
             >
                <h3 className='pb-5 border-b-4'>Admin Login</h3>
 

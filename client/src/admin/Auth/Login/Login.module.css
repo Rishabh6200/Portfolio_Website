@@ -29,7 +29,7 @@
    bottom: -80px;
 }
 
-Form {
+.form {
    width: 500px;
    background-color: rgba(0, 0, 0, 0.438);
    position: absolute;
@@ -42,15 +42,15 @@ Form {
    box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
 }
 
-Form * {
+.form * {
    font-family: 'Poppins', sans-serif;
-   color: #ffffff;
+   /* color: #ffffff; */
    letter-spacing: 0.5px;
    outline: none;
    border: none;
 }
 
-Form h3 {
+.form h3 {
    font-size: 32px;
    font-weight: 500;
    line-height: 42px;
@@ -59,7 +59,7 @@ Form h3 {
 
 
 @media (max-width: 450px) {
-   Form {
+   .form {
       width: 300px;
    }
 }

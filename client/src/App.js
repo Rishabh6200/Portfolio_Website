@@ -9,11 +9,11 @@ import Project from './page/Project';
 import AdminLogin from './admin/Auth/Login/Login';
 import DashboardLayout from './admin/layout/DashboadLayout';
 import Home from './admin/pages/Home/Home';
-import Address from './admin/pages/Address/EditAddress/Address';
 import PersonalDetail from './admin/pages/Personal/PersonalDetail';
 import EducationList from './admin/pages/Education/EucationList/EducationList';
 import SkillList from './admin/pages/Skill/SkillList/SkillList';
 import { useSelector } from 'react-redux'
+import Address from './admin/pages/Address/AddressList/Address';
 
 const App = () => {
   const { user } = useSelector((state) => state.auth);
