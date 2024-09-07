@@ -12,9 +12,9 @@ const Address = () => {
    const { address } = useSelector((s) => s.all)
    
    const value = {
-      email: address.email,
-      phone: address.phono,
-      address: address.address,
+      email: address?.email,
+      phone: address?.phono,
+      address: address?.address,
    }
 
    const field = [

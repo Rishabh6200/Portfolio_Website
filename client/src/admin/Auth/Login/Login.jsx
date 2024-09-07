@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import style from './Login.module.css'
-import { Form } from 'antd'
-import InputText from '../../components/Input/InputText/InputText'
+import { Form, Input } from 'antd'
 import FormButton from '../../components/Button/FormButton/FormButton'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -14,20 +12,6 @@ const Login = () => {
    const [loading, setLoading] = useState(false);
    const { user } = useSelector((state) => state.auth);
 
-   const field = [
-      {
-         name: "userName",
-         label: "UserName",
-         type: "text",
-         message: "Please, Enter your username!"
-      },
-      {
-         name: "password",
-         label: "Password",
-         type: "password",
-         message: "Please, Enter your password!"
-      },
-   ]
 
    const onFinish = async (value) => {
       setLoading(true)
@@ -50,26 +34,44 @@ const Login = () => {
 
    return (
       <>
-         <div className="w-full h-screen bg-white  ">
-            <div className="background">
-               <div className="shape"></div>
-               <div className="shape"></div>
+         <section className="w-full h-screen bg-black flex justify-center">
+            <div className="w-3/12 bg-[#ffffff26] mx-auto mt-32 h-[55%] rounded-2xl shadow shadow-white">
+               <div className="mx-7 py-10">
+                  <h3 className='pb-5 text-3xl text-center font-mono font-bold text-gray-100'>Admin Login</h3>
+                  <Form
+                     onFinish={onFinish}
+                     layout="vertical"
+                     autoComplete="off"
+                     className="w-full mt-8"
+                  >
+                     <Form.Item
+                        name="userName"
+                        rules={[
+                           {
+                              required: true,
+                              message: "User Name is Required !"
+                           }
+                        ]}
+                     >
+                        <Input placeholder='User Name' className='h-12 w-full bg-white' />
+                     </Form.Item>
+                     <Form.Item
+                        name="password"
+                        rules={[
+                           {
+                              required: true,
+                              message: "Password is Required !"
+                           }
+                        ]}
+                     >
+                        <Input.Password placeholder='************' className='h-12 w-full' />
+                     </Form.Item>
+
+                     <FormButton title="Login" loading={loading} />
+                  </Form>
+               </div>
             </div>
-            <Form
-               onFinish={onFinish}
-               layout="vertical"
-               autoComplete="off"
-               className={`p-5 py-10 ${style.form}`}
-            >
-               <h3 className='pb-5 border-b-4'>Admin Login</h3>
-
-               {field.map((item, i) => (
-                  <InputText {...item} key={i} />
-               ))}
-
-               <FormButton title="Login" loading={loading} />
-            </Form>
-         </div >
+         </section >
       </>
    )
 }

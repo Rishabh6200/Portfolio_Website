@@ -13,9 +13,9 @@ const PersonalDetail = () => {
     const { info } = useSelector((s) => s.all)
     
     const value = {
-            name: info.name,
-            profession: info.prof,
-            about: info.detail,
+            name: info?.name,
+            profession: info?.prof,
+            about: info?.detail,
     }
 
     const field = [

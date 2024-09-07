@@ -14,6 +14,7 @@ import EducationList from './admin/pages/Education/EucationList/EducationList';
 import SkillList from './admin/pages/Skill/SkillList/SkillList';
 import { useSelector } from 'react-redux'
 import Address from './admin/pages/Address/AddressList/Address';
+import UpdateSkill from './admin/pages/Skill/EditSkill/UpdateSkill';
 
 const App = () => {
   const { user } = useSelector((state) => state.auth);
@@ -33,9 +34,7 @@ const App = () => {
             <Route path="/project" element={<Project />} />
             <Route path="/contact" element={<Contact />} />
           </Route>
-
           <Route path="/adminlogin" element={<AdminLogin />} />
-
           <Route
             path="/admin"
             element={
@@ -45,6 +44,7 @@ const App = () => {
           >
             <Route index element={<Home />} />
             <Route path="skill" element={<SkillList />} />
+            <Route path="skill/edit" element={<UpdateSkill />} />
             <Route path="education" element={<EducationList />} />
             <Route path="detail" element={<PersonalDetail />} />
             <Route path="address" element={<Address />} />

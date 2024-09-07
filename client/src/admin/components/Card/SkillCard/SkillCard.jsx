@@ -1,9 +1,11 @@
 import React from 'react'
 import { TbEdit } from "react-icons/tb";
 import { CiSquareRemove } from "react-icons/ci";
+import { useNavigate } from 'react-router-dom';
 
 
 const SkillCard = ({ name, img }) => {
+    const navigate = useNavigate();
     return (
         <>
             <div className="block w-[18rem] rounded-lg bg-white text-surface shadow-xl border filter grayscale hover:grayscale-0 cursor-pointer hover:scale-105 transition">
@@ -18,7 +20,10 @@ const SkillCard = ({ name, img }) => {
                         {name}
                     </p>
                     <div className="flex justify-between text-xl mt-2 ">
-                        <button className='hover:scale-110'>
+                        <button
+                            className='hover:scale-110'
+                            onClick={() => navigate(`edit`)}
+                        >
                             <TbEdit size={30} />
                         </button>
                         <button className='hover:scale-110'>

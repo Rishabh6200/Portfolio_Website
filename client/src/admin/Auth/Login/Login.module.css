@@ -1,4 +1,4 @@
-.background {
+/* .background {
    width: 430px;
    height: 520px;
    position: absolute;
@@ -44,7 +44,7 @@
 
 .form * {
    font-family: 'Poppins', sans-serif;
-   /* color: #ffffff; */
+   color: #ffffff;
    letter-spacing: 0.5px;
    outline: none;
    border: none;
@@ -62,4 +62,4 @@
    .form {
       width: 300px;
    }
-}
+} */
