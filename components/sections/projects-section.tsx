@@ -11,14 +11,20 @@ import {
 import { GithubIcon } from "@/components/custom-ui/icons"
 import { SpotlightCard } from "@/components/custom-ui/spotlight-card"
 import { Badge } from "@/components/ui/badge"
-import { portfolioData } from "@/data/portfolio-data"
 
 type CategoryFilter = "All" | "Full-Stack" | "Backend APIs" | "Web Apps"
 
-export function ProjectsSection() {
+interface ProjectsSectionProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialProjects?: any[]
+}
+
+export function ProjectsSection({ initialProjects = [] }: ProjectsSectionProps = {}) {
   const [activeFilter, setActiveFilter] = useState<CategoryFilter>("All")
 
-  const filteredProjects = portfolioData.projects.filter(
+  const projectList = initialProjects
+
+  const filteredProjects = projectList.filter(
     (p) => activeFilter === "All" || p.category === activeFilter
   )
 
@@ -75,9 +81,23 @@ export function ProjectsSection() {
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 xl:gap-8">
-          <AnimatePresence mode="popLayout">
-            {filteredProjects.map((project) => (
+        {projectList.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-black/10 dark:border-white/10 p-12 text-center bg-black/2 dark:bg-white/2">
+            <FolderGit2 className="h-8 w-8 text-muted-foreground mx-auto mb-3 opacity-60" />
+            <h3 className="text-base font-semibold text-foreground">No published projects yet</h3>
+            <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
+              Projects and engineering case studies will appear here once published from the admin dashboard.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 xl:gap-8">
+            <AnimatePresence mode="popLayout">
+              {filteredProjects.length === 0 ? (
+                <div className="col-span-full py-12 text-center text-sm text-muted-foreground">
+                  No projects found matching the selected filter.
+                </div>
+              ) : (
+                filteredProjects.map((project) => (
               <motion.div
                 key={project.slug}
                 layout
@@ -92,6 +112,17 @@ export function ProjectsSection() {
                   className="group relative h-full flex flex-col justify-between p-6 sm:p-7 transition-all hover:border-black/20 dark:hover:border-white/20"
                 >
                   <div>
+                    {project.coverImage && (
+                      <div className="mb-4 aspect-video w-full overflow-hidden rounded-xl border border-black/8 dark:border-white/8 bg-neutral-100 dark:bg-[#0e131f]">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={project.coverImage}
+                          alt={project.title}
+                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                    )}
+
                     <div className="mb-3">
                       <span className="font-mono text-[11px] uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-semibold">
                         {project.category}
@@ -113,7 +144,7 @@ export function ProjectsSection() {
                     </p>
 
                     <div className="mt-5 flex flex-wrap gap-1.5">
-                      {project.technologies.map((tech) => (
+                      {project.technologies.map((tech: string) => (
                         <Badge
                           key={tech}
                           variant="outline"
@@ -161,10 +192,12 @@ export function ProjectsSection() {
                   </div>
                 </SpotlightCard>
               </motion.div>
-            ))}
+            ))
+          )}
           </AnimatePresence>
         </div>
-      </div>
-    </section>
+      )}
+    </div>
+  </section>
   )
 }
