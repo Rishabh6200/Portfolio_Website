@@ -1,15 +1,47 @@
-import { Geist, Geist_Mono, Inter } from "next/font/google"
+import type { Metadata } from "next"
+import { Geist_Mono, Inter } from "next/font/google"
 
 import "./globals.css"
+import { ProgressProvider } from "@/components/progress-provider"
 import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/sonner"
+import { cn } from "@/lib/utils"
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'})
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+})
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
+  display: "swap",
 })
+
+export const metadata: Metadata = {
+  title: "Alex Rivera — Senior Full-Stack & Systems Engineer",
+  description:
+    "Portfolio of Alex Rivera. Specializing in high-throughput distributed architectures, resilient cloud backends, and pixel-precise interactive web experiences.",
+  keywords: [
+    "Full-Stack Engineer",
+    "Systems Architect",
+    "Next.js",
+    "React 19",
+    "TypeScript",
+    "Go",
+    "Distributed Systems",
+    "Tailwind CSS",
+  ],
+  authors: [{ name: "Alex Rivera" }],
+  openGraph: {
+    title: "Alex Rivera — Senior Full-Stack & Systems Engineer",
+    description:
+      "Architecting high-throughput distributed systems & polished interactive web experiences.",
+    type: "website",
+    locale: "en_US",
+  },
+}
 
 export default function RootLayout({
   children,
@@ -20,10 +52,14 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", inter.variable)}
+      data-scroll-behavior="smooth"
+      className={cn("antialiased", fontMono.variable, inter.variable)}
     >
-      <body>
-        <ThemeProvider>{children}</ThemeProvider>
+      <body className="min-h-screen bg-background font-sans text-foreground selection:bg-indigo-500/20 selection:text-indigo-300">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <ProgressProvider>{children}</ProgressProvider>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   )
