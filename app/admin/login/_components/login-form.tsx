@@ -8,7 +8,6 @@ import {
   ShieldCheck,
   Loader2,
   ArrowRight,
-  KeyRound,
   ArrowLeft,
   Lock,
 } from "lucide-react"
@@ -116,7 +115,7 @@ export function LoginForm() {
           <p className="text-xs sm:text-sm text-muted-foreground">
             {isLockedOut
               ? "Security lockout active due to repeated failed attempts"
-              : "Enter the 6-digit code from your Authenticator app"}
+              : "Enter the 6-digit code"}
           </p>
         </div>
 
@@ -188,14 +187,6 @@ export function LoginForm() {
               </>
             )}
           </Button>
-        </div>
-
-        {/* Security Info Footnote */}
-        <div className="pt-2 text-center border-t border-border/50">
-          <p className="text-[11px] text-muted-foreground flex items-center justify-center gap-1.5">
-            <KeyRound className="h-3 w-3" />
-            <span>RFC 6238 Time-based One-Time Password (TOTP)</span>
-          </p>
         </div>
       </motion.div>
     </div>
