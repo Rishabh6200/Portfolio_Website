@@ -3,10 +3,15 @@
 import { revalidatePath } from "next/cache"
 import { projectService, type ProjectInput } from "@/services"
 import { uploadToImageKit, isImageKitConfigured } from "@/lib/imagekit"
+import { isAdminAuthenticated } from "@/lib/auth/session"
 import { projectSchema, type ProjectFormValues } from "./schema"
 
 export async function createProjectAction(data: ProjectInput) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
     const parsed = projectSchema.safeParse(data)
     if (!parsed.success) {
       return {
@@ -29,6 +34,10 @@ export async function createProjectAction(data: ProjectInput) {
 
 export async function updateProjectAction(id: string, data: ProjectInput) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
     const parsed = projectSchema.safeParse(data)
     if (!parsed.success) {
       return {
@@ -54,6 +63,10 @@ export async function updateProjectAction(id: string, data: ProjectInput) {
 
 export async function deleteProjectAction(id: string) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
     await projectService.delete(id)
 
     revalidatePath("/admin")
@@ -68,6 +81,10 @@ export async function deleteProjectAction(id: string) {
 
 export async function toggleProjectStatusAction(id: string, _currentStatus?: "published" | "draft") {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
     const updated = await projectService.toggleStatus(id)
 
     revalidatePath("/admin")
@@ -82,6 +99,10 @@ export async function toggleProjectStatusAction(id: string, _currentStatus?: "pu
 
 export async function reorderProjectsAction(items: { id: string; order: number }[]) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
     await projectService.reorder(items)
     revalidatePath("/admin")
     revalidatePath("/")
@@ -97,6 +118,10 @@ export async function reorderProjectsAction(items: { id: string; order: number }
 
 export async function uploadProjectMediaAction(formData: FormData) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
     if (!isImageKitConfigured()) {
       return {
         success: false,

@@ -2,10 +2,15 @@
 
 import { revalidatePath } from "next/cache"
 import { skillService, type SkillInput } from "@/services"
+import { isAdminAuthenticated } from "@/lib/auth/session"
 import { skillSchema } from "./schema"
 
 export async function createSkillAction(data: SkillInput) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
     const parsed = skillSchema.safeParse(data)
     if (!parsed.success) {
       return {
@@ -31,6 +36,10 @@ export async function createSkillAction(data: SkillInput) {
 
 export async function updateSkillAction(id: string, data: SkillInput) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
     const parsed = skillSchema.safeParse(data)
     if (!parsed.success) {
       return {
@@ -56,6 +65,10 @@ export async function updateSkillAction(id: string, data: SkillInput) {
 
 export async function deleteSkillAction(id: string) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
     await skillService.delete(id)
 
     revalidatePath("/admin", "layout")
@@ -87,6 +100,10 @@ export async function getSkillsAction(filterCategoryId?: string) {
 
 export async function reorderSkillsAction(items: { id: string; order: number }[]) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
     await skillService.reorder(items)
     revalidatePath("/admin/skills")
     revalidatePath("/")
@@ -105,6 +122,10 @@ export async function updateSkillLevelAction(
   level: "Proficient" | "Advanced" | "Expert"
 ) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
     if (!["Proficient", "Advanced", "Expert"].includes(level)) {
       return {
         success: false,

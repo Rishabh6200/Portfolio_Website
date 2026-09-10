@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
@@ -15,9 +15,11 @@ import {
   Layers,
   Sparkles,
   Briefcase,
+  LogOut,
 } from "lucide-react"
-import { buttonVariants } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { logoutAdminAction } from "../login/actions"
 
 interface AdminShellProps {
   children: React.ReactNode
@@ -26,6 +28,18 @@ interface AdminShellProps {
 export function AdminShell({ children }: AdminShellProps) {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isLoggingOut, startLogout] = useTransition()
+
+  // If on login page, render clean standalone layout without admin shell
+  if (pathname === "/admin/login") {
+    return <main className="min-h-screen w-full bg-background text-foreground">{children}</main>
+  }
+
+  const handleLogout = () => {
+    startLogout(async () => {
+      await logoutAdminAction()
+    })
+  }
 
   const navItems = [
     {
@@ -161,7 +175,7 @@ export function AdminShell({ children }: AdminShellProps) {
         </div>
 
         {/* Sidebar Footer */}
-        <div className="p-3 border-t border-border shrink-0">
+        <div className="p-3 border-t border-border shrink-0 space-y-2">
           <div className="flex items-center gap-2.5 p-2 rounded-lg bg-muted/40 text-xs">
             <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
             <div className="min-w-0 flex-1">
@@ -170,6 +184,17 @@ export function AdminShell({ children }: AdminShellProps) {
             </div>
             <Database className="h-3.5 w-3.5 text-muted-foreground" />
           </div>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="w-full justify-start gap-2 text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            <span>{isLoggingOut ? "Logging out..." : "Log Out"}</span>
+          </Button>
         </div>
       </aside>
 
@@ -294,6 +319,17 @@ export function AdminShell({ children }: AdminShellProps) {
               <ExternalLink className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">View Site</span>
             </Link>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="gap-1.5 text-muted-foreground hover:text-destructive hover:border-destructive/30 hover:bg-destructive/10"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{isLoggingOut ? "..." : "Logout"}</span>
+            </Button>
           </div>
         </header>
 

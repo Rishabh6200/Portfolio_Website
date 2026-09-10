@@ -123,8 +123,10 @@
     box-sizing: border-box;
   }
   html {
-    scroll-behavior: smooth;
     @apply font-sans;
+  }
+  html[data-scroll-behavior="smooth"] {
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-background text-foreground antialiased;

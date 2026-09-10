@@ -2,10 +2,15 @@
 
 import { revalidatePath } from "next/cache"
 import { experienceService, type ExperienceInput } from "@/services"
+import { isAdminAuthenticated } from "@/lib/auth/session"
 import { experienceSchema } from "./schema"
 
 export async function createExperienceAction(data: ExperienceInput) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
     const parsed = experienceSchema.safeParse(data)
     if (!parsed.success) {
       return {
@@ -29,6 +34,10 @@ export async function createExperienceAction(data: ExperienceInput) {
 
 export async function updateExperienceAction(id: string, data: ExperienceInput) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
     const parsed = experienceSchema.safeParse(data)
     if (!parsed.success) {
       return {
@@ -52,6 +61,10 @@ export async function updateExperienceAction(id: string, data: ExperienceInput) 
 
 export async function deleteExperienceAction(id: string) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
     await experienceService.delete(id)
 
     revalidatePath("/admin/experience")
@@ -67,6 +80,10 @@ export async function deleteExperienceAction(id: string) {
 
 export async function reorderExperiencesAction(items: { id: string; order: number }[]) {
   try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
     await experienceService.reorder(items)
 
     revalidatePath("/admin/experience")
