@@ -168,6 +168,20 @@ export class ProjectService {
 
     return JSON.parse(JSON.stringify(project))
   }
+
+  async reorder(items: { id: string; order: number }[]) {
+    await dbConnect()
+    const bulkOps = items.map((item) => ({
+      updateOne: {
+        filter: { _id: item.id },
+        update: { $set: { order: item.order } },
+      },
+    }))
+    if (bulkOps.length > 0) {
+      await Project.bulkWrite(bulkOps)
+    }
+    return { success: true }
+  }
 }
 
 export const projectService = new ProjectService()

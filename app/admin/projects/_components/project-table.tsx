@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useEffect, useTransition } from "react"
 import Link from "next/link"
 import {
   Edit3,
@@ -11,6 +11,22 @@ import {
   FolderGit2,
   Plus,
 } from "lucide-react"
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import { toast } from "sonner"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -33,7 +49,9 @@ import {
 import {
   deleteProjectAction,
   toggleProjectStatusAction,
+  reorderProjectsAction,
 } from "../actions"
+import { DragHandle, SortableRow } from "@/components/ui/sortable-row"
 
 interface SerializedProject {
   _id: string
@@ -56,12 +74,55 @@ interface ProjectTableProps {
 
 export function ProjectTable({ projects: initialProjects }: ProjectTableProps) {
   const [projects, setProjects] = useState<SerializedProject[]>(initialProjects)
-  const [isPending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
   const [togglingId, setTogglingId] = useState<string | null>(null)
 
   // Delete Dialog state
   const [projectToDelete, setProjectToDelete] = useState<SerializedProject | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    setProjects(initialProjects)
+  }, [initialProjects])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 4,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIndex = projects.findIndex((p) => p._id === active.id)
+    const newIndex = projects.findIndex((p) => p._id === over.id)
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const reordered = arrayMove(projects, oldIndex, newIndex)
+      setProjects(reordered)
+
+      const payload = reordered.map((item, idx) => ({
+        id: item._id,
+        order: idx,
+      }))
+
+      startTransition(async () => {
+        const res = await reorderProjectsAction(payload)
+        if (res.success) {
+          toast.success("Project order updated", { duration: 1500 })
+        } else {
+          toast.error("Failed to update project order")
+          setProjects(projects) // rollback
+        }
+      })
+    }
+  }
 
   function handleToggleStatus(id: string, currentStatus: "published" | "draft") {
     setTogglingId(id)
@@ -130,150 +191,182 @@ export function ProjectTable({ projects: initialProjects }: ProjectTableProps) {
   return (
     <>
       <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="py-3 px-4">Project</TableHead>
-              <TableHead className="py-3 px-4">Category</TableHead>
-              <TableHead className="py-3 px-4">Technologies</TableHead>
-              <TableHead className="py-3 px-4">Status</TableHead>
-              <TableHead className="py-3 px-4 text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {projects.map((p) => {
-              const isToggling = togglingId === p._id
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis]}
+          onDragEnd={handleDragEnd}
+        >
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="w-10 px-2 text-center">
+                  <span className="sr-only">Drag</span>
+                </TableHead>
+                <TableHead className="py-3 px-4">Project</TableHead>
+                <TableHead className="py-3 px-4">Category</TableHead>
+                <TableHead className="py-3 px-4">Technologies</TableHead>
+                <TableHead className="py-3 px-4">Status</TableHead>
+                <TableHead className="py-3 px-4 text-center w-28">Order</TableHead>
+                <TableHead className="py-3 px-4 text-right w-28">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <SortableContext
+                items={projects.map((p) => p._id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {projects.map((p, index) => {
+                  const isToggling = togglingId === p._id
 
-              return (
-                <TableRow key={p._id}>
-                  {/* Project Info + Thumbnail */}
-                  <TableCell className="py-3 px-4">
-                    <div className="flex items-center gap-3.5">
-                      <div className="h-11 w-16 rounded-lg border border-border bg-muted shrink-0 overflow-hidden flex items-center justify-center">
-                        {p.coverImage ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={p.coverImage}
-                            alt={p.title}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <FolderGit2 className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <Link
-                            href={`/admin/projects/${p._id}`}
-                            className="text-sm font-semibold text-foreground hover:underline truncate max-w-xs sm:max-w-sm"
-                          >
-                            {p.title}
-                          </Link>
-                          {p.featured && (
-                            <Badge variant="secondary" className="gap-1 text-[11px] py-0 px-1.5 text-amber-500 bg-amber-500/10 border-amber-500/20">
-                              <Sparkles className="h-3 w-3" />
-                              <span>Featured</span>
+                  return (
+                    <SortableRow key={p._id} id={p._id}>
+                      {({ attributes, listeners }) => (
+                        <>
+                          {/* Drag Handle */}
+                          <TableCell className="w-10 px-2 text-center">
+                            <DragHandle attributes={attributes} listeners={listeners} />
+                          </TableCell>
+
+                          {/* Project Info + Thumbnail */}
+                          <TableCell className="py-3 px-4">
+                            <div className="flex items-center gap-3.5">
+                              <div className="h-11 w-16 rounded-lg border border-border bg-muted shrink-0 overflow-hidden flex items-center justify-center">
+                                {p.coverImage ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img
+                                    src={p.coverImage}
+                                    alt={p.title}
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <FolderGit2 className="h-4 w-4 text-muted-foreground" />
+                                )}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <Link
+                                    href={`/admin/projects/${p._id}`}
+                                    className="text-sm font-semibold text-foreground hover:underline truncate max-w-xs sm:max-w-sm"
+                                  >
+                                    {p.title}
+                                  </Link>
+                                  {p.featured && (
+                                    <Badge variant="secondary" className="gap-1 text-[11px] py-0 px-1.5 text-amber-500 bg-amber-500/10 border-amber-500/20">
+                                      <Sparkles className="h-3 w-3" />
+                                      <span>Featured</span>
+                                    </Badge>
+                                  )}
+                                </div>
+                                <p className="text-xs font-mono text-muted-foreground truncate max-w-xs sm:max-w-sm mt-0.5">
+                                  /projects/{p.slug}
+                                </p>
+                              </div>
+                            </div>
+                          </TableCell>
+
+                          {/* Category */}
+                          <TableCell className="py-3 px-4">
+                            <Badge variant="outline" className="text-xs font-normal">
+                              {p.category}
                             </Badge>
-                          )}
-                        </div>
-                        <p className="text-xs font-mono text-muted-foreground truncate max-w-xs sm:max-w-sm mt-0.5">
-                          /projects/{p.slug}
-                        </p>
-                      </div>
-                    </div>
-                  </TableCell>
+                          </TableCell>
 
-                  {/* Category */}
-                  <TableCell className="py-3 px-4">
-                    <Badge variant="outline" className="text-xs font-normal">
-                      {p.category}
-                    </Badge>
-                  </TableCell>
+                          {/* Tech Stack */}
+                          <TableCell className="py-3 px-4">
+                            <div className="flex flex-wrap gap-1.5 max-w-xs">
+                              {p.technologies.slice(0, 3).map((tech) => (
+                                <span
+                                  key={tech}
+                                  className="px-2 py-0.5 rounded-md bg-muted text-xs font-mono text-muted-foreground"
+                                >
+                                  {tech}
+                                </span>
+                              ))}
+                              {p.technologies.length > 3 && (
+                                <span className="text-xs font-mono text-muted-foreground self-center">
+                                  +{p.technologies.length - 3}
+                                </span>
+                              )}
+                            </div>
+                          </TableCell>
 
-                  {/* Tech Stack */}
-                  <TableCell className="py-3 px-4">
-                    <div className="flex flex-wrap gap-1.5 max-w-xs">
-                      {p.technologies.slice(0, 3).map((tech) => (
-                        <span
-                          key={tech}
-                          className="px-2 py-0.5 rounded-md bg-muted text-xs font-mono text-muted-foreground"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                      {p.technologies.length > 3 && (
-                        <span className="text-xs font-mono text-muted-foreground self-center">
-                          +{p.technologies.length - 3}
-                        </span>
+                          {/* Status Toggle */}
+                          <TableCell className="py-3 px-4">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleStatus(p._id, p.status)}
+                              disabled={isToggling}
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                                p.status === "published"
+                                  ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
+                                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                              }`}
+                            >
+                              {isToggling ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <span
+                                  className={`h-2 w-2 rounded-full ${
+                                    p.status === "published" ? "bg-emerald-500" : "bg-muted-foreground"
+                                  }`}
+                                />
+                              )}
+                              <span className="capitalize">{p.status}</span>
+                            </button>
+                          </TableCell>
+
+                          {/* Sort Order */}
+                          <TableCell className="py-3 px-4 text-center">
+                            <Badge variant="outline" className="font-mono text-xs">
+                              #{index}
+                            </Badge>
+                          </TableCell>
+
+                          {/* Actions */}
+                          <TableCell className="py-3 px-4 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              {p.status === "published" && (
+                                <a
+                                  href={`/projects/${p.slug}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Preview on site"
+                                  className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
+                                >
+                                  <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                                </a>
+                              )}
+                              <Link
+                                href={`/admin/projects/${p._id}`}
+                                title="Edit Project"
+                                className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
+                              >
+                                <Edit3 className="h-4 w-4 text-muted-foreground" />
+                              </Link>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                onClick={() => setProjectToDelete(p)}
+                                className="hover:text-destructive hover:bg-destructive/10"
+                                title="Delete Project"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </>
                       )}
-                    </div>
-                  </TableCell>
-
-                  {/* Status Toggle */}
-                  <TableCell className="py-3 px-4">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleStatus(p._id, p.status)}
-                      disabled={isToggling}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
-                        p.status === "published"
-                          ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
-                      }`}
-                    >
-                      {isToggling ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <span
-                          className={`h-2 w-2 rounded-full ${
-                            p.status === "published" ? "bg-emerald-500" : "bg-muted-foreground"
-                          }`}
-                        />
-                      )}
-                      <span className="capitalize">{p.status}</span>
-                    </button>
-                  </TableCell>
-
-                  {/* Actions */}
-                  <TableCell className="py-3 px-4 text-right">
-                    <div className="flex items-center justify-end gap-1.5">
-                      {p.status === "published" && (
-                        <a
-                          href={`/projects/${p.slug}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          title="Preview on site"
-                          className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
-                        >
-                          <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                        </a>
-                      )}
-                      <Link
-                        href={`/admin/projects/${p._id}`}
-                        title="Edit Project"
-                        className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
-                      >
-                        <Edit3 className="h-4 w-4 text-muted-foreground" />
-                      </Link>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => setProjectToDelete(p)}
-                        className="hover:text-destructive hover:bg-destructive/10"
-                        title="Delete Project"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
+                    </SortableRow>
+                  )
+                })}
+              </SortableContext>
+            </TableBody>
+          </Table>
+        </DndContext>
       </div>
 
-      {/* Delete Confirmation Modal (shadcn Dialog) */}
+      {/* Delete Confirmation Modal */}
       <Dialog
         open={Boolean(projectToDelete)}
         onOpenChange={(open) => !open && setProjectToDelete(null)}

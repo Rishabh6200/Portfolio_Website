@@ -16,3 +16,4 @@ export const skillSchema = z.object({
 })
 
 export type SkillFormValues = z.infer<typeof skillSchema>
+export type SkillFormData = SkillFormValues

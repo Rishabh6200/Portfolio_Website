@@ -2,9 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { skillService, type SkillInput } from "@/services"
-import { skillSchema, type SkillFormValues } from "./schema"
-
-export type { SkillFormValues as SkillFormData }
+import { skillSchema } from "./schema"
 
 export async function createSkillAction(data: SkillInput) {
   try {
@@ -83,6 +81,21 @@ export async function getSkillsAction(filterCategoryId?: string) {
       success: false,
       error: error instanceof Error ? error.message : "Failed to fetch skills",
       skills: [],
+    }
+  }
+}
+
+export async function reorderSkillsAction(items: { id: string; order: number }[]) {
+  try {
+    await skillService.reorder(items)
+    revalidatePath("/admin/skills")
+    revalidatePath("/")
+    return { success: true }
+  } catch (error: unknown) {
+    console.error("Error in reorderSkillsAction:", error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to reorder skills",
     }
   }
 }

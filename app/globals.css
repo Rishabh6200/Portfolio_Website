@@ -167,6 +167,31 @@
   animation: ambientPulse 8s ease-in-out infinite;
 }
 
+/* Shimmering gradient animation for name / highlights */
+@keyframes nameShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-name-shimmer {
+  background-size: 250% auto;
+  animation: nameShimmer 5s ease-in-out infinite;
+}
+
+/* Shimmer wave for skeleton loaders */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 /* Sleek custom scrollbars */
 ::-webkit-scrollbar {
   width: 7px;

@@ -33,9 +33,8 @@ import {
 import {
   createCategoryAction,
   updateCategoryAction,
-  CategoryFormData,
 } from "@/app/admin/categories/actions"
-import { categorySchema, CategoryFormValues } from "@/app/admin/categories/schema"
+import { categorySchema, CategoryFormValues, type CategoryFormData } from "@/app/admin/categories/schema"
 
 interface CategoryFormProps {
   initialData?: CategoryFormData & { _id?: string }

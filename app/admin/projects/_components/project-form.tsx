@@ -22,8 +22,8 @@ import { TechStackInput } from "./tech-stack-input"
 import {
   createProjectAction,
   updateProjectAction,
-  ProjectFormData,
 } from "../actions"
+import { type ProjectFormData } from "../schema"
 
 export interface CategoryOption {
   _id?: string

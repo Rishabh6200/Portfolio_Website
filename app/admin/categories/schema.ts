@@ -27,3 +27,4 @@ export const categorySchema = z.object({
 })
 
 export type CategoryFormValues = z.infer<typeof categorySchema>
+export type CategoryFormData = CategoryFormValues

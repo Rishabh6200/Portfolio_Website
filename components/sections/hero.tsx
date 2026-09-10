@@ -57,17 +57,56 @@ export function HeroSection() {
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
+            transition={{ duration: 0.5, delay: 0.08, ease: "easeOut" }}
             className="font-mono text-xs uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-4 flex items-center gap-2"
           >
             <Terminal className="h-3.5 w-3.5" />
             <span>{portfolioData.personal.role}</span>
           </motion.div>
 
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.14, ease: "easeOut" }}
+            className="flex items-center gap-2.5 text-xl sm:text-2xl lg:text-3xl font-medium tracking-tight text-neutral-800 dark:text-neutral-200 mb-3"
+          >
+            <span>
+              Hi, I&apos;m{" "}
+              <motion.span
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                className="inline-block font-extrabold bg-linear-to-r from-indigo-500 via-cyan-400 to-emerald-500 dark:from-indigo-400 dark:via-cyan-300 dark:to-emerald-400 bg-clip-text text-transparent animate-name-shimmer select-none cursor-default"
+              >
+                {portfolioData.personal.name}
+              </motion.span>
+            </span>
+            <motion.span
+              className="inline-block text-2xl sm:text-3xl origin-[70%_70%] select-none cursor-pointer"
+              animate={{
+                rotate: [0, 18, -10, 18, -6, 12, 0],
+              }}
+              transition={{
+                duration: 1.8,
+                repeat: Infinity,
+                repeatDelay: 1.2,
+                ease: "easeInOut",
+              }}
+              whileHover={{
+                scale: 1.25,
+                rotate: [0, 22, -14, 22, -8, 14, 0],
+                transition: { duration: 0.6, repeat: Infinity },
+              }}
+              whileTap={{ scale: 0.9 }}
+              title="Wave back!"
+            >
+              👋
+            </motion.span>
+          </motion.div>
+
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="text-4xl sm:text-6xl md:text-7xl xl:text-7xl 2xl:text-[5rem] font-bold tracking-tight text-neutral-900 dark:text-white leading-[1.08]"
           >
             Architecting{" "}

@@ -75,8 +75,8 @@ export interface PortfolioData {
 
 export const portfolioData: PortfolioData = {
   personal: {
-    name: "Alex Rivera",
-    role: "Full-Stack Engineer (NestJS • React • Laravel)",
+    name: "Rishabh",
+    role: "Full-Stack Engineer (JavaScript)",
     tagline: "I build robust, high-throughput backend APIs in NestJS & Laravel, paired with polished React web applications.",
     bio: "I’m a full-stack engineer specializing in scalable backend architectures and dynamic web applications. Over the last 6+ years, I’ve architected modular microservice APIs with NestJS, production web platforms with Laravel, and interactive frontend dashboards using React and Next.js.",
     status: "Open for Work",

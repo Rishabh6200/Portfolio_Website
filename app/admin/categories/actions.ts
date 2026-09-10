@@ -2,9 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { categoryService, type CategoryInput } from "@/services"
-import { categorySchema, type CategoryFormValues } from "./schema"
-
-export type { CategoryFormValues as CategoryFormData }
+import { categorySchema } from "./schema"
 
 export async function createCategoryAction(data: CategoryInput) {
   try {
@@ -50,11 +48,12 @@ export async function updateCategoryAction(id: string, data: CategoryInput) {
   }
 }
 
-export async function deleteCategoryAction(id: string) {
+export async function deleteCategoryAction(id: string, cascade = false) {
   try {
-    await categoryService.delete(id)
+    await categoryService.delete(id, { cascade })
 
-    revalidatePath("/admin", "layout")
+    revalidatePath("/admin/categories")
+    revalidatePath("/admin/skills")
     revalidatePath("/")
 
     return { success: true }
@@ -77,6 +76,22 @@ export async function getCategoriesAction() {
       success: false,
       error: error instanceof Error ? error.message : "Failed to fetch categories",
       categories: [],
+    }
+  }
+}
+
+export async function reorderCategoriesAction(items: { id: string; order: number }[]) {
+  try {
+    await categoryService.reorder(items)
+    revalidatePath("/admin/categories")
+    revalidatePath("/admin/skills")
+    revalidatePath("/")
+    return { success: true }
+  } catch (error: unknown) {
+    console.error("Error in reorderCategoriesAction:", error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to reorder categories",
     }
   }
 }

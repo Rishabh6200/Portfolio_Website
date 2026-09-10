@@ -111,7 +111,7 @@ export class CategoryService {
     return JSON.parse(JSON.stringify(currentCategory))
   }
 
-  async delete(id: string) {
+  async delete(id: string, options?: { cascade?: boolean }) {
     await dbConnect()
 
     const category = await Category.findById(id)
@@ -130,12 +130,30 @@ export class CategoryService {
     // Check skill reference
     const skillCount = await Skill.countDocuments({ categoryId: id })
     if (skillCount > 0) {
-      throw new Error(
-        `Cannot delete "${category.name}" because it currently contains ${skillCount} skill(s). Please reassign or delete these skills first.`
-      )
+      if (options?.cascade) {
+        await Skill.deleteMany({ categoryId: id })
+      } else {
+        throw new Error(
+          `Cannot delete "${category.name}" because it currently contains ${skillCount} skill(s). Please reassign or delete these skills first, or enable cascade deletion.`
+        )
+      }
     }
 
     await Category.findByIdAndDelete(id)
+    return { success: true }
+  }
+
+  async reorder(items: { id: string; order: number }[]) {
+    await dbConnect()
+    const bulkOps = items.map((item) => ({
+      updateOne: {
+        filter: { _id: item.id },
+        update: { $set: { order: item.order } },
+      },
+    }))
+    if (bulkOps.length > 0) {
+      await Category.bulkWrite(bulkOps)
+    }
     return { success: true }
   }
 }

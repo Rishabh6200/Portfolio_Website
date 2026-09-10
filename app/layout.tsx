@@ -20,9 +20,9 @@ const fontMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Alex Rivera — Senior Full-Stack & Systems Engineer",
+  title: "Rishabh — Senior Full-Stack & Systems Engineer",
   description:
-    "Portfolio of Alex Rivera. Specializing in high-throughput distributed architectures, resilient cloud backends, and pixel-precise interactive web experiences.",
+    "Portfolio of Rishabh. Specializing in high-throughput distributed architectures, resilient cloud backends, and pixel-precise interactive web experiences.",
   keywords: [
     "Full-Stack Engineer",
     "Systems Architect",
@@ -33,9 +33,9 @@ export const metadata: Metadata = {
     "Distributed Systems",
     "Tailwind CSS",
   ],
-  authors: [{ name: "Alex Rivera" }],
+  authors: [{ name: "Rishabh" }],
   openGraph: {
-    title: "Alex Rivera — Senior Full-Stack & Systems Engineer",
+    title: "Rishabh — Senior Full-Stack & Systems Engineer",
     description:
       "Architecting high-throughput distributed systems & polished interactive web experiences.",
     type: "website",

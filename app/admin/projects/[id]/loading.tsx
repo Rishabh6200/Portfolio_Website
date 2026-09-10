@@ -6,11 +6,17 @@ export default function EditProjectLoading() {
       {/* Page Header */}
       <div className="pb-4 border-b border-border space-y-2">
         <Skeleton className="h-8 w-56 rounded-lg" />
-        <Skeleton className="h-4 w-96 max-w-full rounded-md" />
+        <Skeleton className="h-4 w-120 max-w-full rounded-md" />
+      </div>
+
+      {/* Top Action Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 py-2 border-b border-border">
+        <Skeleton className="h-10 w-40 rounded-lg" />
+        <Skeleton className="h-10 w-36 rounded-lg" />
       </div>
 
       {/* Project Form Sections */}
-      <div className="space-y-6 max-w-4xl">
+      <div className="space-y-8 max-w-4xl pb-20">
         {/* Section 1: Basic Info */}
         <div className="rounded-xl border border-border bg-card p-6 space-y-5">
           <div className="space-y-1">

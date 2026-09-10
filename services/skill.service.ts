@@ -1,3 +1,4 @@
+import mongoose from "mongoose"
 import { dbConnect } from "@/lib/db/connect"
 import { Category, Skill } from "@/lib/db/models"
 
@@ -10,14 +11,42 @@ export interface SkillInput {
 }
 
 export class SkillService {
-  async getAll(filterCategoryId?: string) {
+  async getAll(filterCategory?: string) {
     await dbConnect()
-    const filter = filterCategoryId ? { categoryId: filterCategoryId } : {}
+    let filter: Record<string, unknown> = {}
+
+    if (filterCategory) {
+      if (mongoose.isValidObjectId(filterCategory)) {
+        filter = { categoryId: filterCategory }
+      } else {
+        const cat = await Category.findOne({ slug: filterCategory }).select("_id").lean()
+        if (cat) {
+          filter = { categoryId: cat._id }
+        } else {
+          filter = { categoryId: filterCategory }
+        }
+      }
+    }
+
     const docs = await Skill.find(filter)
       .populate("categoryId", "name slug color")
       .sort({ order: 1, createdAt: 1 })
       .lean()
     return JSON.parse(JSON.stringify(docs))
+  }
+
+  async getCategoryCounts(): Promise<Record<string, number>> {
+    await dbConnect()
+    const counts = await Skill.aggregate([
+      { $group: { _id: "$categoryId", count: { $sum: 1 } } },
+    ])
+    const result: Record<string, number> = {}
+    counts.forEach((c: { _id: unknown; count: number }) => {
+      if (c._id) {
+        result[String(c._id)] = c.count
+      }
+    })
+    return result
   }
 
   async getById(id: string) {
@@ -104,6 +133,20 @@ export class SkillService {
       throw new Error("Skill not found or already deleted.")
     }
 
+    return { success: true }
+  }
+
+  async reorder(items: { id: string; order: number }[]) {
+    await dbConnect()
+    const bulkOps = items.map((item) => ({
+      updateOne: {
+        filter: { _id: item.id },
+        update: { $set: { order: item.order } },
+      },
+    }))
+    if (bulkOps.length > 0) {
+      await Skill.bulkWrite(bulkOps)
+    }
     return { success: true }
   }
 

@@ -5,8 +5,6 @@ import { projectService, type ProjectInput } from "@/services"
 import { uploadToImageKit, isImageKitConfigured } from "@/lib/imagekit"
 import { projectSchema, type ProjectFormValues } from "./schema"
 
-export type { ProjectInput as ProjectFormData }
-
 export async function createProjectAction(data: ProjectInput) {
   try {
     const parsed = projectSchema.safeParse(data)
@@ -19,7 +17,7 @@ export async function createProjectAction(data: ProjectInput) {
 
     const created = await projectService.create(parsed.data)
 
-    revalidatePath("/admin", "layout")
+    revalidatePath("/admin")
     revalidatePath("/")
 
     return { success: true, project: created }
@@ -41,7 +39,7 @@ export async function updateProjectAction(id: string, data: ProjectInput) {
 
     const updated = await projectService.update(id, parsed.data)
 
-    revalidatePath("/admin", "layout")
+    revalidatePath("/admin")
     revalidatePath("/")
     if (updated.slug) {
       revalidatePath(`/projects/${updated.slug}`)
@@ -58,7 +56,7 @@ export async function deleteProjectAction(id: string) {
   try {
     await projectService.delete(id)
 
-    revalidatePath("/admin", "layout")
+    revalidatePath("/admin")
     revalidatePath("/")
 
     return { success: true }
@@ -72,13 +70,28 @@ export async function toggleProjectStatusAction(id: string, _currentStatus?: "pu
   try {
     const updated = await projectService.toggleStatus(id)
 
-    revalidatePath("/admin", "layout")
+    revalidatePath("/admin")
     revalidatePath("/")
 
     return { success: true, status: updated.status }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to toggle project status"
     return { success: false, error: message }
+  }
+}
+
+export async function reorderProjectsAction(items: { id: string; order: number }[]) {
+  try {
+    await projectService.reorder(items)
+    revalidatePath("/admin")
+    revalidatePath("/")
+    return { success: true }
+  } catch (error: unknown) {
+    console.error("Error in reorderProjectsAction:", error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to reorder projects",
+    }
   }
 }
 

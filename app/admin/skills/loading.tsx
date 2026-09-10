@@ -1,50 +1,40 @@
-import { Skeleton } from "@/components/ui/skeleton"
+import Link from "next/link"
+import { buttonVariants } from "@/components/ui/button"
+import { Plus } from "lucide-react"
+import {
+  SkillsTableSkeleton,
+  SkillsTabsSkeleton,
+} from "./_components/skills-skeleton"
 
 export default function AdminSkillsLoading() {
   return (
     <div className="w-full space-y-6">
-      {/* Page Header */}
+      {/* Static Page Header - Loaded Instantly */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-border">
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-48 rounded-lg" />
-          <Skeleton className="h-4 w-96 max-w-full rounded-md" />
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+            Skills & Competencies
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Manage production technologies, frameworks, and tools bound to technical categories.
+          </p>
         </div>
-        <Skeleton className="h-10 w-32 rounded-lg" />
+
+        <div>
+          <Link
+            href="/admin/skills/new"
+            className={buttonVariants({ size: "default" })}
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add Skill</span>
+          </Link>
+        </div>
       </div>
 
-      {/* Table Card Skeleton */}
-      <div className="rounded-xl border border-border bg-card p-4 space-y-4">
-        <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-          <Skeleton className="h-9 w-full sm:w-72 rounded-lg" />
-          <Skeleton className="h-9 w-40 rounded-lg" />
-        </div>
-
-        <div className="divide-y divide-border">
-          <div className="py-3 flex items-center justify-between text-xs text-muted-foreground">
-            <Skeleton className="h-4 w-32 rounded-md" />
-            <Skeleton className="h-4 w-24 rounded-md hidden sm:block" />
-            <Skeleton className="h-4 w-16 rounded-md" />
-            <Skeleton className="h-4 w-12 rounded-md" />
-          </div>
-
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="py-3.5 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <Skeleton className="h-9 w-9 rounded-xl shrink-0" />
-                <div className="space-y-1.5">
-                  <Skeleton className="h-4 w-28 sm:w-36 rounded-md" />
-                  <Skeleton className="h-3 w-40 rounded-md hidden sm:block" />
-                </div>
-              </div>
-              <Skeleton className="h-6 w-20 rounded-full hidden sm:block" />
-              <Skeleton className="h-5 w-16 rounded-md" />
-              <div className="flex items-center gap-1.5">
-                <Skeleton className="h-8 w-8 rounded-lg" />
-                <Skeleton className="h-8 w-8 rounded-lg" />
-              </div>
-            </div>
-          ))}
-        </div>
+      {/* Tabs & Table Skeletons */}
+      <div className="space-y-4">
+        <SkillsTabsSkeleton />
+        <SkillsTableSkeleton />
       </div>
     </div>
   )

@@ -21,9 +21,8 @@ import {
 import {
   createSkillAction,
   updateSkillAction,
-  SkillFormData,
 } from "@/app/admin/skills/actions"
-import { skillSchema, SkillFormValues } from "@/app/admin/skills/schema"
+import { skillSchema, SkillFormValues, type SkillFormData } from "@/app/admin/skills/schema"
 
 interface CategoryOption {
   _id: string
