@@ -38,10 +38,9 @@ export function ProjectsDashboardSkeleton() {
                 <span className="sr-only">Drag</span>
               </TableHead>
               <TableHead className="py-3 px-4">Project</TableHead>
-              <TableHead className="py-3 px-4">Category</TableHead>
-              <TableHead className="py-3 px-4">Technologies</TableHead>
+              <TableHead className="py-3 px-4">Role</TableHead>
+              <TableHead className="py-3 px-4">Skills</TableHead>
               <TableHead className="py-3 px-4">Status</TableHead>
-              <TableHead className="py-3 px-4 text-center w-28">Order</TableHead>
               <TableHead className="py-3 px-4 text-right w-28">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -56,7 +55,7 @@ export function ProjectsDashboardSkeleton() {
                 {/* Project Info + Thumbnail */}
                 <TableCell className="py-3 px-4">
                   <div className="flex items-center gap-3.5">
-                    <Skeleton className="h-11 w-16 rounded-lg shrink-0" />
+                    <Skeleton className="h-10 w-10 rounded-lg shrink-0" />
                     <div className="space-y-1.5">
                       <Skeleton className="h-4 w-36 sm:w-48 rounded-md" />
                       <Skeleton className="h-3 w-24 rounded-md" />
@@ -64,28 +63,25 @@ export function ProjectsDashboardSkeleton() {
                   </div>
                 </TableCell>
 
-                {/* Category */}
+                {/* Role */}
                 <TableCell className="py-3 px-4">
-                  <Skeleton className="h-6 w-20 rounded-md" />
+                  <Skeleton className="h-4 w-24 rounded-md" />
                 </TableCell>
 
-                {/* Technologies */}
+                {/* Skills */}
                 <TableCell className="py-3 px-4">
-                  <div className="flex gap-1.5">
+                  <div className="flex flex-wrap gap-1.5 max-w-85">
                     <Skeleton className="h-5 w-14 rounded-md" />
+                    <Skeleton className="h-5 w-16 rounded-md" />
+                    <Skeleton className="h-5 w-12 rounded-md hidden sm:block" />
                     <Skeleton className="h-5 w-14 rounded-md" />
-                    <Skeleton className="h-5 w-14 rounded-md hidden sm:block" />
+                    <Skeleton className="h-5 w-8 rounded-md" />
                   </div>
                 </TableCell>
 
                 {/* Status */}
                 <TableCell className="py-3 px-4">
                   <Skeleton className="h-6 w-20 rounded-md" />
-                </TableCell>
-
-                {/* Order */}
-                <TableCell className="py-3 px-4 text-center">
-                  <Skeleton className="h-5 w-8 rounded-md mx-auto" />
                 </TableCell>
 
                 {/* Actions */}

@@ -30,7 +30,8 @@ export function SkillTabs({
     const target = cat.slug || cat._id
     startTransition(() => {
       const params = new URLSearchParams(searchParams.toString())
-      params.set("category", target)
+      params.delete("category")
+      params.set("c", target)
       router.replace(`/admin/skills?${params.toString()}`, { scroll: false })
     })
   }

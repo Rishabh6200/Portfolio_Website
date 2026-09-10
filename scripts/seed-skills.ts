@@ -121,7 +121,7 @@ export const skillSeedData: CategorySeedGroup[] = [
   {
     name: "Core & Languages",
     slug: "core-languages",
-    description: "Core programming languages, paradigms, design patterns, and engineering fundamentals.",
+    description: "Core programming languages, paradigms, design patterns, and development fundamentals.",
     icon: "Code2",
     color: "#8b5cf6",
     order: 4,

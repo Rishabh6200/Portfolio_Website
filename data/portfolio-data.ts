@@ -76,13 +76,13 @@ export interface PortfolioData {
 export const portfolioData: PortfolioData = {
   personal: {
     name: "Rishabh",
-    role: "Full-Stack Engineer (JavaScript)",
+    role: "Full-Stack Developer (JavaScript)",
     tagline: "I build robust, high-throughput backend APIs in NestJS & Laravel, paired with polished React web applications.",
-    bio: "I’m a full-stack engineer specializing in scalable backend architectures and dynamic web applications. Over the last 6+ years, I’ve architected modular microservice APIs with NestJS, production web platforms with Laravel, and interactive frontend dashboards using React and Next.js.",
+    bio: "I’m a full-stack developer specializing in scalable backend architectures and dynamic web applications. Over the last 6+ years, I’ve architected modular microservice APIs with NestJS, production web platforms with Laravel, and interactive frontend dashboards using React and Next.js.",
     status: "Open for Work",
     location: "Mohali, India (IST)",
     timezone: "Asia/Kolkata",
-    email: "[EMAIL_ADDRESS]",
+    email: "rc4556c@gmail.com",
     socials: {
       github: "https://github.com",
       linkedin: "https://linkedin.com",
@@ -101,7 +101,7 @@ export const portfolioData: PortfolioData = {
   experience: [
     {
       company: "Vanguard Systems",
-      role: "Staff Backend & Full-Stack Engineer",
+      role: "Staff Backend & Full-Stack Developer",
       period: "2023 — Present",
       location: "Remote",
       type: "Full-Time",
@@ -115,7 +115,7 @@ export const portfolioData: PortfolioData = {
     },
     {
       company: "Synthetix Cloud",
-      role: "Senior Full-Stack Engineer",
+      role: "Senior Full-Stack Developer",
       period: "2021 — 2023",
       location: "Remote",
       type: "Full-Time",

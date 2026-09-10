@@ -45,7 +45,7 @@ export function ContactSection() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
           </span>
-          <span>Available for new projects & high-impact engineering roles</span>
+          <span>Available for new projects & high-impact developer roles</span>
         </motion.div>
 
         <motion.h2
@@ -69,7 +69,7 @@ export function ContactSection() {
           transition={{ duration: 0.55, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           className="text-neutral-600 dark:text-neutral-400 text-sm sm:text-base xl:text-lg mt-6 max-w-xl xl:max-w-2xl mx-auto leading-relaxed"
         >
-          Have an ambitious project in mind, an engineering role to discuss, or just want to chat about distributed systems and frontend craft? Reach out anytime.
+          Have an ambitious project in mind, a developer role to discuss, or just want to chat about distributed systems and frontend craft? Reach out anytime.
         </motion.p>
 
         <motion.div

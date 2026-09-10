@@ -12,7 +12,7 @@ export const skillSchema = z.object({
     message: "Select a valid proficiency level",
   }),
   highlight: z.boolean(),
-  order: z.number().min(0, "Order must be 0 or greater"),
+  order: z.number().min(0, "Order must be 0 or greater").optional(),
 })
 
 export type SkillFormValues = z.infer<typeof skillSchema>

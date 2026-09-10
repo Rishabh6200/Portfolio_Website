@@ -3,13 +3,14 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Save, Loader2, Plus, Trash2 } from "lucide-react"
+import { ArrowLeft, Save, Loader2, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import { Switch } from "@/components/ui/switch"
 import {
   Select,
   SelectContent,
@@ -18,88 +19,62 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { MediaUploader } from "./media-uploader"
-import { TechStackInput } from "./tech-stack-input"
+import { GalleryUploader } from "./gallery-uploader"
+import { SkillSelector, type AvailableSkill } from "./skill-selector"
 import {
   createProjectAction,
   updateProjectAction,
 } from "../actions"
 import { type ProjectFormData } from "../schema"
 
-export interface CategoryOption {
-  _id?: string
-  name: string
-  slug?: string
-}
+const STATUS_OPTIONS = [
+  { value: "published", label: "Published (Visible on site)" },
+  { value: "draft", label: "Draft (Admin only)" },
+]
 
 interface ProjectFormProps {
-  initialData?: ProjectFormData & { _id?: string }
+  initialData?: any
   isEditing?: boolean
-  categories?: CategoryOption[]
+  availableSkills?: AvailableSkill[]
 }
-
-const DEFAULT_CATEGORIES: string[] = [
-  "Full-Stack",
-  "Backend APIs",
-  "Web Apps",
-]
-
-const ACCENT_PRESETS = [
-  "#6366f1", // Indigo
-  "#06b6d4", // Cyan
-  "#10b981", // Emerald
-  "#f59e0b", // Amber
-  "#ec4899", // Pink
-  "#8b5cf6", // Violet
-  "#3b82f6", // Blue
-  "#14b8a6", // Teal
-]
 
 export function ProjectForm({
   initialData,
   isEditing = false,
-  categories = [],
+  availableSkills = [],
 }: ProjectFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
-  const availableCategories =
-    categories && categories.length > 0
-      ? categories.map((c) => c.name)
-      : DEFAULT_CATEGORIES
-
+  // Form states
   const [title, setTitle] = useState(initialData?.title || "")
   const [slug, setSlug] = useState(initialData?.slug || "")
   const [isAutoSlug, setIsAutoSlug] = useState(!isEditing)
   const [tagline, setTagline] = useState(initialData?.tagline || "")
+  const [role, setRole] = useState(initialData?.role || "Full-Stack Developer")
   const [description, setDescription] = useState(initialData?.description || "")
-  const [category, setCategory] = useState<string>(
-    initialData?.category || availableCategories[0] || "Full-Stack"
+
+  // Skills: array of skill IDs
+  const initialSkillIds = (initialData?.skills || []).map((s: any) =>
+    typeof s === "object" && s?._id ? s._id : String(s)
   )
-  const [role, setRole] = useState(initialData?.role || "Full-Stack Engineer")
-  const [timeline, setTimeline] = useState(initialData?.timeline || "Recent")
-  const [accentColor, setAccentColor] = useState(initialData?.accentColor || "#6366f1")
-  const [coverImage, setCoverImage] = useState(initialData?.coverImage || "")
-  const [architectureDiagram, setArchitectureDiagram] = useState(
-    initialData?.architectureDiagram || ""
+  const [skills, setSkills] = useState<string[]>(initialSkillIds)
+
+  // Media
+  const [logo, setLogo] = useState(initialData?.logo || "")
+  const [images, setImages] = useState<string[]>(
+    initialData?.images || (initialData?.coverImage ? [initialData.coverImage] : [])
   )
-  const [technologies, setTechnologies] = useState<string[]>(
-    initialData?.technologies || ["NestJS", "React", "TypeScript"]
-  )
-  const [highlights, setHighlights] = useState<string[]>(
-    initialData?.highlights || ["High-throughput architecture designed for zero downtime."]
-  )
-  const [architectureOverview, setArchitectureOverview] = useState(
-    initialData?.architectureOverview || ""
-  )
-  const [challenge, setChallenge] = useState(initialData?.challenge || "")
-  const [solution, setSolution] = useState(initialData?.solution || "")
+
+  // Links
   const [liveUrl, setLiveUrl] = useState(initialData?.liveUrl || "")
   const [githubUrl, setGithubUrl] = useState(initialData?.githubUrl || "")
-  const featured = Boolean(initialData?.featured)
+
+  // Settings
+  const [featured, setFeatured] = useState<boolean>(Boolean(initialData?.featured))
   const [status, setStatus] = useState<"published" | "draft">(
     initialData?.status || "published"
   )
-  const [order, setOrder] = useState<number>(initialData?.order || 0)
 
   function handleTitleChange(newTitle: string) {
     setTitle(newTitle)
@@ -112,20 +87,6 @@ export function ProjectForm({
           .replace(/^-+|-+$/g, "")
       )
     }
-  }
-
-  function handleAddHighlight() {
-    setHighlights([...highlights, ""])
-  }
-
-  function handleHighlightChange(index: number, val: string) {
-    const next = [...highlights]
-    next[index] = val
-    setHighlights(next)
-  }
-
-  function handleRemoveHighlight(index: number) {
-    setHighlights(highlights.filter((_, i) => i !== index))
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -156,22 +117,15 @@ export function ProjectForm({
       slug: slug.trim(),
       tagline: tagline.trim(),
       description: description.trim(),
-      category,
-      role: role.trim(),
-      timeline: timeline.trim(),
-      accentColor,
-      coverImage: coverImage.trim(),
-      architectureDiagram: architectureDiagram.trim(),
-      technologies,
-      highlights: highlights.filter((h) => h.trim().length > 0),
-      architectureOverview: architectureOverview.trim(),
-      challenge: challenge.trim(),
-      solution: solution.trim(),
+      role: role.trim() || "Full-Stack Developer",
+      skills,
+      logo: logo.trim(),
+      images,
       liveUrl: liveUrl.trim(),
       githubUrl: githubUrl.trim(),
       featured,
       status,
-      order,
+      ...(isEditing && initialData?.order !== undefined ? { order: initialData.order } : {}),
     }
 
     startTransition(async () => {
@@ -180,7 +134,6 @@ export function ProjectForm({
         if (res.success) {
           toast.success("Project updated successfully!")
           router.push("/admin")
-          router.refresh()
         } else {
           toast.error(res.error || "Failed to update project")
         }
@@ -189,7 +142,6 @@ export function ProjectForm({
         if (res.success) {
           toast.success("Project created successfully!")
           router.push("/admin")
-          router.refresh()
         } else {
           toast.error(res.error || "Failed to create project")
         }
@@ -198,40 +150,31 @@ export function ProjectForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full space-y-10 pb-20">
+    <form onSubmit={handleSubmit} className="space-y-10 max-w-4xl pb-16">
       {/* Top Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 py-2 border-b border-border">
-        <Link
-          href="/admin"
-          className={buttonVariants({ variant: "outline", size: "default" })}
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Back to Projects</span>
-        </Link>
-
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-border">
         <div className="flex items-center gap-3">
-          <Select
-            value={status}
-            items={[
-              { value: "published", label: "Published" },
-              { value: "draft", label: "Draft" },
-            ]}
-            onValueChange={(val) => {
-              if (val === "published" || val === "draft") {
-                setStatus(val)
-              }
-            }}
+          <Link
+            href="/admin"
+            className={buttonVariants({ variant: "outline", size: "sm" })}
           >
-            <SelectTrigger className="h-9 min-w-32 bg-card">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="published" label="Published">Published</SelectItem>
-              <SelectItem value="draft" label="Draft">Draft</SelectItem>
-            </SelectContent>
-          </Select>
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back to Projects</span>
+          </Link>
+          <Separator orientation="vertical" className="h-4" />
+          <h1 className="text-base sm:text-lg font-semibold text-foreground truncate max-w-xs sm:max-w-md">
+            {isEditing ? `Edit: ${initialData?.title || "Project"}` : "New Project"}
+          </h1>
+        </div>
 
-          <Button type="submit" size="default" disabled={isPending}>
+        <div className="flex items-center gap-2.5">
+          <Link
+            href="/admin"
+            className={buttonVariants({ variant: "outline", size: "sm" })}
+          >
+            Cancel
+          </Link>
+          <Button type="submit" size="sm" disabled={isPending} className="gap-2">
             {isPending ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -240,7 +183,7 @@ export function ProjectForm({
             ) : (
               <>
                 <Save className="h-4 w-4" />
-                <span>{isEditing ? "Save Changes" : "Create Project"}</span>
+                <span>{isEditing ? "Update Project" : "Create Project"}</span>
               </>
             )}
           </Button>
@@ -254,13 +197,13 @@ export function ProjectForm({
             Basic Information
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Core identity, URLs, and overview of this engineering case study.
+            Project name, route slug, role, and visibility settings.
           </p>
         </div>
 
-        <div className="space-y-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {/* Project Title */}
-          <div className="space-y-2">
+          <div className="space-y-2 sm:col-span-2">
             <Label className="text-sm font-medium">
               Project Title <span className="text-destructive">*</span>
             </Label>
@@ -268,79 +211,59 @@ export function ProjectForm({
               type="text"
               value={title}
               onChange={(e) => handleTitleChange(e.target.value)}
-              placeholder="e.g. CloudPulse API Gateway"
+              placeholder="e.g. CloudPulse — Distributed API Gateway"
               required
             />
           </div>
 
-          {/* Slug and Category */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">
-                  URL Slug <span className="text-destructive">*</span>
-                </Label>
-                <button
-                  type="button"
-                  onClick={() => setIsAutoSlug(!isAutoSlug)}
-                  className="text-xs text-muted-foreground hover:text-foreground underline cursor-pointer"
-                >
-                  {isAutoSlug ? "Switch to Custom Slug" : "Enable Auto-Slug"}
-                </button>
-              </div>
-              <div className="flex items-center rounded-lg border border-input bg-transparent px-3 py-1 focus-within:ring-2 focus-within:ring-ring/50">
-                <span className="text-sm font-mono text-muted-foreground select-none">/projects/</span>
-                <input
-                  type="text"
-                  value={slug}
-                  onChange={(e) => {
-                    setIsAutoSlug(false)
-                    setSlug(e.target.value)
-                  }}
-                  placeholder="e.g. cloudpulse-api-gateway"
-                  required
-                  className="flex-1 bg-transparent text-sm font-mono text-foreground focus:outline-none ml-1 py-1.5"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">
-                  Category <span className="text-destructive">*</span>
-                </Label>
-                <Link
-                  href="/admin/categories/new"
-                  target="_blank"
-                  className="text-xs text-muted-foreground hover:text-foreground underline cursor-pointer"
-                >
-                  + Manage Categories
-                </Link>
-              </div>
-              <Select
-                value={category}
-                onValueChange={(val) => {
-                  if (val) {
-                    setCategory(val)
-                  }
-                }}
+          {/* URL Slug */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">
+                URL Slug <span className="text-destructive">*</span>
+              </Label>
+              <button
+                type="button"
+                onClick={() => setIsAutoSlug(!isAutoSlug)}
+                className="text-xs text-muted-foreground hover:text-foreground underline cursor-pointer"
               >
-                <SelectTrigger className="h-10 w-full">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableCategories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                {isAutoSlug ? "Manual Slug" : "Auto Slug"}
+              </button>
+            </div>
+            <div className="flex items-center rounded-lg border border-input px-3 bg-muted/20 focus-within:ring-2 focus-within:ring-ring/50">
+              <span className="text-xs font-mono text-muted-foreground select-none">
+                /projects/
+              </span>
+              <input
+                type="text"
+                value={slug}
+                onChange={(e) => {
+                  setIsAutoSlug(false)
+                  setSlug(e.target.value)
+                }}
+                placeholder="cloudpulse-api-gateway"
+                required
+                className="flex-1 bg-transparent text-sm font-mono text-foreground focus:outline-none ml-1 py-1.5"
+              />
             </div>
           </div>
 
-          {/* Tagline */}
+          {/* Role */}
           <div className="space-y-2">
+            <Label className="text-sm font-medium">
+              Your Role <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              type="text"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              placeholder="e.g. Full-Stack Developer"
+              required
+            />
+          </div>
+
+          {/* Tagline */}
+          <div className="space-y-2 sm:col-span-2">
             <Label className="text-sm font-medium">
               Tagline (One-liner summary) <span className="text-destructive">*</span>
             </Label>
@@ -348,199 +271,74 @@ export function ProjectForm({
               type="text"
               value={tagline}
               onChange={(e) => setTagline(e.target.value)}
-              placeholder="e.g. Enterprise modular microservices gateway with JWT RBAC and BullMQ queues"
+              placeholder="e.g. High-throughput distributed API gateway with sub-millisecond route dispatch"
               required
             />
           </div>
 
-          {/* Summary Description */}
-          <div className="space-y-2">
+          {/* Description */}
+          <div className="space-y-2 sm:col-span-2">
             <Label className="text-sm font-medium">
-              Summary Description <span className="text-destructive">*</span>
+              Project Description <span className="text-destructive">*</span>
             </Label>
             <Textarea
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Provide a comprehensive summary of what this system does, how it works, and who it serves..."
+              placeholder="Describe the system, problem it solves, architecture decisions, and business impact..."
               required
             />
           </div>
-        </div>
-      </section>
 
-      <Separator />
-
-      {/* Section 2: Role, Timeline & Display Order */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="text-xl font-semibold tracking-tight text-foreground">
-            Role & Timeline
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Specify your technical capacity, timeline duration, and listing priority.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {/* Status */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Your Role</Label>
-            <Input
-              type="text"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              placeholder="e.g. Lead Backend Architect"
-            />
+            <Label className="text-sm font-medium">Publication Status</Label>
+            <Select
+              value={status}
+              onValueChange={(val) => {
+                if (val === "published" || val === "draft") {
+                  setStatus(val)
+                }
+              }}
+              items={STATUS_OPTIONS}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select status">
+                  {(val) => {
+                    const opt = STATUS_OPTIONS.find((o) => o.value === val)
+                    return opt ? opt.label : "Select status"
+                  }}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {STATUS_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value} label={opt.label}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
+          {/* Featured Toggle */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Timeline / Duration</Label>
-            <Input
-              type="text"
-              value={timeline}
-              onChange={(e) => setTimeline(e.target.value)}
-              placeholder="e.g. 5 Months (Q1 2025)"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Display Sort Order</Label>
-            <Input
-              type="number"
-              value={order}
-              onChange={(e) => setOrder(Number(e.target.value) || 0)}
-              placeholder="e.g. 1"
-            />
-            <p className="text-xs text-muted-foreground">Lower numbers appear first on the site.</p>
-          </div>
-        </div>
-      </section>
-
-      <Separator />
-
-      {/* Section 3: Project Media (ImageKit) */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="text-xl font-semibold tracking-tight text-foreground">
-            Project Media (ImageKit CDN)
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Upload images directly to ImageKit CDN or provide hosted media URLs.
-          </p>
-        </div>
-
-        <div className="space-y-8">
-          <MediaUploader
-            label="Cover Image / Hero Banner"
-            description="The primary showcase image presented on the portfolio gallery and project detail hero."
-            value={coverImage}
-            onChange={setCoverImage}
-            aspectRatio="video"
-          />
-
-          <MediaUploader
-            label="Architecture Diagram / System Flow (Optional)"
-            description="Displayed prominently inside the technical deep dive section to showcase service topology."
-            value={architectureDiagram}
-            onChange={setArchitectureDiagram}
-            aspectRatio="wide"
-          />
-        </div>
-      </section>
-
-      <Separator />
-
-      {/* Section 4: Architecture & Deep Dive */}
-      <section className="space-y-6">
-        <div>
-          <h2 className="text-xl font-semibold tracking-tight text-foreground">
-            Architecture & Deep Dive
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Detailed engineering narrative covering topology, bottlenecks, and solutions.
-          </p>
-        </div>
-
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Architecture Overview</Label>
-            <Textarea
-              rows={4}
-              value={architectureOverview}
-              onChange={(e) => setArchitectureOverview(e.target.value)}
-              placeholder="Describe microservices communication, pub/sub pipelines, Redis caching layers, database indexing strategies..."
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Engineering Challenge</Label>
-              <Textarea
-                rows={4}
-                value={challenge}
-                onChange={(e) => setChallenge(e.target.value)}
-                placeholder="What was the core bottleneck or technical challenge? (e.g. rate limiting spikes, concurrent transactions, memory limits)"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Implementation & Solution</Label>
-              <Textarea
-                rows={4}
-                value={solution}
-                onChange={(e) => setSolution(e.target.value)}
-                placeholder="How did you solve it? (e.g. sliding window algorithm in Redis, BullMQ workers with exponential backoff)"
-              />
-            </div>
-          </div>
-
-          {/* Highlights List */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-sm font-medium">Key Engineering Highlights</Label>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Bulleted engineering achievements displayed in the project case study.
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleAddHighlight}
-                className="gap-1.5"
+            <Label htmlFor="featured-toggle" className="text-sm font-medium">Featured Project</Label>
+            <div className="flex items-center justify-between rounded-lg border border-input px-3.5 h-10 bg-muted/20 transition-colors hover:bg-muted/30">
+              <label
+                htmlFor="featured-toggle"
+                className="flex items-center gap-2 cursor-pointer select-none flex-1 pr-2 min-w-0"
               >
-                <Plus className="h-3.5 w-3.5" />
-                <span>Add Point</span>
-              </Button>
-            </div>
-
-            <div className="space-y-3">
-              {highlights.map((highlight, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-muted-foreground w-6 text-center shrink-0">
-                    #{index + 1}
-                  </span>
-                  <Input
-                    type="text"
-                    value={highlight}
-                    onChange={(e) => handleHighlightChange(index, e.target.value)}
-                    placeholder="e.g. Benchmarked 12,000 req/sec at p99 latency < 18ms"
-                    className="flex-1"
-                  />
-                  {highlights.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRemoveHighlight(index)}
-                      className="text-muted-foreground hover:text-destructive shrink-0"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
+                <Sparkles className="h-4 w-4 text-amber-500 shrink-0" />
+                <span className="text-xs text-muted-foreground truncate">
+                  Spotlight on homepage hero & grid
+                </span>
+              </label>
+              <Switch
+                id="featured-toggle"
+                checked={featured}
+                onCheckedChange={setFeatured}
+                aria-label="Feature this project"
+              />
             </div>
           </div>
         </div>
@@ -548,84 +346,99 @@ export function ProjectForm({
 
       <Separator />
 
-      {/* Section 5: Technologies & External Links */}
-      <section className="space-y-6">
+      {/* Section 2: Skills & Technologies (From Skill Collection) */}
+      <section className="space-y-4">
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-foreground">
-            Technologies & External Links
+            Technologies & Skills
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Define tech stack pills, brand accent color, and live links.
+            Pick technologies directly from your database Skill collection.
           </p>
         </div>
 
-        <div className="space-y-6">
-          {/* Tech Stack Input */}
+        <SkillSelector
+          availableSkills={availableSkills}
+          selectedSkillIds={skills}
+          onChange={setSkills}
+        />
+      </section>
+
+      <Separator />
+
+      {/* Section 3: Media (Logo + Gallery Images) */}
+      <section className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">
+            Project Media
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Upload the project logo and multiple showcase screenshots/gallery images.
+          </p>
+        </div>
+
+        {/* Logo */}
+        <div className="space-y-3">
+          <Label className="text-sm font-medium">Project Logo / Icon (Optional)</Label>
+          <p className="text-xs text-muted-foreground">
+            A square icon or brand logo shown in the admin table and project headers.
+          </p>
+          <MediaUploader
+            label="Project Logo"
+            description="Upload or paste image URL for logo"
+            value={logo}
+            onChange={setLogo}
+            aspectRatio="square"
+          />
+        </div>
+
+        {/* Gallery Images */}
+        <div className="space-y-3 pt-4 border-t border-border">
+          <Label className="text-sm font-medium">Showcase Gallery Images</Label>
+          <p className="text-xs text-muted-foreground">
+            Upload project screenshots, mockups, or UI walkthroughs. The first image serves as the main showcase card image.
+          </p>
+          <GalleryUploader images={images} onChange={setImages} />
+        </div>
+      </section>
+
+      <Separator />
+
+      {/* Section 4: External Links */}
+      <section className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">
+            External Links
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Optional production deployment and source code repository links.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Technologies Used</Label>
-            <TechStackInput value={technologies} onChange={setTechnologies} />
+            <Label className="text-sm font-medium">Live Demo URL</Label>
+            <Input
+              type="url"
+              value={liveUrl}
+              onChange={(e) => setLiveUrl(e.target.value)}
+              placeholder="https://example.com"
+            />
           </div>
 
-          {/* Accent Color, Live Demo & GitHub URLs */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Accent Color</Label>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="h-10 w-12 rounded-lg border border-input shrink-0 transition-colors"
-                    style={{ backgroundColor: accentColor }}
-                  />
-                  <Input
-                    type="text"
-                    value={accentColor}
-                    onChange={(e) => setAccentColor(e.target.value)}
-                    placeholder="e.g. #6366f1"
-                    className="font-mono"
-                  />
-                </div>
-                <div className="flex items-center gap-1.5 pt-1">
-                  {ACCENT_PRESETS.map((color) => (
-                    <button
-                      key={color}
-                      type="button"
-                      onClick={() => setAccentColor(color)}
-                      className={`h-5 w-5 rounded-full border transition-all cursor-pointer ${
-                        accentColor.toLowerCase() === color.toLowerCase()
-                          ? "ring-2 ring-primary ring-offset-2 ring-offset-background scale-110"
-                          : "border-border hover:scale-105"
-                      }`}
-                      style={{ backgroundColor: color }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Live Demo URL</Label>
-              <Input
-                type="url"
-                value={liveUrl}
-                onChange={(e) => setLiveUrl(e.target.value)}
-                placeholder="e.g. https://cloudpulse.io"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">GitHub Repository URL</Label>
-              <Input
-                type="url"
-                value={githubUrl}
-                onChange={(e) => setGithubUrl(e.target.value)}
-                placeholder="e.g. https://github.com/username/project"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">GitHub Repository URL</Label>
+            <Input
+              type="url"
+              value={githubUrl}
+              onChange={(e) => setGithubUrl(e.target.value)}
+              placeholder="https://github.com/username/project"
+            />
           </div>
         </div>
       </section>
 
-      {/* Bottom Sticky Action Footer */}
+      {/* Bottom Save Button */}
       <div className="flex items-center justify-end gap-3 pt-6 border-t border-border">
         <Link
           href="/admin"
@@ -633,8 +446,7 @@ export function ProjectForm({
         >
           Cancel
         </Link>
-
-        <Button type="submit" size="default" disabled={isPending} className="gap-2 min-w-36">
+        <Button type="submit" size="default" disabled={isPending} className="gap-2">
           {isPending ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />

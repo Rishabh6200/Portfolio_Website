@@ -99,3 +99,31 @@ export async function reorderSkillsAction(items: { id: string; order: number }[]
     }
   }
 }
+
+export async function updateSkillLevelAction(
+  id: string,
+  level: "Proficient" | "Advanced" | "Expert"
+) {
+  try {
+    if (!["Proficient", "Advanced", "Expert"].includes(level)) {
+      return {
+        success: false,
+        error: "Invalid proficiency level",
+      }
+    }
+
+    const skill = await skillService.updateLevel(id, level)
+
+    revalidatePath("/admin/skills")
+    revalidatePath("/admin", "layout")
+    revalidatePath("/")
+
+    return { success: true, skill }
+  } catch (error: unknown) {
+    console.error("Error in updateSkillLevelAction:", error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to update proficiency level",
+    }
+  }
+}

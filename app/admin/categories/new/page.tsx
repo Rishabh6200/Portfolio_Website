@@ -8,7 +8,7 @@ export default function NewCategoryPage() {
           New Category
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Create a new technical domain or engineering classification for portfolio systems and skills.
+          Create a new technical domain or development classification for portfolio systems and skills.
         </p>
       </div>
 

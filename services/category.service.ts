@@ -56,13 +56,19 @@ export class CategoryService {
       throw new Error(`A category with slug "${slug}" already exists.`)
     }
 
+    let order = data.order !== undefined ? Number(data.order) : NaN
+    if (isNaN(order)) {
+      const lastCategory = await Category.findOne().sort({ order: -1 }).select("order").lean()
+      order = lastCategory && typeof lastCategory.order === "number" ? lastCategory.order + 1 : 0
+    }
+
     const newCategory = await Category.create({
       name,
       slug,
       description: data.description?.trim() || "",
       icon: data.icon || "Layers",
       color: data.color || "#6366f1",
-      order: Number(data.order) || 0,
+      order,
     })
 
     return JSON.parse(JSON.stringify(newCategory))
@@ -99,7 +105,9 @@ export class CategoryService {
     currentCategory.description = data.description?.trim() || ""
     currentCategory.icon = data.icon || "Layers"
     currentCategory.color = data.color || "#6366f1"
-    currentCategory.order = Number(data.order) || 0
+    if (data.order !== undefined) {
+      currentCategory.order = Number(data.order) || 0
+    }
 
     await currentCategory.save()
 

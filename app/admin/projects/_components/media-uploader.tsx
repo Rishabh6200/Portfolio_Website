@@ -31,10 +31,10 @@ export function MediaUploader({
 
   const aspectClass =
     aspectRatio === "square"
-      ? "aspect-square max-w-sm"
+      ? "h-40 w-40 aspect-square"
       : aspectRatio === "wide"
-      ? "aspect-[21/9] w-full"
-      : "aspect-video w-full"
+      ? "aspect-[21/9] max-w-sm w-full"
+      : "aspect-video max-w-sm w-full"
 
   async function handleFileUpload(file: File) {
     if (!file.type.startsWith("image/")) {
@@ -109,35 +109,35 @@ export function MediaUploader({
       </div>
 
       {value ? (
-        <div className={`relative overflow-hidden rounded-xl border border-border bg-muted/30 ${aspectClass}`}>
+        <div className={`relative overflow-hidden rounded-xl border border-border bg-muted/20 ${aspectClass}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={value}
             alt={label}
-            className="h-full w-full object-cover"
+            className={`h-full w-full ${aspectRatio === "square" ? "object-contain p-2" : "object-cover"}`}
             onError={() => {
               toast.error("Image failed to load. Please verify the URL.")
             }}
           />
-          <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-3 p-4 backdrop-blur-[2px]">
+          <div className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2 backdrop-blur-[2px]">
             <Button
               type="button"
               variant="destructive"
-              size="sm"
+              size="icon"
               onClick={handleClear}
-              className="gap-1.5 text-xs"
+              className="h-8 w-8 rounded-lg"
+              title="Replace image"
             >
               <RefreshCw className="h-3.5 w-3.5" />
-              <span>Replace Image</span>
             </Button>
             <a
               href={value}
               target="_blank"
               rel="noopener noreferrer"
-              className={buttonVariants({ variant: "secondary", size: "sm", className: "gap-1.5 text-xs" })}
+              className={buttonVariants({ variant: "secondary", size: "icon", className: "h-8 w-8 rounded-lg" })}
+              title="View full size"
             >
               <ExternalLink className="h-3.5 w-3.5" />
-              <span>View Full</span>
             </a>
           </div>
         </div>

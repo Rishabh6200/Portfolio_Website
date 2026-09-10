@@ -17,7 +17,7 @@ export const categorySchema = z.object({
     .string()
     .max(300, "Description must be 300 characters or less"),
   icon: z.string().min(1, "Icon is required"),
-  order: z.number().min(0, "Order must be 0 or greater"),
+  order: z.number().min(0, "Order must be 0 or greater").optional(),
   color: z
     .string()
     .regex(

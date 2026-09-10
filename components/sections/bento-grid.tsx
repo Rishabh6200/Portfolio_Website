@@ -66,7 +66,7 @@ export function BentoGridSection({ initialCategories = [] }: BentoGridSectionPro
             <span>Technical Stack & Core Competencies</span>
           </div>
           <h2 className="text-3xl sm:text-4xl xl:text-5xl font-bold tracking-tight text-neutral-900 dark:text-white">
-            Skills & Engineering Capabilities.
+            Skills & Technical Capabilities.
           </h2>
           <p className="text-neutral-600 dark:text-neutral-400 text-sm sm:text-base xl:text-lg mt-2.5 max-w-2xl leading-relaxed">
             A comprehensive breakdown of the languages, frameworks, database systems, and infrastructure tools I leverage in production.

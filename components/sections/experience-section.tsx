@@ -26,7 +26,7 @@ export function ExperienceSection() {
             Work experience.
           </h2>
           <p className="text-neutral-600 dark:text-neutral-400 text-sm sm:text-base xl:text-lg mt-2 max-w-xl xl:max-w-2xl leading-relaxed">
-            A chronological timeline of roles where I designed systems, built engineering teams, and scaled products.
+            A chronological timeline of roles where I designed systems, built development teams, and scaled products.
           </p>
         </motion.div>
 

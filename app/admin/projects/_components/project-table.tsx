@@ -53,18 +53,27 @@ import {
 } from "../actions"
 import { DragHandle, SortableRow } from "@/components/ui/sortable-row"
 
-interface SerializedProject {
+export interface PopulatedSkill {
+  _id: string
+  name: string
+  level?: string
+  categoryId?: { _id: string; name: string; color?: string } | string
+}
+
+export interface SerializedProject {
   _id: string
   slug: string
   title: string
   tagline: string
-  category: string
   role: string
+  skills?: (PopulatedSkill | string)[]
+  logo?: string
+  images?: string[]
+  liveUrl?: string
+  githubUrl?: string
   status: "published" | "draft"
   featured: boolean
   order: number
-  coverImage?: string
-  technologies: string[]
   updatedAt?: string
 }
 
@@ -204,10 +213,9 @@ export function ProjectTable({ projects: initialProjects }: ProjectTableProps) {
                   <span className="sr-only">Drag</span>
                 </TableHead>
                 <TableHead className="py-3 px-4">Project</TableHead>
-                <TableHead className="py-3 px-4">Category</TableHead>
-                <TableHead className="py-3 px-4">Technologies</TableHead>
+                <TableHead className="py-3 px-4">Role</TableHead>
+                <TableHead className="py-3 px-4">Skills</TableHead>
                 <TableHead className="py-3 px-4">Status</TableHead>
-                <TableHead className="py-3 px-4 text-center w-28">Order</TableHead>
                 <TableHead className="py-3 px-4 text-right w-28">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -216,8 +224,9 @@ export function ProjectTable({ projects: initialProjects }: ProjectTableProps) {
                 items={projects.map((p) => p._id)}
                 strategy={verticalListSortingStrategy}
               >
-                {projects.map((p, index) => {
+                {projects.map((p) => {
                   const isToggling = togglingId === p._id
+                  const thumbnail = p.logo || (p.images && p.images[0]) || null
 
                   return (
                     <SortableRow key={p._id} id={p._id}>
@@ -231,16 +240,16 @@ export function ProjectTable({ projects: initialProjects }: ProjectTableProps) {
                           {/* Project Info + Thumbnail */}
                           <TableCell className="py-3 px-4">
                             <div className="flex items-center gap-3.5">
-                              <div className="h-11 w-16 rounded-lg border border-border bg-muted shrink-0 overflow-hidden flex items-center justify-center">
-                                {p.coverImage ? (
+                              <div className="h-10 w-10 rounded-lg border border-border bg-muted/60 shrink-0 overflow-hidden flex items-center justify-center p-1">
+                                {thumbnail ? (
                                   // eslint-disable-next-line @next/next/no-img-element
                                   <img
-                                    src={p.coverImage}
+                                    src={thumbnail}
                                     alt={p.title}
-                                    className="h-full w-full object-cover"
+                                    className={p.logo ? "h-full w-full object-contain" : "h-full w-full object-cover rounded"}
                                   />
                                 ) : (
-                                  <FolderGit2 className="h-4 w-4 text-muted-foreground" />
+                                  <FolderGit2 className="h-5 w-5 text-muted-foreground" />
                                 )}
                               </div>
                               <div className="min-w-0">
@@ -265,30 +274,58 @@ export function ProjectTable({ projects: initialProjects }: ProjectTableProps) {
                             </div>
                           </TableCell>
 
-                          {/* Category */}
+                          {/* Role */}
                           <TableCell className="py-3 px-4">
-                            <Badge variant="outline" className="text-xs font-normal">
-                              {p.category}
-                            </Badge>
+                            <span className="text-xs font-medium text-muted-foreground">
+                              {p.role || "Developer"}
+                            </span>
                           </TableCell>
 
-                          {/* Tech Stack */}
+                          {/* Skills Chips (2-line layout with + remaining count) */}
                           <TableCell className="py-3 px-4">
-                            <div className="flex flex-wrap gap-1.5 max-w-xs">
-                              {p.technologies.slice(0, 3).map((tech) => (
-                                <span
-                                  key={tech}
-                                  className="px-2 py-0.5 rounded-md bg-muted text-xs font-mono text-muted-foreground"
-                                >
-                                  {tech}
-                                </span>
-                              ))}
-                              {p.technologies.length > 3 && (
-                                <span className="text-xs font-mono text-muted-foreground self-center">
-                                  +{p.technologies.length - 3}
-                                </span>
-                              )}
-                            </div>
+                            {(() => {
+                              const skills = p.skills || []
+                              const maxVisible = 5
+                              const visibleSkills = skills.slice(0, maxVisible)
+                              const remainingCount = skills.length - maxVisible
+                              const remainingNames =
+                                remainingCount > 0
+                                  ? skills
+                                      .slice(maxVisible)
+                                      .map((s) => (typeof s === "object" ? s.name : String(s)))
+                                      .join(", ")
+                                  : ""
+
+                              return (
+                                <div className="flex flex-wrap items-center gap-1.5 max-w-85 sm:max-w-95">
+                                  {visibleSkills.map((skill) => {
+                                    const name = typeof skill === "object" ? skill.name : String(skill)
+                                    const id = typeof skill === "object" ? skill._id : String(skill)
+                                    return (
+                                      <Badge
+                                        key={id}
+                                        variant="secondary"
+                                        className="text-[11px] font-normal py-0 px-1.5 bg-muted/80 text-foreground/80 border-border/50 shrink-0"
+                                      >
+                                        {name}
+                                      </Badge>
+                                    )
+                                  })}
+                                  {remainingCount > 0 && (
+                                    <Badge
+                                      variant="outline"
+                                      title={remainingNames ? `+${remainingCount} more: ${remainingNames}` : undefined}
+                                      className="text-[10px] font-mono font-medium py-0 px-1.5 text-muted-foreground bg-muted/40 border-border/60 hover:bg-muted/80 shrink-0 cursor-default"
+                                    >
+                                      +{remainingCount}
+                                    </Badge>
+                                  )}
+                                  {skills.length === 0 && (
+                                    <span className="text-xs text-muted-foreground/60 italic">No skills linked</span>
+                                  )}
+                                </div>
+                              )
+                            })()}
                           </TableCell>
 
                           {/* Status Toggle */}
@@ -314,13 +351,6 @@ export function ProjectTable({ projects: initialProjects }: ProjectTableProps) {
                               )}
                               <span className="capitalize">{p.status}</span>
                             </button>
-                          </TableCell>
-
-                          {/* Sort Order */}
-                          <TableCell className="py-3 px-4 text-center">
-                            <Badge variant="outline" className="font-mono text-xs">
-                              #{index}
-                            </Badge>
                           </TableCell>
 
                           {/* Actions */}

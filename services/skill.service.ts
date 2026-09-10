@@ -77,12 +77,18 @@ export class SkillService {
       )
     }
 
+    let order = data.order !== undefined ? Number(data.order) : NaN
+    if (isNaN(order)) {
+      const lastSkill = await Skill.findOne({ categoryId }).sort({ order: -1 }).select("order").lean()
+      order = lastSkill && typeof lastSkill.order === "number" ? lastSkill.order + 1 : 0
+    }
+
     const newSkill = await Skill.create({
       name,
       categoryId,
       level: data.level || "Advanced",
       highlight: Boolean(data.highlight),
-      order: Number(data.order) || 0,
+      order,
     })
 
     return JSON.parse(JSON.stringify(newSkill))
@@ -119,9 +125,24 @@ export class SkillService {
     skill.categoryId = categoryId as any
     skill.level = data.level || "Advanced"
     skill.highlight = Boolean(data.highlight)
-    skill.order = Number(data.order) || 0
+    if (data.order !== undefined) {
+      skill.order = Number(data.order) || 0
+    }
 
     await skill.save()
+    return JSON.parse(JSON.stringify(skill))
+  }
+
+  async updateLevel(id: string, level: "Proficient" | "Advanced" | "Expert") {
+    await dbConnect()
+    const skill = await Skill.findByIdAndUpdate(
+      id,
+      { level },
+      { new: true }
+    ).lean()
+    if (!skill) {
+      throw new Error("Skill not found.")
+    }
     return JSON.parse(JSON.stringify(skill))
   }
 

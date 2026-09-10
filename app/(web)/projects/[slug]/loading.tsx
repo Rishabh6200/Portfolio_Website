@@ -61,7 +61,7 @@ export default function ProjectDetailLoading() {
               <Skeleton className="h-3.5 w-4/5 rounded-md" />
             </div>
 
-            {/* Engineering Challenge */}
+            {/* Development Challenge */}
             <div className="space-y-2 pt-2">
               <Skeleton className="h-4 w-32 rounded-md" />
               <Skeleton className="h-3.5 w-full rounded-md" />

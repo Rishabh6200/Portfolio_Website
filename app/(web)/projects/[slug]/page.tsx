@@ -7,8 +7,7 @@ import {
   ExternalLink,
   Layers,
   Sparkles,
-  CheckCircle2,
-  Terminal,
+  Images,
 } from "lucide-react"
 import { GithubIcon } from "@/components/custom-ui/icons"
 import { Badge } from "@/components/ui/badge"
@@ -34,11 +33,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { project } = data
 
   return {
-    title: `${project.title} — Technical Overview | ${portfolioData.personal.name}`,
-    description: project.description,
+    title: `${project.title} — Case Study | ${portfolioData.personal.name}`,
+    description: project.tagline || project.description,
     openGraph: {
-      title: `${project.title} — Technical Overview`,
-      description: project.tagline,
+      title: `${project.title} — Case Study`,
+      description: project.tagline || project.description,
+      images: project.images?.[0] ? [project.images[0]] : undefined,
     },
   }
 }
@@ -52,13 +52,15 @@ export default async function ProjectPage({ params }: PageProps) {
   }
 
   const { project, prevProject, nextProject } = data
+  const primaryImage = project.images?.[0]
+  const additionalImages = project.images?.slice(1) || []
 
   return (
     <main className="relative min-h-screen bg-background text-foreground">
       <div
         className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-200 h-125 blur-3xl opacity-20 dark:opacity-20 rounded-full"
         style={{
-          background: `radial-gradient(circle, ${project.accentColor || "#6366f1"}, transparent 70%)`,
+          background: `radial-gradient(circle, #6366f1, transparent 70%)`,
         }}
       />
 
@@ -74,29 +76,38 @@ export default async function ProjectPage({ params }: PageProps) {
         <header className="space-y-6">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="secondary" className="text-xs font-mono">
-              {project.category}
-            </Badge>
-            <Badge variant="outline" className="text-xs font-mono text-neutral-600 dark:text-neutral-400">
-              {project.role}
+              {project.role || "Development Project"}
             </Badge>
             {project.featured && (
-              <Badge variant="outline" className="text-xs font-mono">
-                <Sparkles className="h-3 w-3 text-indigo-400 mr-1" />
-                Featured System
+              <Badge variant="outline" className="text-xs font-mono text-amber-500 border-amber-500/30 bg-amber-500/10">
+                <Sparkles className="h-3 w-3 mr-1" />
+                Featured Project
               </Badge>
             )}
           </div>
 
-          <div className="space-y-3">
-            <h1 className="text-4xl sm:text-5xl xl:text-6xl font-bold tracking-tight text-neutral-900 dark:text-white">
-              {project.title}
-            </h1>
-            <p className="text-lg sm:text-xl text-neutral-600 dark:text-neutral-300 leading-relaxed font-normal max-w-3xl">
-              {project.tagline}
-            </p>
+          <div className="flex items-start gap-5">
+            {project.logo && (
+              <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl border border-black/10 dark:border-white/10 bg-muted/40 p-2.5 flex items-center justify-center shrink-0 shadow-sm">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={project.logo}
+                  alt={`${project.title} logo`}
+                  className="h-full w-full object-contain"
+                />
+              </div>
+            )}
+            <div className="space-y-3">
+              <h1 className="text-4xl sm:text-5xl xl:text-6xl font-bold tracking-tight text-neutral-900 dark:text-white">
+                {project.title}
+              </h1>
+              <p className="text-lg sm:text-xl text-neutral-600 dark:text-neutral-300 leading-relaxed font-normal max-w-3xl">
+                {project.tagline}
+              </p>
+            </div>
           </div>
 
-          <div className="text-sm sm:text-base text-neutral-700 dark:text-neutral-400 leading-relaxed border-l-2 border-indigo-500/40 pl-4 py-1">
+          <div className="text-sm sm:text-base text-neutral-700 dark:text-neutral-300 leading-relaxed border-l-2 border-indigo-500/40 pl-4 py-1 whitespace-pre-line">
             <p>{project.description}</p>
           </div>
 
@@ -127,104 +138,73 @@ export default async function ProjectPage({ params }: PageProps) {
           </div>
         </header>
 
-        {/* Project Cover Image (if uploaded) */}
-        {project.coverImage && (
-          <div className="mt-10 overflow-hidden rounded-3xl border border-black/10 dark:border-white/10 shadow-2xl bg-neutral-100 dark:bg-[#0e131f] aspect-video w-full">
+        {/* Primary Cover / Showcase Screenshot */}
+        {primaryImage && (
+          <div className="mt-12 overflow-hidden rounded-3xl border border-black/10 dark:border-white/10 shadow-2xl bg-neutral-100 dark:bg-[#0e131f] aspect-video w-full">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={project.coverImage}
-              alt={project.title}
+              src={primaryImage}
+              alt={`${project.title} Preview`}
               className="h-full w-full object-cover"
             />
           </div>
         )}
 
-        <section className="mt-16 space-y-4">
-          <div className="font-mono text-xs uppercase tracking-widest text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-            <Layers className="h-3.5 w-3.5" />
-            <span>System Architecture & Solution</span>
-          </div>
-
-          <div className="rounded-3xl border border-black/8 dark:border-white/10 bg-black/1 dark:bg-white/2 p-6 sm:p-8 space-y-6">
-            {project.architectureOverview && (
-              <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 dark:bg-indigo-500/10 p-5 font-mono text-xs text-neutral-800 dark:text-neutral-200">
-                <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold mb-2">
-                  <Terminal className="h-3.5 w-3.5" />
-                  <span>Architecture Blueprint</span>
-                </div>
-                <p className="leading-relaxed whitespace-pre-line">{project.architectureOverview}</p>
-              </div>
-            )}
-
-            {/* Architecture Diagram Media (if uploaded) */}
-            {project.architectureDiagram && (
-              <div className="overflow-hidden rounded-2xl border border-black/10 dark:border-white/10 bg-neutral-100 dark:bg-[#0e131f] aspect-video w-full">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={project.architectureDiagram}
-                  alt={`${project.title} Architecture Diagram`}
-                  className="h-full w-full object-contain p-4"
-                />
-              </div>
-            )}
-
-            {project.solution && (
-              <div className="space-y-3">
-                <h3 className="text-sm font-semibold tracking-tight text-neutral-900 dark:text-white uppercase font-mono text-[11px]">
-                  Implementation Details
-                </h3>
-                <p className="text-sm sm:text-base text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-line">
-                  {project.solution}
-                </p>
-              </div>
-            )}
-
-            {project.challenge && (
-              <div className="space-y-3 pt-2">
-                <h3 className="text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
-                  Engineering Challenge
-                </h3>
-                <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
-                  {project.challenge}
-                </p>
-              </div>
-            )}
-
-            {project.highlights && project.highlights.length > 0 && (
-              <div className="space-y-3 pt-2">
-                <h3 className="text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
-                  Key Technical Highlights
-                </h3>
-                <ul className="space-y-2.5">
-                  {project.highlights.map((highlight: string, idx: number) => (
-                    <li
-                      key={idx}
-                      className="flex items-start gap-3 text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed"
-                    >
-                      <CheckCircle2 className="h-4 w-4 text-indigo-500 shrink-0 mt-0.5" />
-                      <span>{highlight}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {project.technologies && project.technologies.length > 0 && (
-          <section className="mt-12 space-y-4">
-            <h2 className="font-semibold text-neutral-900 dark:text-white uppercase tracking-wider font-mono text-xs">
-              Technologies & Infrastructure
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {project.technologies.map((tech: string) => (
-                <span
-                  key={tech}
-                  className="rounded-xl border border-black/8 dark:border-white/10 bg-black/2 dark:bg-white/4 px-4 py-2 font-mono text-xs text-neutral-800 dark:text-neutral-200"
+        {/* Gallery / Additional Screenshots */}
+        {additionalImages.length > 0 && (
+          <section className="mt-14 space-y-4">
+            <div className="font-mono text-xs uppercase tracking-widest text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+              <Images className="h-3.5 w-3.5" />
+              <span>Project Gallery ({additionalImages.length} additional)</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {additionalImages.map((imgUrl: string, idx: number) => (
+                <div
+                  key={idx}
+                  className="overflow-hidden rounded-2xl border border-black/8 dark:border-white/10 bg-neutral-100 dark:bg-[#0e131f] aspect-video w-full group relative"
                 >
-                  {tech}
-                </span>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={imgUrl}
+                    alt={`${project.title} screenshot ${idx + 2}`}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors pointer-events-none" />
+                </div>
               ))}
+            </div>
+          </section>
+        )}
+
+        {/* Technologies & Linked Skills */}
+        {project.skills && project.skills.length > 0 && (
+          <section className="mt-14 space-y-4">
+            <div className="font-mono text-xs uppercase tracking-widest text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+              <Layers className="h-3.5 w-3.5" />
+              <span>Technologies & Core Stack</span>
+            </div>
+            <div className="flex flex-wrap gap-2.5">
+              {project.skills.map((skill: any) => {
+                const name = typeof skill === "object" ? skill.name : String(skill)
+                const id = typeof skill === "object" ? skill._id : String(skill)
+                const catName = typeof skill === "object" ? skill.categoryId?.name : undefined
+
+                return (
+                  <div
+                    key={id}
+                    className="flex items-center gap-2 rounded-xl border border-black/8 dark:border-white/10 bg-black/2 dark:bg-white/4 px-3.5 py-2"
+                  >
+                    <span className="font-mono text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                      {name}
+                    </span>
+                    {catName && (
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-500 dark:text-neutral-400">
+                        {catName}
+                      </span>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </section>
         )}

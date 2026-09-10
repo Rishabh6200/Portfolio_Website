@@ -10,12 +10,12 @@ import { Plus, AlertCircle, Sparkles } from "lucide-react"
 export const dynamic = "force-dynamic"
 
 interface AdminSkillsPageProps {
-  searchParams: Promise<{ category?: string }>
+  searchParams: Promise<{ category?: string; c?: string }>
 }
 
 export default async function AdminSkillsPage({ searchParams }: AdminSkillsPageProps) {
   const resolvedParams = await searchParams
-  const categoryQuery = resolvedParams?.category
+  const categoryQuery = resolvedParams?.c || resolvedParams?.category
 
   // Fetch categories and lightweight counts for tab rendering
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

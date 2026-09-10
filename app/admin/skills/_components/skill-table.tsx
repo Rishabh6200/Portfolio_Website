@@ -44,8 +44,26 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { deleteSkillAction, reorderSkillsAction } from "@/app/admin/skills/actions"
+import { deleteSkillAction, reorderSkillsAction, updateSkillLevelAction } from "@/app/admin/skills/actions"
 import { DragHandle, SortableRow } from "@/components/ui/sortable-row"
+import { cn } from "@/lib/utils"
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"
+
+const PROFICIENCY_LEVELS: {
+  value: "Proficient" | "Advanced" | "Expert"
+  label: string
+  dotColor: string
+}[] = [
+  { value: "Expert", label: "Expert", dotColor: "bg-indigo-500" },
+  { value: "Advanced", label: "Advanced", dotColor: "bg-sky-500" },
+  { value: "Proficient", label: "Proficient", dotColor: "bg-emerald-500" },
+]
 
 export interface SerializedSkill {
   _id: string
@@ -86,6 +104,37 @@ export function SkillTable({
   // Delete Dialog state
   const [skillToDelete, setSkillToDelete] = useState<SerializedSkill | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  // Level quick-change state
+  const [updatingSkillId, setUpdatingSkillId] = useState<string | null>(null)
+
+  async function handleLevelChange(
+    skillId: string,
+    skillName: string,
+    newLevel: "Proficient" | "Advanced" | "Expert"
+  ) {
+    const previousSkills = [...skills]
+    // Optimistic UI update
+    setSkills((prev) =>
+      prev.map((s) => (s._id === skillId ? { ...s, level: newLevel } : s))
+    )
+    setUpdatingSkillId(skillId)
+
+    try {
+      const res = await updateSkillLevelAction(skillId, newLevel)
+      if (res.success) {
+        toast.success(`Updated "${skillName}" to ${newLevel}`, { duration: 1500 })
+      } else {
+        setSkills(previousSkills)
+        toast.error(res.error || "Failed to update proficiency level")
+      }
+    } catch {
+      setSkills(previousSkills)
+      toast.error("An error occurred while updating proficiency level")
+    } finally {
+      setUpdatingSkillId(null)
+    }
+  }
 
   // Keep state in sync when category tab changes
   useEffect(() => {
@@ -199,7 +248,7 @@ export function SkillTable({
                 </TableHead>
                 <TableHead className="w-75">Skill / Technology</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead>Proficiency</TableHead>
+                <TableHead className="w-32">Proficiency</TableHead>
                 <TableHead className="w-28 text-center">Sort Order</TableHead>
                 <TableHead className="text-right w-28">Actions</TableHead>
               </TableRow>
@@ -256,20 +305,63 @@ export function SkillTable({
                             )}
                           </TableCell>
 
-                          {/* Proficiency Level */}
+                          {/* Quick Changeable Proficiency Level */}
                           <TableCell>
-                            <Badge
-                              variant={
-                                skill.level === "Expert"
-                                  ? "default"
-                                  : skill.level === "Advanced"
-                                  ? "secondary"
-                                  : "outline"
-                              }
-                              className="text-xs"
+                            <Select
+                              value={skill.level}
+                              onValueChange={(val) => {
+                                if (val && val !== skill.level) {
+                                  handleLevelChange(
+                                    skill._id,
+                                    skill.name,
+                                    val as "Proficient" | "Advanced" | "Expert"
+                                  )
+                                }
+                              }}
+                              items={PROFICIENCY_LEVELS.map((lvl) => ({
+                                value: lvl.value,
+                                label: lvl.label,
+                              }))}
+                              disabled={updatingSkillId === skill._id}
                             >
-                              {skill.level}
-                            </Badge>
+                              <SelectTrigger
+                                size="sm"
+                                className={cn(
+                                  "h-6! w-26 px-2.5 py-0! rounded-full text-[11px] sm:text-xs font-semibold border justify-between transition-all cursor-pointer shadow-none group select-none leading-none",
+                                  "[&_svg]:size-3 [&_svg]:opacity-60 group-hover:[&_svg]:opacity-100 [&_svg]:transition-opacity [&_svg]:text-current",
+                                  skill.level === "Expert"
+                                    ? "bg-primary text-primary-foreground dark:bg-primary dark:text-primary-foreground border-transparent hover:bg-primary/90 dark:hover:bg-primary/90 shadow-xs"
+                                    : skill.level === "Advanced"
+                                    ? "bg-secondary text-secondary-foreground dark:bg-secondary dark:text-secondary-foreground border-border/80 hover:bg-secondary/80"
+                                    : "bg-background text-muted-foreground dark:bg-background/80 border-border hover:bg-muted hover:text-foreground",
+                                  updatingSkillId === skill._id && "opacity-60 cursor-wait pointer-events-none"
+                                )}
+                              >
+                                <SelectValue className="leading-none">
+                                  {(val) => val || skill.level}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent align="start" className="min-w-36 p-1">
+                                {PROFICIENCY_LEVELS.map((lvl) => (
+                                  <SelectItem
+                                    key={lvl.value}
+                                    value={lvl.value}
+                                    label={lvl.label}
+                                    className="py-1.5 text-xs font-medium cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        className={cn(
+                                          "h-2 w-2 rounded-full shrink-0",
+                                          lvl.dotColor
+                                        )}
+                                      />
+                                      <span>{lvl.label}</span>
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </TableCell>
 
                           {/* Sort Order Badge */}

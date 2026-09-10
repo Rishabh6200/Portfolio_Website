@@ -18,7 +18,7 @@ export default function AdminDashboardPage() {
             Projects
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Manage your engineering case studies and ImageKit media assets.
+            Manage your project case studies and ImageKit media assets.
           </p>
         </div>
 

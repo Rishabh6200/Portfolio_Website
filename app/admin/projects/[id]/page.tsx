@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { projectService, categoryService } from "@/services"
+import { projectService, skillService } from "@/services"
 import { ProjectForm } from "../_components/project-form"
 
 interface PageProps {
@@ -14,17 +14,17 @@ export default async function EditProjectPage({ params }: PageProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let project: any = null
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let categories: any[] = []
+  let skills: any[] = []
 
   try {
-    const [projectDoc, categoryDocs] = await Promise.all([
+    const [projectDoc, skillDocs] = await Promise.all([
       projectService.getById(id),
-      categoryService.getAll(),
+      skillService.getAll(),
     ])
     project = projectDoc
-    categories = categoryDocs
+    skills = skillDocs
   } catch (err) {
-    console.error("Error finding project or categories:", err)
+    console.error("Error finding project or skills:", err)
   }
 
   if (!project) {
@@ -38,14 +38,14 @@ export default async function EditProjectPage({ params }: PageProps) {
           Edit: {project.title}
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Update system architecture details, ImageKit media, and visibility.
+          Update project details, skills used, media, and visibility.
         </p>
       </div>
 
       <ProjectForm
         initialData={project}
         isEditing={true}
-        categories={categories}
+        availableSkills={skills}
       />
     </div>
   )

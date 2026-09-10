@@ -1,21 +1,14 @@
-import mongoose, { Schema, Document, Model } from "mongoose"
+import mongoose, { Schema, Document, Model, Types } from "mongoose"
 
 export interface IProject extends Document {
-  slug: string
   title: string
+  slug: string
   tagline: string
   description: string
-  category: string
   role: string
-  timeline?: string
-  accentColor?: string
-  coverImage?: string
-  architectureDiagram?: string
-  technologies: string[]
-  highlights: string[]
-  architectureOverview?: string
-  challenge?: string
-  solution?: string
+  skills: Types.ObjectId[]
+  logo?: string
+  images: string[]
   liveUrl?: string
   githubUrl?: string
   featured: boolean
@@ -27,6 +20,11 @@ export interface IProject extends Document {
 
 const ProjectSchema = new Schema<IProject>(
   {
+    title: {
+      type: String,
+      required: [true, "Project title is required"],
+      trim: true,
+    },
     slug: {
       type: String,
       required: [true, "Project slug is required"],
@@ -34,11 +32,6 @@ const ProjectSchema = new Schema<IProject>(
       trim: true,
       lowercase: true,
       index: true,
-    },
-    title: {
-      type: String,
-      required: [true, "Project title is required"],
-      trim: true,
     },
     tagline: {
       type: String,
@@ -49,52 +42,24 @@ const ProjectSchema = new Schema<IProject>(
       type: String,
       required: [true, "Project description is required"],
     },
-    category: {
-      type: String,
-      required: [true, "Category is required"],
-      trim: true,
-      default: "Full-Stack",
-      index: true,
-    },
     role: {
       type: String,
-      default: "Full-Stack Engineer",
+      default: "Full-Stack Developer",
+      trim: true,
     },
-    timeline: {
-      type: String,
-      default: "Recent",
-    },
-    accentColor: {
-      type: String,
-      default: "#6366f1",
-    },
-    coverImage: {
-      type: String,
-      default: "",
-    },
-    architectureDiagram: {
+    skills: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Skill",
+      },
+    ],
+    logo: {
       type: String,
       default: "",
     },
-    technologies: {
+    images: {
       type: [String],
       default: [],
-    },
-    highlights: {
-      type: [String],
-      default: [],
-    },
-    architectureOverview: {
-      type: String,
-      default: "",
-    },
-    challenge: {
-      type: String,
-      default: "",
-    },
-    solution: {
-      type: String,
-      default: "",
     },
     liveUrl: {
       type: String,
@@ -123,6 +88,15 @@ const ProjectSchema = new Schema<IProject>(
     timestamps: true,
   }
 )
+
+mongoose.set("strictPopulate", false)
+
+// In Next.js dev server/HMR, clear stale cached model if it lacks the new 'skills' field
+if (mongoose.models && mongoose.models.Project) {
+  if (!mongoose.models.Project.schema?.path("skills")) {
+    delete (mongoose.models as Record<string, unknown>).Project
+  }
+}
 
 export const Project: Model<IProject> =
   mongoose.models.Project || mongoose.model<IProject>("Project", ProjectSchema)

@@ -87,7 +87,7 @@ export function CategoryForm({ initialData, isEditing = false }: CategoryFormPro
       slug: initialData?.slug || "",
       description: initialData?.description || "",
       icon: initialData?.icon || "Server",
-      order: initialData?.order ?? 0,
+      order: initialData?.order,
       color: initialData?.color || "#6366f1",
     },
   })
@@ -98,8 +98,8 @@ export function CategoryForm({ initialData, isEditing = false }: CategoryFormPro
       slug: data.slug.trim(),
       description: (data.description || "").trim(),
       icon: data.icon,
-      order: Number(data.order) || 0,
       color: data.color,
+      ...(isEditing && initialData?.order !== undefined ? { order: initialData.order } : {}),
     }
 
     startTransition(async () => {
@@ -166,7 +166,7 @@ export function CategoryForm({ initialData, isEditing = false }: CategoryFormPro
             Category Details
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Define the technical domain name, URL slug, icon, and display sort order.
+            Define the technical domain name, URL slug, icon, and accent color.
           </p>
         </div>
 
@@ -229,8 +229,8 @@ export function CategoryForm({ initialData, isEditing = false }: CategoryFormPro
             </div>
           </div>
 
-          {/* Icon & Display Order & Color */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {/* Icon & Color */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div className="space-y-2">
               <Label className="text-sm font-medium">Category Icon</Label>
               <Controller
@@ -326,25 +326,6 @@ export function CategoryForm({ initialData, isEditing = false }: CategoryFormPro
               {errors.color && (
                 <p className="text-xs text-destructive font-medium mt-1">
                   {errors.color.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Display Sort Order</Label>
-              <Input
-                type="number"
-                placeholder="e.g. 1"
-                {...register("order", { valueAsNumber: true })}
-                className={errors.order ? "border-destructive focus-visible:ring-destructive" : ""}
-              />
-              {errors.order ? (
-                <p className="text-xs text-destructive font-medium mt-1">
-                  {errors.order.message}
-                </p>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  Lower numbers appear first on the site.
                 </p>
               )}
             </div>

@@ -78,7 +78,7 @@ export function SkillForm({
       categoryId: defaultCategoryId,
       level: initialData?.level || "Advanced",
       highlight: initialData?.highlight ?? false,
-      order: initialData?.order ?? 0,
+      order: initialData?.order,
     },
   })
 
@@ -88,7 +88,7 @@ export function SkillForm({
       categoryId: data.categoryId,
       level: data.level,
       highlight: Boolean(data.highlight),
-      order: Number(data.order) || 0,
+      ...(isEditing && initialData?.order !== undefined ? { order: initialData.order } : {}),
     }
 
     startTransition(async () => {
@@ -155,7 +155,7 @@ export function SkillForm({
             Skill & Competency Details
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Assign the technical competency to a parent domain category, specify proficiency level, and configure display ordering.
+            Assign the technical competency to a parent domain category and specify proficiency level.
           </p>
         </div>
 
@@ -246,70 +246,49 @@ export function SkillForm({
             </div>
           </div>
 
-          {/* Proficiency Level & Sort Order */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Proficiency Level <span className="text-destructive">*</span>
-              </Label>
-              <Controller
-                name="level"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    items={PROFICIENCY_LEVELS.map((lvl) => ({
-                      value: lvl.value,
-                      label: lvl.label,
-                    }))}
-                  >
-                    <SelectTrigger className="h-10 w-full">
-                      <SelectValue placeholder="Select level">
-                        {(val) => {
-                          const lvl = PROFICIENCY_LEVELS.find((l) => l.value === val)
-                          return lvl ? lvl.label : "Select level"
-                        }}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PROFICIENCY_LEVELS.map((lvl) => (
-                        <SelectItem key={lvl.value} value={lvl.value} label={lvl.label}>
-                          <div className="flex flex-col text-left py-0.5">
-                            <span className="font-medium text-foreground">{lvl.label}</span>
-                            <span className="text-[11px] text-muted-foreground">{lvl.description}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.level && (
-                <p className="text-xs text-destructive font-medium mt-1">
-                  {errors.level.message}
-                </p>
+          {/* Proficiency Level */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">
+              Proficiency Level <span className="text-destructive">*</span>
+            </Label>
+            <Controller
+              name="level"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  items={PROFICIENCY_LEVELS.map((lvl) => ({
+                    value: lvl.value,
+                    label: lvl.label,
+                  }))}
+                >
+                  <SelectTrigger className="h-10 w-full">
+                    <SelectValue placeholder="Select level">
+                      {(val) => {
+                        const lvl = PROFICIENCY_LEVELS.find((l) => l.value === val)
+                        return lvl ? lvl.label : "Select level"
+                      }}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PROFICIENCY_LEVELS.map((lvl) => (
+                      <SelectItem key={lvl.value} value={lvl.value} label={lvl.label}>
+                        <div className="flex flex-col text-left py-0.5">
+                          <span className="font-medium text-foreground">{lvl.label}</span>
+                          <span className="text-[11px] text-muted-foreground">{lvl.description}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Display Sort Order</Label>
-              <Input
-                type="number"
-                placeholder="e.g. 1"
-                {...register("order", { valueAsNumber: true })}
-                className={errors.order ? "border-destructive focus-visible:ring-destructive" : ""}
-              />
-              {errors.order ? (
-                <p className="text-xs text-destructive font-medium mt-1">
-                  {errors.order.message}
-                </p>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  Lower numbers appear first within this category.
-                </p>
-              )}
-            </div>
+            />
+            {errors.level && (
+              <p className="text-xs text-destructive font-medium mt-1">
+                {errors.level.message}
+              </p>
+            )}
           </div>
 
           {/* Highlight Toggle */}

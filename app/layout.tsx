@@ -20,11 +20,11 @@ const fontMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Rishabh — Senior Full-Stack & Systems Engineer",
+  title: "Rishabh — Senior Full-Stack & Systems Developer",
   description:
     "Portfolio of Rishabh. Specializing in high-throughput distributed architectures, resilient cloud backends, and pixel-precise interactive web experiences.",
   keywords: [
-    "Full-Stack Engineer",
+    "Full-Stack Developer",
     "Systems Architect",
     "Next.js",
     "React 19",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Rishabh" }],
   openGraph: {
-    title: "Rishabh — Senior Full-Stack & Systems Engineer",
+    title: "Rishabh — Senior Full-Stack & Systems Developer",
     description:
       "Architecting high-throughput distributed systems & polished interactive web experiences.",
     type: "website",

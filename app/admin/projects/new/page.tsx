@@ -1,16 +1,16 @@
-import { categoryService } from "@/services"
+import { skillService } from "@/services"
 import { ProjectForm } from "../_components/project-form"
 
 export const dynamic = "force-dynamic"
 
 export default async function NewProjectPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let categories: any[] = []
+  let skills: any[] = []
 
   try {
-    categories = await categoryService.getAll()
+    skills = await skillService.getAll()
   } catch (err) {
-    console.error("Error fetching categories for new project:", err)
+    console.error("Error fetching skills for new project:", err)
   }
 
   return (
@@ -20,11 +20,11 @@ export default async function NewProjectPage() {
           New Project
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Add an engineering system, backend architecture, or web application to your portfolio.
+          Add a project, backend architecture, or web application to your portfolio.
         </p>
       </div>
 
-      <ProjectForm isEditing={false} categories={categories} />
+      <ProjectForm isEditing={false} availableSkills={skills} />
     </div>
   )
 }

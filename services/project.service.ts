@@ -1,22 +1,18 @@
 import { dbConnect } from "@/lib/db/connect"
 import { Project } from "@/lib/db/models"
+// Ensure Skill and Category models are registered in Mongoose for population
+import "@/lib/db/models/category.model"
+import "@/lib/db/models/skill.model"
 
 export interface ProjectInput {
   title: string
   slug?: string
   tagline: string
   description: string
-  category: string
-  role: string
-  timeline?: string
-  accentColor?: string
-  coverImage?: string
-  architectureDiagram?: string
-  technologies: string[]
-  highlights: string[]
-  architectureOverview?: string
-  challenge?: string
-  solution?: string
+  role?: string
+  skills?: string[]
+  logo?: string
+  images?: string[]
   liveUrl?: string
   githubUrl?: string
   featured?: boolean
@@ -38,6 +34,12 @@ export class ProjectService {
     try {
       await dbConnect()
       const docs = await Project.find({ status: "published" })
+        .populate({
+          path: "skills",
+          select: "name level categoryId",
+          strictPopulate: false,
+          populate: { path: "categoryId", select: "name slug color", strictPopulate: false },
+        })
         .sort({ order: 1, createdAt: -1 })
         .lean()
       if (docs && docs.length > 0) {
@@ -52,13 +54,28 @@ export class ProjectService {
 
   async getAllAdmin() {
     await dbConnect()
-    const docs = await Project.find().sort({ order: 1, createdAt: -1 }).lean()
+    const docs = await Project.find()
+      .populate({
+        path: "skills",
+        select: "name level categoryId",
+        strictPopulate: false,
+        populate: { path: "categoryId", select: "name slug color", strictPopulate: false },
+      })
+      .sort({ order: 1, createdAt: -1 })
+      .lean()
     return JSON.parse(JSON.stringify(docs))
   }
 
   async getById(id: string) {
     await dbConnect()
-    const doc = await Project.findById(id).lean()
+    const doc = await Project.findById(id)
+      .populate({
+        path: "skills",
+        select: "name level categoryId",
+        strictPopulate: false,
+        populate: { path: "categoryId", select: "name slug color", strictPopulate: false },
+      })
+      .lean()
     if (!doc) return null
     return JSON.parse(JSON.stringify(doc))
   }
@@ -69,6 +86,12 @@ export class ProjectService {
     try {
       await dbConnect()
       const docs = await Project.find({ status: "published" })
+        .populate({
+          path: "skills",
+          select: "name level categoryId",
+          strictPopulate: false,
+          populate: { path: "categoryId", select: "name slug color", strictPopulate: false },
+        })
         .sort({ order: 1, createdAt: -1 })
         .lean()
       if (docs && docs.length > 0) {
@@ -104,12 +127,26 @@ export class ProjectService {
       throw new Error(`A project with slug "${finalSlug}" already exists. Please choose a different title or slug.`)
     }
 
+    let order = data.order !== undefined ? Number(data.order) : NaN
+    if (isNaN(order)) {
+      const lastProject = await Project.findOne().sort({ order: -1 }).select("order").lean()
+      order = lastProject && typeof lastProject.order === "number" ? lastProject.order + 1 : 0
+    }
+
     const created = await Project.create({
-      ...data,
+      title: data.title.trim(),
       slug: finalSlug,
+      tagline: data.tagline.trim(),
+      description: data.description.trim(),
+      role: data.role?.trim() || "Full-Stack Developer",
+      skills: data.skills || [],
+      logo: data.logo || "",
+      images: data.images || [],
+      liveUrl: data.liveUrl || "",
+      githubUrl: data.githubUrl || "",
       featured: Boolean(data.featured),
       status: data.status || "published",
-      order: Number(data.order) || 0,
+      order,
     })
 
     return JSON.parse(JSON.stringify(created))
@@ -125,15 +162,27 @@ export class ProjectService {
       throw new Error(`Another project with slug "${finalSlug}" already exists.`)
     }
 
+    const updatePayload: Record<string, any> = {
+      title: data.title.trim(),
+      slug: finalSlug,
+      tagline: data.tagline.trim(),
+      description: data.description.trim(),
+      role: data.role?.trim() || "Full-Stack Developer",
+      skills: data.skills || [],
+      logo: data.logo || "",
+      images: data.images || [],
+      liveUrl: data.liveUrl || "",
+      githubUrl: data.githubUrl || "",
+      featured: Boolean(data.featured),
+      status: data.status || "published",
+    }
+    if (data.order !== undefined) {
+      updatePayload.order = Number(data.order)
+    }
+
     const updated = await Project.findByIdAndUpdate(
       id,
-      {
-        ...data,
-        slug: finalSlug,
-        featured: Boolean(data.featured),
-        status: data.status || "published",
-        order: Number(data.order) || 0,
-      },
+      updatePayload,
       { new: true }
     ).lean()
 
