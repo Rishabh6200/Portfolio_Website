@@ -2,13 +2,22 @@
 
 import { motion } from "motion/react"
 import { Briefcase, MapPin, Calendar } from "lucide-react"
-import { portfolioData } from "@/data/portfolio-data"
 
-export function ExperienceSection() {
+interface ExperienceSectionProps {
+  initialExperiences?: any[]
+}
+
+export function ExperienceSection({ initialExperiences = [] }: ExperienceSectionProps) {
+  const experiences = initialExperiences
+
+  if (experiences.length === 0) {
+    return null
+  }
+
   return (
     <section
       id="experience"
-      className="relative py-24 sm:py-28 px-6 sm:px-8 xl:px-12 border-t border-black/6 dark:border-white/6"
+      className="relative py-24 sm:py-28 px-6 sm:px-8 xl:px-12 border-t border-black/6 dark:border-white/6 scroll-mt-24 sm:scroll-mt-28"
     >
       <div className="mx-auto max-w-5xl xl:max-w-6xl 2xl:max-w-7xl">
         <motion.div
@@ -31,12 +40,15 @@ export function ExperienceSection() {
         </motion.div>
 
         <div className="border-t border-black/8 dark:border-white/8">
-          {portfolioData.experience.map((exp, idx) => {
-            const isCurrent = exp.period.toLowerCase().includes("present")
+          {experiences.map((exp: any, idx: number) => {
+            const isCurrent = (exp.period || "").toLowerCase().includes("present")
+            const techList: string[] = Array.isArray(exp.skills) && exp.skills.length > 0
+              ? exp.skills.map((s: any) => (typeof s === "object" && s?.name ? s.name : String(s)))
+              : (exp.technologies || [])
 
             return (
               <motion.div
-                key={exp.company + exp.period}
+                key={exp._id || exp.company + exp.period}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
@@ -68,7 +80,13 @@ export function ExperienceSection() {
 
                     <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
                       <MapPin className="h-3 w-3 shrink-0" />
-                      <span>{exp.location}</span>
+                      <span>
+                        {exp.locationType &&
+                        exp.locationType !== "Remote" &&
+                        !exp.location.toLowerCase().includes(exp.locationType.toLowerCase())
+                          ? `${exp.location} (${exp.locationType})`
+                          : exp.location || exp.locationType || "Remote"}
+                      </span>
                       <span>•</span>
                       <span>{exp.type}</span>
                     </div>
@@ -85,7 +103,7 @@ export function ExperienceSection() {
                     </div>
 
                     <div className="space-y-2.5 pt-1">
-                      {exp.achievements.map((item, i) => (
+                      {(exp.achievements || []).map((item: string, i: number) => (
                         <div
                           key={i}
                           className="flex items-start gap-3 text-xs sm:text-sm text-neutral-700 dark:text-neutral-300"
@@ -99,7 +117,7 @@ export function ExperienceSection() {
                     </div>
 
                     <div className="flex flex-wrap gap-1.5 pt-3">
-                      {exp.technologies.map((tech) => (
+                      {techList.map((tech: string) => (
                         <span
                           key={tech}
                           className="font-mono text-[10px] px-2 py-0.5 rounded-md border border-black/6 bg-black/2 text-neutral-600 dark:border-white/6 dark:bg-white/2 dark:text-neutral-400"

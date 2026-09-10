@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Layers,
   Sparkles,
+  Briefcase,
 } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -51,6 +52,12 @@ export function AdminShell({ children }: AdminShellProps) {
       icon: Sparkles,
       exact: false,
     },
+    {
+      title: "Experience",
+      href: "/admin/experience",
+      icon: Briefcase,
+      exact: false,
+    },
   ]
 
   // Breadcrumb generator
@@ -62,6 +69,9 @@ export function AdminShell({ children }: AdminShellProps) {
   const isSkills = pathname.startsWith("/admin/skills")
   const isNewSkill = pathname === "/admin/skills/new"
   const isEditSkill = isSkills && !isNewSkill && pathname !== "/admin/skills"
+  const isExperience = pathname.startsWith("/admin/experience")
+  const isNewExperience = pathname === "/admin/experience/new"
+  const isEditExperience = isExperience && !isNewExperience && pathname !== "/admin/experience"
 
   return (
     <div className="h-screen w-full overflow-hidden flex bg-background text-foreground">
@@ -182,7 +192,27 @@ export function AdminShell({ children }: AdminShellProps) {
                 Admin
               </Link>
               <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
-              {isSkills ? (
+              {isExperience ? (
+                isNewExperience ? (
+                  <>
+                    <Link href="/admin/experience" className="hover:text-foreground transition-colors">
+                      Experience
+                    </Link>
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
+                    <span className="text-foreground font-semibold">New Experience</span>
+                  </>
+                ) : isEditExperience ? (
+                  <>
+                    <Link href="/admin/experience" className="hover:text-foreground transition-colors">
+                      Experience
+                    </Link>
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
+                    <span className="text-foreground font-semibold">Edit Experience</span>
+                  </>
+                ) : (
+                  <span className="text-foreground font-semibold">Experience</span>
+                )
+              ) : isSkills ? (
                 isNewSkill ? (
                   <>
                     <Link href="/admin/skills" className="hover:text-foreground transition-colors">

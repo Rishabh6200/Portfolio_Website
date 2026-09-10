@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export function BentoGridSkeleton() {
   return (
-    <section className="relative py-24 sm:py-28 px-6 sm:px-8 xl:px-12 border-t border-black/6 dark:border-white/6">
+    <section id="about" className="relative py-24 sm:py-28 px-6 sm:px-8 xl:px-12 border-t border-black/6 dark:border-white/6 scroll-mt-24 sm:scroll-mt-28">
       <div className="mx-auto max-w-5xl xl:max-w-6xl 2xl:max-w-7xl">
         <div className="mb-14 sm:mb-16 space-y-3">
           <Skeleton className="h-4 w-44 rounded-full" />

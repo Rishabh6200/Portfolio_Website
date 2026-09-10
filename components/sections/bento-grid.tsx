@@ -49,9 +49,9 @@ export function BentoGridSection({ initialCategories = [] }: BentoGridSectionPro
   return (
     <section
       id="about"
-      className="relative py-24 sm:py-28 px-6 sm:px-8 xl:px-12 border-t border-black/6 dark:border-white/6 scroll-mt-12"
+      className="relative py-24 sm:py-28 px-6 sm:px-8 xl:px-12 border-t border-black/6 dark:border-white/6 scroll-mt-24 sm:scroll-mt-28"
     >
-      <div id="skills" className="scroll-mt-12" />
+      <div id="skills" className="scroll-mt-24 sm:scroll-mt-28" />
       <div className="mx-auto max-w-5xl xl:max-w-6xl 2xl:max-w-7xl">
         {/* Section Header */}
         <motion.div

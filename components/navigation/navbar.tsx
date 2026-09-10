@@ -71,6 +71,22 @@ export function Navbar() {
     setTheme(resolvedTheme === "dark" ? "light" : "dark")
   }
 
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    if (href.startsWith("/#") && window.location.pathname === "/") {
+      const targetId = href.replace("/#", "")
+      const el = document.getElementById(targetId)
+      if (el) {
+        e.preventDefault()
+        window.history.pushState(null, "", href.replace("/", ""))
+        el.scrollIntoView({ behavior: "smooth", block: "start" })
+        setMobileMenuOpen(false)
+      }
+    }
+  }
+
   return (
     <>
       <AnimatePresence>
@@ -130,30 +146,16 @@ export function Navbar() {
               </Link>
 
               <div className="hidden sm:flex items-center gap-1 text-xs text-neutral-600 dark:text-neutral-400">
-                <Link
-                  href="/#about"
-                  className="rounded-full px-3 py-1.5 transition-colors hover:text-neutral-900 hover:bg-black/4 dark:hover:text-white dark:hover:bg-white/4"
-                >
-                  About
-                </Link>
-                <Link
-                  href="/#projects"
-                  className="rounded-full px-3 py-1.5 transition-colors hover:text-neutral-900 hover:bg-black/4 dark:hover:text-white dark:hover:bg-white/4"
-                >
-                  Projects
-                </Link>
-                <Link
-                  href="/#experience"
-                  className="rounded-full px-3 py-1.5 transition-colors hover:text-neutral-900 hover:bg-black/4 dark:hover:text-white dark:hover:bg-white/4"
-                >
-                  Experience
-                </Link>
-                <Link
-                  href="/#contact"
-                  className="rounded-full px-3 py-1.5 transition-colors hover:text-neutral-900 hover:bg-black/4 dark:hover:text-white dark:hover:bg-white/4"
-                >
-                  Contact
-                </Link>
+                {navItems.map((item) => (
+                  <Link
+                    key={item.title}
+                    href={item.href}
+                    onClick={(e) => handleNavClick(e, item.href)}
+                    className="rounded-full px-3 py-1.5 transition-colors hover:text-neutral-900 hover:bg-black/4 dark:hover:text-white dark:hover:bg-white/4"
+                  >
+                    {item.title}
+                  </Link>
+                ))}
               </div>
 
               <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
@@ -264,7 +266,10 @@ export function Navbar() {
                           >
                             <Link
                               href={item.href}
-                              onClick={() => setMobileMenuOpen(false)}
+                              onClick={(e) => {
+                                handleNavClick(e, item.href)
+                                setMobileMenuOpen(false)
+                              }}
                               className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-neutral-700 hover:text-neutral-900 hover:bg-black/4 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/6 transition-colors"
                             >
                               <div className="flex items-center gap-2.5">

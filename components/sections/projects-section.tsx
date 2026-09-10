@@ -40,7 +40,7 @@ export function ProjectsSection({ initialProjects = [] }: ProjectsSectionProps =
   }, [initialProjects, activeFilter])
 
   return (
-    <section id="projects" className="relative py-24 px-6 sm:px-8 xl:px-12 border-t border-black/6 dark:border-white/6">
+    <section id="projects" className="relative py-24 px-6 sm:px-8 xl:px-12 border-t border-black/6 dark:border-white/6 scroll-mt-24 sm:scroll-mt-28">
       <div className="mx-auto max-w-5xl xl:max-w-6xl 2xl:max-w-7xl">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 xl:mb-14">
           <motion.div
@@ -61,6 +61,7 @@ export function ProjectsSection({ initialProjects = [] }: ProjectsSectionProps =
             </p>
           </motion.div>
 
+          {/* Category filter pills - commented out for now
           {categories.length > 1 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -91,6 +92,7 @@ export function ProjectsSection({ initialProjects = [] }: ProjectsSectionProps =
               ))}
             </motion.div>
           )}
+          */}
         </div>
 
         {initialProjects.length === 0 ? (

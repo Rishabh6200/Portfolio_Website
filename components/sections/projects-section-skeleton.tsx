@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export function ProjectsSectionSkeleton() {
   return (
-    <section className="relative py-24 px-6 sm:px-8 xl:px-12 border-t border-black/6 dark:border-white/6">
+    <section id="projects" className="relative py-24 px-6 sm:px-8 xl:px-12 border-t border-black/6 dark:border-white/6 scroll-mt-24 sm:scroll-mt-28">
       <div className="mx-auto max-w-5xl xl:max-w-6xl 2xl:max-w-7xl">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 xl:mb-14">
           <div className="space-y-3">
@@ -10,7 +10,7 @@ export function ProjectsSectionSkeleton() {
             <Skeleton className="h-10 sm:h-12 w-80 max-w-full rounded-xl" />
             <Skeleton className="h-4 w-96 max-w-full rounded-md" />
           </div>
-          <Skeleton className="h-10 w-72 rounded-xl" />
+          {/* <Skeleton className="h-10 w-72 rounded-xl" /> */}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 xl:gap-6">

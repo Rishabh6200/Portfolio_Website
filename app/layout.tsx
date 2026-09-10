@@ -52,8 +52,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      data-scroll-behavior="smooth"
-      className={cn("antialiased", fontMono.variable, inter.variable)}
+      className={cn("antialiased scroll-smooth", fontMono.variable, inter.variable)}
     >
       <body className="min-h-screen bg-background font-sans text-foreground selection:bg-indigo-500/20 selection:text-indigo-300">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>

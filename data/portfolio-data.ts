@@ -98,49 +98,7 @@ export const portfolioData: PortfolioData = {
   },
   skills: [],
   projects: [],
-  experience: [
-    {
-      company: "Vanguard Systems",
-      role: "Staff Backend & Full-Stack Developer",
-      period: "2023 — Present",
-      location: "Remote",
-      type: "Full-Time",
-      description: "Leading backend API design and frontend architecture for enterprise developer tools and subscription systems.",
-      achievements: [
-        "Architected modular NestJS microservices handling 15,000+ requests/sec with Redis caching and BullMQ queues.",
-        "Spearheaded React 19 web application re-architecture, improving Lighthouse performance score to 99.",
-        "Designed Laravel billing and webhook processing infrastructure with Stripe Cashier.",
-      ],
-      technologies: ["NestJS", "React", "Laravel", "TypeScript", "PostgreSQL", "Redis", "Docker"],
-    },
-    {
-      company: "Synthetix Cloud",
-      role: "Senior Full-Stack Developer",
-      period: "2021 — 2023",
-      location: "Remote",
-      type: "Full-Time",
-      description: "Built high-concurrency Laravel REST APIs, real-time React dashboards, and high-frequency webhook ingestors.",
-      achievements: [
-        "Delivered headless e-commerce backend in Laravel 11 with sub-200ms checkout and zero-oversell concurrency locks.",
-        "Created real-time node canvas editor in React with WebSockets and optimistic state synchronization.",
-        "Implemented automated OpenAPI documentation and CI/CD testing pipelines.",
-      ],
-      technologies: ["Laravel", "React", "TypeScript", "Node.js", "MySQL", "Redis", "Docker"],
-    },
-    {
-      company: "Nebula Interactive",
-      role: "Full-Stack Developer",
-      period: "2019 — 2021",
-      location: "Austin, TX",
-      type: "Full-Time",
-      description: "Developed customer-facing React portals and Node.js / PHP backend APIs for high-growth SaaS clients.",
-      achievements: [
-        "Built modular component libraries and RESTful API endpoints for multi-tenant customer applications.",
-        "Optimized client-side bundle size by 35% through dynamic code splitting and modern assets caching.",
-      ],
-      technologies: ["React", "JavaScript", "PHP", "Node.js", "MySQL", "Tailwind CSS"],
-    },
-  ],
+  experience: [],
   principles: [
     {
       title: "Clean Architecture & Modularity",

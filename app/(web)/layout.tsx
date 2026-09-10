@@ -1,5 +1,6 @@
 import { Footer } from "@/components/navigation/footer"
 import { Navbar } from "@/components/navigation/navbar"
+import { HashScrollHandler } from "@/components/navigation/hash-scroll-handler"
 
 export default function WebLayout({
   children,
@@ -8,6 +9,7 @@ export default function WebLayout({
 }>) {
   return (
     <main>
+      <HashScrollHandler />
       <Navbar />
       {children}
       <Footer />
