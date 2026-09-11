@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import { Geist_Mono, Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
-import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
 import { ProgressProvider } from "@/components/progress-provider"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -86,7 +85,6 @@ export default function RootLayout({
               return event
             }}
           />
-          <SpeedInsights />
         </ThemeProvider>
       </body>
     </html>
