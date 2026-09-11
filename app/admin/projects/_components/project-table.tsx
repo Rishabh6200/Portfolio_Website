@@ -38,14 +38,7 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog"
+import { DeleteConfirmDialog } from "@/app/admin/_components/delete-confirm-dialog"
 import {
   deleteProjectAction,
   toggleProjectStatusAction,
@@ -397,48 +390,24 @@ export function ProjectTable({ projects: initialProjects }: ProjectTableProps) {
       </div>
 
       {/* Delete Confirmation Modal */}
-      <Dialog
+      <DeleteConfirmDialog
         open={Boolean(projectToDelete)}
         onOpenChange={(open) => !open && setProjectToDelete(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="text-lg">Delete Project</DialogTitle>
-            <DialogDescription className="text-sm">
-              Are you sure you want to delete{" "}
-              <strong className="text-foreground font-semibold">
-                &ldquo;{projectToDelete?.title}&rdquo;
-              </strong>
-              ? This action cannot be undone and will permanently remove this project and its media configurations from MongoDB Atlas.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
-              size="default"
-              onClick={() => setProjectToDelete(null)}
-              disabled={isDeleting}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              size="default"
-              onClick={confirmDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Deleting...</span>
-                </>
-              ) : (
-                <span>Delete Project</span>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        title="Delete Project"
+        itemName={projectToDelete?.title}
+        description={
+          <>
+            Are you sure you want to delete{" "}
+            <strong className="text-foreground font-semibold">
+              &ldquo;{projectToDelete?.title}&rdquo;
+            </strong>
+            ? This action cannot be undone and will permanently remove this project and its media configurations from MongoDB Atlas.
+          </>
+        }
+        confirmText="Delete Project"
+        isDeleting={isDeleting}
+        onConfirm={confirmDelete}
+      />
     </>
   )
 }

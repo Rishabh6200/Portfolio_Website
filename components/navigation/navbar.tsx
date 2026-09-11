@@ -3,19 +3,10 @@
 import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "motion/react"
-import {
-  Sun,
-  Moon,
-  ArrowUpRight,
-  ChevronRight,
-  User,
-  FolderKanban,
-  Briefcase,
-  Mail,
-} from "lucide-react"
+import { Sun, Moon, ArrowUpRight, ChevronRight, User, FolderKanban, Briefcase, Mail, } from "lucide-react"
 import { useTheme } from "next-themes"
-import { portfolioData } from "@/data/portfolio-data"
 import { GithubIcon, LinkedinIcon, XIcon } from "@/components/custom-ui/icons"
+import { DEFAULT_PROFILE, type ProfileData } from "@/lib/constants/profile"
 
 const navItems = [
   { title: "About", href: "/#about", icon: User },
@@ -24,14 +15,26 @@ const navItems = [
   { title: "Contact", href: "/#contact", icon: Mail },
 ]
 
-export function Navbar() {
+interface NavbarProps {
+  initialProfile?: ProfileData
+}
+
+const emptySubscribe = () => () => { }
+
+export function Navbar({ initialProfile }: NavbarProps) {
+  const profile = initialProfile || DEFAULT_PROFILE
+
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const mounted = React.useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  )
   const { resolvedTheme, setTheme } = useTheme()
 
   useEffect(() => {
-    setMounted(true)
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
     }
@@ -121,11 +124,10 @@ export function Navbar() {
                 ease: [0.16, 1, 0.3, 1],
               },
             }}
-            className={`flex flex-col w-full border overflow-hidden transition-[background-color,border-color,box-shadow] duration-200 ${
-              scrolled || mobileMenuOpen
+            className={`flex flex-col w-full border overflow-hidden transition-[background-color,border-color,box-shadow] duration-200 ${scrolled || mobileMenuOpen
                 ? "border-black/10 bg-white/75 shadow-[0_12px_36px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,0.8)] backdrop-blur-2xl backdrop-saturate-150 dark:border-white/15 dark:bg-[#07090e]/85 dark:shadow-[0_16px_48px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.12)]"
                 : "border-black/8 bg-white/30 shadow-[0_4px_24px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.7)] backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 dark:bg-black/35 dark:shadow-[0_4px_24px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.08)]"
-            }`}
+              }`}
           >
             <div className="flex items-center justify-between w-full gap-3 sm:gap-6 px-4 py-2 sm:py-2.5">
               <Link
@@ -134,14 +136,14 @@ export function Navbar() {
                 className="group flex items-center gap-2.5 text-sm font-semibold text-neutral-900 dark:text-white tracking-tight shrink-0"
               >
                 <div className="relative flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-tr from-indigo-600 to-cyan-400 text-[10px] font-bold text-white shadow-md shrink-0">
-                  {portfolioData.personal.name.charAt(0)}
+                  {profile.name.charAt(0)}
                   <span className="absolute -bottom-0.5 -right-0.5 flex h-2 w-2">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
                   </span>
                 </div>
                 <span className="font-semibold text-xs sm:text-sm tracking-tight whitespace-nowrap">
-                  {portfolioData.personal.name}
+                  {profile.name}
                 </span>
               </Link>
 
@@ -293,37 +295,43 @@ export function Navbar() {
                           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                           <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
                         </span>
-                        <span className="text-[10px]">{portfolioData.personal.status}</span>
+                        <span className="text-[10px]">{profile.status}</span>
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <a
-                          href={portfolioData.personal.socials.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-1 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
-                          aria-label="GitHub"
-                        >
-                          <GithubIcon className="h-3.5 w-3.5" />
-                        </a>
-                        <a
-                          href={portfolioData.personal.socials.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-1 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
-                          aria-label="LinkedIn"
-                        >
-                          <LinkedinIcon className="h-3.5 w-3.5" />
-                        </a>
-                        <a
-                          href={portfolioData.personal.socials.twitter}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-1 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
-                          aria-label="X (Twitter)"
-                        >
-                          <XIcon className="h-3.5 w-3.5" />
-                        </a>
+                        {profile.socials.github && (
+                          <a
+                            href={profile.socials.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+                            aria-label="GitHub"
+                          >
+                            <GithubIcon className="h-3.5 w-3.5" />
+                          </a>
+                        )}
+                        {profile.socials.linkedin && (
+                          <a
+                            href={profile.socials.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+                            aria-label="LinkedIn"
+                          >
+                            <LinkedinIcon className="h-3.5 w-3.5" />
+                          </a>
+                        )}
+                        {profile.socials.twitter && (
+                          <a
+                            href={profile.socials.twitter}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+                            aria-label="X (Twitter)"
+                          >
+                            <XIcon className="h-3.5 w-3.5" />
+                          </a>
+                        )}
                       </div>
                     </div>
 

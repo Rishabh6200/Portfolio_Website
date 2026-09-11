@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Save, Loader2, Sparkles, FileCode, ClipboardPaste } from "lucide-react"
+import { ArrowLeft, Save, Loader2, Sparkles, FileCode } from "lucide-react"
 import { toast } from "sonner"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,14 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { ProjectImportDialog, type ImportedProjectData } from "./project-import-dialog"
 import {
   Select,
   SelectContent,
@@ -86,122 +79,86 @@ export function ProjectForm({
 
   // Quick JSON / String Import State
   const [isImportOpen, setIsImportOpen] = useState(false)
-  const [importString, setImportString] = useState("")
 
-  function handleApplyImport() {
-    if (!importString.trim()) {
-      toast.error("Please paste a JSON string first")
-      return
+  function handleApplyImportData(data: ImportedProjectData) {
+    if (typeof data.title === "string" && data.title.trim()) {
+      setTitle(data.title.trim())
+      if (isAutoSlug) {
+        setSlug(
+          (typeof data.slug === "string" && data.slug.trim()) ||
+            data.title
+              .toLowerCase()
+              .trim()
+              .replace(/[\s\W-]+/g, "-")
+              .replace(/^-+|-+$/g, "")
+        )
+      }
     }
 
-    try {
-      const data = JSON.parse(importString.trim())
-      if (!data || typeof data !== "object") {
-        throw new Error("Input must be a valid JSON object")
-      }
+    if (typeof data.slug === "string" && data.slug.trim()) {
+      setSlug(data.slug.trim())
+      setIsAutoSlug(false)
+    }
 
-      if (typeof data.title === "string" && data.title.trim()) {
-        setTitle(data.title.trim())
-        if (isAutoSlug) {
-          setSlug(
-            (typeof data.slug === "string" && data.slug.trim()) ||
-              data.title
-                .toLowerCase()
-                .trim()
-                .replace(/[\s\W-]+/g, "-")
-                .replace(/^-+|-+$/g, "")
-          )
-        }
-      }
+    if (typeof data.tagline === "string" && data.tagline.trim()) {
+      setTagline(data.tagline.trim())
+    }
 
-      if (typeof data.slug === "string" && data.slug.trim()) {
-        setSlug(data.slug.trim())
-        setIsAutoSlug(false)
-      }
+    if (typeof data.role === "string" && data.role.trim()) {
+      setRole(data.role.trim())
+    }
 
-      if (typeof data.tagline === "string" && data.tagline.trim()) {
-        setTagline(data.tagline.trim())
-      }
+    if (typeof data.description === "string" && data.description.trim()) {
+      setDescription(data.description.trim())
+    }
 
-      if (typeof data.role === "string" && data.role.trim()) {
-        setRole(data.role.trim())
-      }
+    if (typeof data.liveUrl === "string") {
+      setLiveUrl(data.liveUrl.trim())
+    }
 
-      if (typeof data.description === "string" && data.description.trim()) {
-        setDescription(data.description.trim())
-      }
+    if (typeof data.githubUrl === "string") {
+      setGithubUrl(data.githubUrl.trim())
+    }
 
-      if (typeof data.liveUrl === "string") {
-        setLiveUrl(data.liveUrl.trim())
-      }
+    if (typeof data.logo === "string") {
+      setLogo(data.logo.trim())
+    }
 
-      if (typeof data.githubUrl === "string") {
-        setGithubUrl(data.githubUrl.trim())
-      }
+    if (Array.isArray(data.images)) {
+      setImages(data.images.map((img: unknown) => String(img).trim()).filter(Boolean))
+    }
 
-      if (typeof data.logo === "string") {
-        setLogo(data.logo.trim())
-      }
+    if (typeof data.featured === "boolean") {
+      setFeatured(data.featured)
+    }
 
-      if (Array.isArray(data.images)) {
-        setImages(data.images.map((img: unknown) => String(img).trim()).filter(Boolean))
-      }
+    if (data.status === "published" || data.status === "draft") {
+      setStatus(data.status)
+    }
 
-      if (typeof data.featured === "boolean") {
-        setFeatured(data.featured)
-      }
-
-      if (data.status === "published" || data.status === "draft") {
-        setStatus(data.status)
-      }
-
-      // Handle skills array if provided (matches skill names or ObjectIds)
-      if (Array.isArray(data.skills) && data.skills.length > 0) {
-        const resolvedSkillIds: string[] = []
-        data.skills.forEach((rawSkill: unknown) => {
-          const strVal = String(rawSkill).trim().toLowerCase()
-          const match = availableSkills.find(
-            (s) =>
-              s._id.toLowerCase() === strVal ||
-              s.name.toLowerCase() === strVal
-          )
-          if (match && !resolvedSkillIds.includes(match._id)) {
-            resolvedSkillIds.push(match._id)
-          } else if (typeof rawSkill === "string" && rawSkill.length === 24) {
-            if (!resolvedSkillIds.includes(rawSkill)) {
-              resolvedSkillIds.push(rawSkill)
-            }
+    // Handle skills array if provided (matches skill names or ObjectIds)
+    if (Array.isArray(data.skills) && data.skills.length > 0) {
+      const resolvedSkillIds: string[] = []
+      data.skills.forEach((rawSkill: unknown) => {
+        const strVal = String(rawSkill).trim().toLowerCase()
+        const match = availableSkills.find(
+          (s) =>
+            s._id.toLowerCase() === strVal ||
+            s.name.toLowerCase() === strVal
+        )
+        if (match && !resolvedSkillIds.includes(match._id)) {
+          resolvedSkillIds.push(match._id)
+        } else if (typeof rawSkill === "string" && rawSkill.length === 24) {
+          if (!resolvedSkillIds.includes(rawSkill)) {
+            resolvedSkillIds.push(rawSkill)
           }
-        })
-
-        if (resolvedSkillIds.length > 0) {
-          setSkills((prev) => Array.from(new Set([...prev, ...resolvedSkillIds])))
         }
+      })
+
+      if (resolvedSkillIds.length > 0) {
+        setSkills((prev) => Array.from(new Set([...prev, ...resolvedSkillIds])))
       }
-
-      toast.success("Successfully imported and populated project fields!")
-      setIsImportOpen(false)
-      setImportString("")
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to parse JSON"
-      toast.error(msg)
     }
-  }
-
-  function handleInsertTemplate() {
-    const sample = {
-      title: "CloudPulse — Distributed API Gateway",
-      slug: "cloudpulse-api-gateway",
-      role: "Full-Stack Developer",
-      tagline: "High-throughput distributed API gateway with sub-millisecond route dispatch",
-      description: "Designed and implemented a distributed microservices gateway handling high concurrency with Redis rate limiting, pub/sub streaming, and Docker orchestration.",
-      skills: availableSkills.slice(0, 4).map((s) => s.name),
-      liveUrl: "https://cloudpulse.example.com",
-      githubUrl: "https://github.com/username/cloudpulse",
-      featured: true,
-      status: "published",
-    }
-    setImportString(JSON.stringify(sample, null, 2))
   }
 
   function handleTitleChange(newTitle: string) {
@@ -601,67 +558,13 @@ export function ProjectForm({
         </Button>
       </div>
 
-      {/* Quick Import String / JSON Dialog */}
-      <Dialog open={isImportOpen} onOpenChange={setIsImportOpen}>
-        <DialogContent className="sm:max-w-xl">
-          <DialogHeader>
-            <DialogTitle className="text-base sm:text-lg flex items-center gap-2 font-semibold">
-              <FileCode className="h-4 w-4 text-indigo-500" />
-              <span>Import Project Data (JSON / String)</span>
-            </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
-              Paste a raw JSON object string to auto-fill the project fields and match linked skills.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-3 py-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs font-medium text-muted-foreground">
-                Paste JSON String:
-              </Label>
-              <button
-                type="button"
-                onClick={handleInsertTemplate}
-                className="text-xs text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer flex items-center gap-1 font-medium"
-              >
-                <Sparkles className="h-3 w-3" />
-                <span>Load Sample Template</span>
-              </button>
-            </div>
-
-            <Textarea
-              rows={9}
-              value={importString}
-              onChange={(e) => setImportString(e.target.value)}
-              placeholder={`{\n  "title": "CloudPulse — Distributed API Gateway",\n  "tagline": "High-throughput distributed API gateway",\n  "role": "Full-Stack Developer",\n  "description": "Architected distributed system with Redis & Docker...",\n  "skills": ["React", "TypeScript", "Docker"],\n  "liveUrl": "https://example.com",\n  "githubUrl": "https://github.com/..."\n}`}
-              className="font-mono text-xs"
-            />
-          </div>
-
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setIsImportOpen(false)
-                setImportString("")
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleApplyImport}
-              className="gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white"
-            >
-              <ClipboardPaste className="h-3.5 w-3.5" />
-              <span>Apply & Populate Form</span>
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Quick Import String / JSON Dialog (Extracted Component) */}
+      <ProjectImportDialog
+        open={isImportOpen}
+        onOpenChange={setIsImportOpen}
+        onImport={handleApplyImportData}
+        sampleSkills={availableSkills.slice(0, 4).map((s) => s.name)}
+      />
     </form>
   )
 }

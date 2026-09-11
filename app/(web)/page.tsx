@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { experienceService, projectService, skillService } from "@/services"
+import { experienceService, profileService, projectService, skillService } from "@/services"
 import { HeroSection } from "@/components/sections/hero"
 import { BentoGridSection } from "@/components/sections/bento-grid"
 import { BentoGridSkeleton } from "@/components/sections/bento-grid-skeleton"
@@ -26,10 +26,12 @@ async function AsyncExperienceSection() {
   return <ExperienceSection initialExperiences={experiences} />
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const profile = await profileService.getProfile()
+
   return (
     <>
-      <HeroSection />
+      <HeroSection initialProfile={profile} />
       <Suspense fallback={<BentoGridSkeleton />}>
         <AsyncSkillsSection />
       </Suspense>
@@ -39,7 +41,7 @@ export default function HomePage() {
       <Suspense fallback={<ExperienceSectionSkeleton />}>
         <AsyncExperienceSection />
       </Suspense>
-      <ContactSection />
+      <ContactSection initialProfile={profile} />
     </>
   )
 }

@@ -2,27 +2,28 @@
 
 import React, { useState } from "react"
 import { motion } from "motion/react"
-import {
-  ArrowRight,
-  Copy,
-  Check,
-  Terminal,
-  ExternalLink,
-  ChevronDown,
-} from "lucide-react"
-import { portfolioData } from "@/data/portfolio-data"
+import { ArrowRight, Copy, Check, Terminal, ExternalLink, ChevronDown } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
 import { MeshConstellation } from "@/components/custom-ui/mesh-constellation"
+import { cn } from "@/lib/utils"
+import { DEFAULT_PROFILE, type ProfileData } from "@/lib/constants/profile"
 
-export function HeroSection() {
+
+interface HeroSectionProps {
+  initialProfile?: ProfileData
+}
+
+export function HeroSection({ initialProfile }: HeroSectionProps) {
   const [copied, setCopied] = useState(false)
 
+  const profile = initialProfile || DEFAULT_PROFILE
+
   const copyEmail = () => {
-    navigator.clipboard.writeText(portfolioData.personal.email)
+    navigator.clipboard.writeText(profile.email)
     setCopied(true)
     toast.success("Email address copied!", {
-      description: `${portfolioData.personal.email} is ready to paste.`,
+      description: `${profile.email} is ready to paste.`,
     })
     setTimeout(() => setCopied(false), 2000)
   }
@@ -50,7 +51,7 @@ export function HeroSection() {
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
             </span>
             <span className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
-              {portfolioData.personal.status}
+              {profile.status}
             </span>
           </motion.div>
 
@@ -61,7 +62,7 @@ export function HeroSection() {
             className="font-mono text-xs uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-4 flex items-center gap-2"
           >
             <Terminal className="h-3.5 w-3.5" />
-            <span>{portfolioData.personal.role}</span>
+            <span>{profile.role}</span>
           </motion.div>
 
           <motion.div
@@ -77,7 +78,7 @@ export function HeroSection() {
                 transition={{ type: "spring", stiffness: 400, damping: 15 }}
                 className="inline-block font-extrabold bg-linear-to-r from-indigo-500 via-cyan-400 to-emerald-500 dark:from-indigo-400 dark:via-cyan-300 dark:to-emerald-400 bg-clip-text text-transparent animate-name-shimmer select-none cursor-default"
               >
-                {portfolioData.personal.name}
+                {profile.name}
               </motion.span>
             </span>
             <motion.span
@@ -122,7 +123,7 @@ export function HeroSection() {
             transition={{ duration: 0.6, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="mt-6 text-base sm:text-lg xl:text-xl text-neutral-600 dark:text-neutral-400 max-w-2xl leading-relaxed"
           >
-            {portfolioData.personal.bio}
+            {profile.bio}
           </motion.p>
 
           <motion.div
@@ -151,15 +152,17 @@ export function HeroSection() {
               <span>{copied ? "Copied Email!" : "Copy Email"}</span>
             </button>
 
-            <a
-              href={portfolioData.personal.socials.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-full border border-black/8 bg-black/2 text-neutral-700 hover:text-neutral-900 dark:border-white/8 dark:bg-white/2 dark:text-neutral-400 dark:hover:text-white px-4 py-3 text-sm font-medium transition-colors"
-            >
-              <span>GitHub</span>
-              <ExternalLink className="h-3.5 w-3.5" />
-            </a>
+            {profile.socials.github && (
+              <a
+                href={profile.socials.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 rounded-full border border-black/8 bg-black/2 text-neutral-700 hover:text-neutral-900 dark:border-white/8 dark:bg-white/2 dark:text-neutral-400 dark:hover:text-white px-4 py-3 text-sm font-medium transition-colors"
+              >
+                <span>GitHub</span>
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            )}
           </motion.div>
         </div>
 
@@ -167,21 +170,32 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-16 xl:mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 xl:gap-8 border-t border-black/8 dark:border-white/8 pt-10 xl:pt-12"
+          className="mt-16 xl:mt-20 w-full border-t border-black/8 dark:border-white/8 pt-10 xl:pt-12"
         >
-          {portfolioData.personal.stats.map((stat, idx) => (
-            <div key={idx} className="flex flex-col">
-              <span className="font-mono text-2xl sm:text-3xl xl:text-4xl 2xl:text-5xl font-bold text-neutral-900 dark:text-white tracking-tight">
-                {stat.value}
-              </span>
-              <span className="text-xs sm:text-sm xl:text-base font-medium text-neutral-700 dark:text-neutral-300 mt-1">
-                {stat.label}
-              </span>
-              <span className="text-[11px] xl:text-xs text-neutral-500 mt-0.5">
-                {stat.subtext}
-              </span>
-            </div>
-          ))}
+          <div
+            className={cn(
+              "grid gap-8 xl:gap-12 justify-center",
+              profile.stats.length === 1 && "grid-cols-1 max-w-xs mx-auto",
+              profile.stats.length === 2 && "grid-cols-1 sm:grid-cols-2 max-w-xl mx-auto",
+              profile.stats.length === 3 && "grid-cols-1 sm:grid-cols-3 max-w-4xl mx-auto",
+              profile.stats.length === 4 && "grid-cols-2 md:grid-cols-4 w-full",
+              profile.stats.length > 4 && "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 w-full"
+            )}
+          >
+            {profile.stats.map((stat, idx) => (
+              <div key={idx} className="flex flex-col items-center text-center">
+                <span className="font-mono text-2xl sm:text-3xl xl:text-4xl 2xl:text-5xl font-bold text-neutral-900 dark:text-white tracking-tight">
+                  {stat.value}
+                </span>
+                <span className="text-xs sm:text-sm xl:text-base font-medium text-neutral-700 dark:text-neutral-300 mt-1">
+                  {stat.label}
+                </span>
+                <span className="text-[11px] xl:text-xs text-neutral-500 mt-0.5 max-w-60">
+                  {stat.subtext}
+                </span>
+              </div>
+            ))}
+          </div>
         </motion.div>
       </div>
 

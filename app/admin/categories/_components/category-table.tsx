@@ -44,14 +44,7 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog"
+import { DeleteConfirmDialog } from "@/app/admin/_components/delete-confirm-dialog"
 import {
   deleteCategoryAction,
   reorderCategoriesAction,
@@ -310,7 +303,7 @@ export function CategoryTable({ categories: initialCategories }: CategoryTablePr
       </div>
 
       {/* Delete Confirmation Modal */}
-      <Dialog
+      <DeleteConfirmDialog
         open={Boolean(categoryToDelete)}
         onOpenChange={(open) => {
           if (!open) {
@@ -318,71 +311,34 @@ export function CategoryTable({ categories: initialCategories }: CategoryTablePr
             setDeleteWithSkills(false)
           }
         }}
+        title="Delete Category"
+        itemName={categoryToDelete?.name}
+        confirmText="Delete Category"
+        isDeleting={isDeleting}
+        onConfirm={confirmDelete}
       >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="text-lg">Delete Category</DialogTitle>
-            <DialogDescription className="text-sm pt-1">
-              Are you sure you want to delete{" "}
-              <strong className="text-foreground font-semibold">
-                &ldquo;{categoryToDelete?.name}&rdquo;
-              </strong>
-              ? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="py-2">
-            <div className="flex items-start space-x-3 rounded-lg border border-border p-3.5 bg-muted/30">
-              <Checkbox
-                id="cascade-delete"
-                checked={deleteWithSkills}
-                onCheckedChange={(checked) => setDeleteWithSkills(Boolean(checked))}
-                className="mt-0.5"
-              />
-              <div className="space-y-1 leading-none">
-                <label
-                  htmlFor="cascade-delete"
-                  className="text-xs font-medium text-foreground cursor-pointer"
-                >
-                  Cascade delete associated skills
-                </label>
-                <p className="text-[11px] text-muted-foreground">
-                  Check this if you want to automatically remove all skills belonging to this category.
-                </p>
-              </div>
+        <div className="py-2">
+          <div className="flex items-start space-x-3 rounded-lg border border-border p-3.5 bg-muted/30">
+            <Checkbox
+              id="cascade-delete"
+              checked={deleteWithSkills}
+              onCheckedChange={(checked) => setDeleteWithSkills(Boolean(checked))}
+              className="mt-0.5"
+            />
+            <div className="space-y-1 leading-none">
+              <label
+                htmlFor="cascade-delete"
+                className="text-xs font-medium text-foreground cursor-pointer"
+              >
+                Cascade delete associated skills
+              </label>
+              <p className="text-[11px] text-muted-foreground">
+                Check this if you want to automatically remove all skills belonging to this category.
+              </p>
             </div>
           </div>
-
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
-              size="default"
-              onClick={() => {
-                setCategoryToDelete(null)
-                setDeleteWithSkills(false)
-              }}
-              disabled={isDeleting}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              size="default"
-              onClick={confirmDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Deleting...</span>
-                </>
-              ) : (
-                <span>Delete Category</span>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </DeleteConfirmDialog>
     </>
   )
 }

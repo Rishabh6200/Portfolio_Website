@@ -11,17 +11,24 @@ import {
   Mail,
 } from "lucide-react"
 import { GithubIcon, LinkedinIcon, TwitterIcon } from "@/components/custom-ui/icons"
-import { portfolioData } from "@/data/portfolio-data"
 import { toast } from "sonner"
+import { DEFAULT_PROFILE, type ProfileData } from "@/lib/constants/profile"
 
-export function ContactSection() {
+
+interface ContactSectionProps {
+  initialProfile?: ProfileData
+}
+
+export function ContactSection({ initialProfile }: ContactSectionProps) {
   const [copied, setCopied] = useState(false)
 
+  const profile = initialProfile || DEFAULT_PROFILE
+
   const copyEmail = () => {
-    navigator.clipboard.writeText(portfolioData.personal.email)
+    navigator.clipboard.writeText(profile.email)
     setCopied(true)
     toast.success("Email copied to clipboard!", {
-      description: portfolioData.personal.email,
+      description: profile.email,
     })
     setTimeout(() => setCopied(false), 2500)
   }
@@ -82,7 +89,7 @@ export function ContactSection() {
           <div className="flex flex-col sm:flex-row items-center gap-2 p-1.5 sm:p-2 rounded-2xl sm:rounded-full border border-black/10 dark:border-white/10 bg-white/80 dark:bg-white/3 backdrop-blur-xl shadow-xs dark:shadow-none">
             <div className="flex items-center gap-2 px-3.5 py-2 w-full sm:w-auto flex-1 text-xs sm:text-sm font-mono text-neutral-700 dark:text-neutral-300">
               <Mail className="h-4 w-4 text-neutral-400 shrink-0" />
-              <span className="truncate">{portfolioData.personal.email}</span>
+              <span className="truncate">{profile.email}</span>
             </div>
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -104,7 +111,7 @@ export function ContactSection() {
               </button>
 
               <a
-                href={`mailto:${portfolioData.personal.email}`}
+                href={`mailto:${profile.email}`}
                 className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-5 py-2 rounded-full bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 text-xs font-semibold transition-all hover:shadow-md active:scale-95"
               >
                 <span>Say Hello</span>
@@ -121,60 +128,70 @@ export function ContactSection() {
           transition={{ duration: 0.55, delay: 0.4 }}
           className="mt-14 flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs text-neutral-600 dark:text-neutral-400"
         >
-          <a
-            href={portfolioData.personal.socials.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-black/4 dark:hover:bg-white/5 transition-all duration-200"
-          >
-            <span className="flex items-center justify-center w-4 h-4 shrink-0 text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-950 dark:group-hover:text-white transition-all duration-200 group-hover:scale-110">
-              <GithubIcon className="w-3.5 h-3.5" />
-            </span>
-            <span className="leading-none font-medium pt-px group-hover:text-neutral-950 dark:group-hover:text-white transition-colors">
-              GitHub
-            </span>
-            <ArrowUpRight className="w-3 h-3 text-neutral-400 dark:text-neutral-500 shrink-0 transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-neutral-950 dark:group-hover:text-white" />
-          </a>
+          {profile.socials.github && (
+            <a
+              href={profile.socials.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-black/4 dark:hover:bg-white/5 transition-all duration-200"
+            >
+              <span className="flex items-center justify-center w-4 h-4 shrink-0 text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-950 dark:group-hover:text-white transition-all duration-200 group-hover:scale-110">
+                <GithubIcon className="w-3.5 h-3.5" />
+              </span>
+              <span className="leading-none font-medium pt-px group-hover:text-neutral-950 dark:group-hover:text-white transition-colors">
+                GitHub
+              </span>
+              <ArrowUpRight className="w-3 h-3 text-neutral-400 dark:text-neutral-500 shrink-0 transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-neutral-950 dark:group-hover:text-white" />
+            </a>
+          )}
 
-          <span className="h-1 w-1 rounded-full bg-neutral-300 dark:bg-neutral-800 shrink-0 select-none" />
+          {profile.socials.github && profile.socials.linkedin && (
+            <span className="h-1 w-1 rounded-full bg-neutral-300 dark:bg-neutral-800 shrink-0 select-none" />
+          )}
 
-          <a
-            href={portfolioData.personal.socials.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-black/4 dark:hover:bg-white/5 transition-all duration-200"
-          >
-            <span className="flex items-center justify-center w-4 h-4 shrink-0 text-neutral-500 dark:text-neutral-400 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-all duration-200 group-hover:scale-110">
-              <LinkedinIcon className="w-3.5 h-3.5" />
-            </span>
-            <span className="leading-none font-medium pt-px group-hover:text-neutral-950 dark:group-hover:text-white transition-colors">
-              LinkedIn
-            </span>
-            <ArrowUpRight className="w-3 h-3 text-neutral-400 dark:text-neutral-500 shrink-0 transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-neutral-950 dark:group-hover:text-white" />
-          </a>
+          {profile.socials.linkedin && (
+            <a
+              href={profile.socials.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-black/4 dark:hover:bg-white/5 transition-all duration-200"
+            >
+              <span className="flex items-center justify-center w-4 h-4 shrink-0 text-neutral-500 dark:text-neutral-400 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-all duration-200 group-hover:scale-110">
+                <LinkedinIcon className="w-3.5 h-3.5" />
+              </span>
+              <span className="leading-none font-medium pt-px group-hover:text-neutral-950 dark:group-hover:text-white transition-colors">
+                LinkedIn
+              </span>
+              <ArrowUpRight className="w-3 h-3 text-neutral-400 dark:text-neutral-500 shrink-0 transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-neutral-950 dark:group-hover:text-white" />
+            </a>
+          )}
 
-          <span className="h-1 w-1 rounded-full bg-neutral-300 dark:bg-neutral-800 shrink-0 select-none" />
+          {(profile.socials.github || profile.socials.linkedin) && profile.socials.twitter && (
+            <span className="h-1 w-1 rounded-full bg-neutral-300 dark:bg-neutral-800 shrink-0 select-none" />
+          )}
 
-          <a
-            href={portfolioData.personal.socials.twitter}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-black/4 dark:hover:bg-white/5 transition-all duration-200"
-          >
-            <span className="flex items-center justify-center w-4 h-4 shrink-0 text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-950 dark:group-hover:text-white transition-all duration-200 group-hover:scale-110">
-              <TwitterIcon className="w-3 h-3" />
-            </span>
-            <span className="leading-none font-medium pt-px group-hover:text-neutral-950 dark:group-hover:text-white transition-colors">
-              X (Twitter)
-            </span>
-            <ArrowUpRight className="w-3 h-3 text-neutral-400 dark:text-neutral-500 shrink-0 transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-neutral-950 dark:group-hover:text-white" />
-          </a>
+          {profile.socials.twitter && (
+            <a
+              href={profile.socials.twitter}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-black/4 dark:hover:bg-white/5 transition-all duration-200"
+            >
+              <span className="flex items-center justify-center w-4 h-4 shrink-0 text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-950 dark:group-hover:text-white transition-all duration-200 group-hover:scale-110">
+                <TwitterIcon className="w-3 h-3" />
+              </span>
+              <span className="leading-none font-medium pt-px group-hover:text-neutral-950 dark:group-hover:text-white transition-colors">
+                X (Twitter)
+              </span>
+              <ArrowUpRight className="w-3 h-3 text-neutral-400 dark:text-neutral-500 shrink-0 transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-neutral-950 dark:group-hover:text-white" />
+            </a>
+          )}
 
-          {portfolioData.personal.socials.cal && (
+          {profile.socials.cal && (
             <>
               <span className="h-1 w-1 rounded-full bg-neutral-300 dark:bg-neutral-800 shrink-0 select-none" />
               <a
-                href={portfolioData.personal.socials.cal}
+                href={profile.socials.cal}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-black/4 dark:hover:bg-white/5 transition-all duration-200"

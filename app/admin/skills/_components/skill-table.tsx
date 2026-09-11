@@ -6,7 +6,6 @@ import {
   Edit3,
   Trash2,
   Sparkles,
-  Loader2,
   Plus,
 } from "lucide-react"
 import {
@@ -27,7 +26,6 @@ import {
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import { toast } from "sonner"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import {
   Table,
   TableHeader,
@@ -36,14 +34,7 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog"
+import { DeleteConfirmDialog } from "@/app/admin/_components/delete-confirm-dialog"
 import { deleteSkillAction, reorderSkillsAction, updateSkillLevelAction } from "@/app/admin/skills/actions"
 import { DragHandle, SortableRow } from "@/components/ui/sortable-row"
 import { cn } from "@/lib/utils"
@@ -408,47 +399,24 @@ export function SkillTable({
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog
+      <DeleteConfirmDialog
         open={Boolean(skillToDelete)}
         onOpenChange={(open) => !open && setSkillToDelete(null)}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Delete Skill</DialogTitle>
-            <DialogDescription className="pt-2">
-              Are you sure you want to delete{" "}
-              <strong className="text-foreground">
-                &ldquo;{skillToDelete?.name}&rdquo;
-              </strong>
-              ? This competency will be permanently removed from your portfolio.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0 pt-4">
-            <Button
-              variant="outline"
-              onClick={() => setSkillToDelete(null)}
-              disabled={isDeleting}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmDelete}
-              disabled={isDeleting}
-              className="gap-2"
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Deleting...</span>
-                </>
-              ) : (
-                <span>Delete Skill</span>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        title="Delete Skill"
+        itemName={skillToDelete?.name}
+        description={
+          <>
+            Are you sure you want to delete{" "}
+            <strong className="text-foreground">
+              &ldquo;{skillToDelete?.name}&rdquo;
+            </strong>
+            ? This competency will be permanently removed from your portfolio.
+          </>
+        }
+        confirmText="Delete Skill"
+        isDeleting={isDeleting}
+        onConfirm={confirmDelete}
+      />
     </>
   )
 }

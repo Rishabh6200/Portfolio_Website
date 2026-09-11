@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { FolderGit2, PlusCircle, ExternalLink, Menu, X, Terminal, Database, ChevronRight, Layers, Sparkles, Briefcase, LogOut } from "lucide-react"
+import { FolderGit2, PlusCircle, ExternalLink, Menu, X, Terminal, Database, ChevronRight, Layers, Sparkles, Briefcase, LogOut, UserCircle } from "lucide-react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { logoutAdminAction } from "../login/actions"
@@ -53,9 +53,16 @@ export function AdminShell({ children }: AdminShellProps) {
       icon: Briefcase,
       exact: false,
     },
+    {
+      title: "Profile & Socials",
+      href: "/admin/profile",
+      icon: UserCircle,
+      exact: false,
+    },
   ]
 
   // Breadcrumb generator
+  const isProfile = pathname.startsWith("/admin/profile")
   const isNew = pathname === "/admin/projects/new"
   const isEdit = pathname.startsWith("/admin/projects/") && !isNew
   const isCategories = pathname.startsWith("/admin/categories")
@@ -196,7 +203,9 @@ export function AdminShell({ children }: AdminShellProps) {
                 Admin
               </Link>
               <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
-              {isExperience ? (
+              {isProfile ? (
+                <span className="text-foreground font-semibold">Profile & Socials</span>
+              ) : isExperience ? (
                 isNewExperience ? (
                   <>
                     <Link href="/admin/experience" className="hover:text-foreground transition-colors">

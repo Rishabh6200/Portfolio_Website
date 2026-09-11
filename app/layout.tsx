@@ -20,26 +20,32 @@ const fontMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Rishabh — Senior Full-Stack & Systems Developer",
-  description:
-    "Portfolio of Rishabh. Specializing in high-throughput distributed architectures, resilient cloud backends, and pixel-precise interactive web experiences.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL!),
+  title: "Rishabh — Full-Stack & Systems Developer",
+  description: "Portfolio of Rishabh. Specializing in high-throughput distributed architectures, resilient cloud backends, and pixel-precise interactive web experiences.",
   keywords: [
     "Full-Stack Developer",
     "Systems Architect",
     "Next.js",
     "React 19",
     "TypeScript",
-    "Go",
     "Distributed Systems",
     "Tailwind CSS",
   ],
   authors: [{ name: "Rishabh" }],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "Rishabh — Senior Full-Stack & Systems Developer",
-    description:
-      "Architecting high-throughput distributed systems & polished interactive web experiences.",
+    title: "Rishabh — Full-Stack & Systems Developer",
+    description: "Architecting high-throughput distributed systems & polished interactive web experiences.",
     type: "website",
     locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rishabh — Full-Stack & Systems Developer",
+    description: "Architecting high-throughput distributed systems & polished interactive web experiences.",
   },
 }
 

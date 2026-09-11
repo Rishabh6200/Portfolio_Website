@@ -3,24 +3,30 @@ import { Skeleton } from "@/components/ui/skeleton"
 export default function ProjectDetailLoading() {
   return (
     <main className="relative min-h-screen bg-background text-foreground">
-      {/* Background radial glow placeholder */}
-      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-120 sm:w-200 h-96 blur-3xl opacity-10 rounded-full bg-indigo-500" />
+      <div
+        className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-200 h-125 blur-3xl opacity-20 dark:opacity-20 rounded-full"
+        style={{
+          background: `radial-gradient(circle, #6366f1, transparent 70%)`,
+        }}
+      />
 
-      <article className="relative mx-auto max-w-4xl xl:max-w-5xl px-6 sm:px-8 xl:px-12 pt-32 pb-24 space-y-10">
-        {/* Back Link */}
-        <Skeleton className="h-4 w-32 rounded-md" />
+      <article className="relative mx-auto max-w-4xl xl:max-w-5xl px-6 sm:px-8 xl:px-12 pt-32 pb-24">
+        <div className="mb-10">
+          <Skeleton className="h-4 w-28 rounded-md" />
+        </div>
 
-        {/* Header section */}
         <header className="space-y-6">
           <div className="flex flex-wrap items-center gap-2">
-            <Skeleton className="h-6 w-20 rounded-full" />
-            <Skeleton className="h-6 w-28 rounded-full" />
-            <Skeleton className="h-6 w-36 rounded-full" />
+            <Skeleton className="h-6 w-36 rounded-md" />
+            <Skeleton className="h-6 w-28 rounded-md" />
           </div>
 
-          <div className="space-y-3">
-            <Skeleton className="h-10 sm:h-14 w-3/4 rounded-xl" />
-            <Skeleton className="h-5 sm:h-6 w-5/6 rounded-lg" />
+          <div className="flex items-start gap-5">
+            <Skeleton className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl shrink-0" />
+            <div className="space-y-3 flex-1">
+              <Skeleton className="h-10 sm:h-12 xl:h-14 w-3/4 max-w-lg rounded-xl" />
+              <Skeleton className="h-5 sm:h-6 w-5/6 max-w-2xl rounded-lg" />
+            </div>
           </div>
 
           <div className="border-l-2 border-indigo-500/30 pl-4 py-1 space-y-2">
@@ -28,79 +34,53 @@ export default function ProjectDetailLoading() {
             <Skeleton className="h-4 w-4/5 rounded-md" />
           </div>
 
-          <div className="flex items-center gap-3 pt-2">
+          <div className="flex flex-wrap items-center gap-3 pt-2">
             <Skeleton className="h-10 w-36 rounded-full" />
             <Skeleton className="h-10 w-40 rounded-full" />
           </div>
         </header>
 
-        {/* Cover Image Placeholder */}
-        <Skeleton className="aspect-video w-full rounded-3xl" />
-
-        {/* System Architecture Section */}
-        <section className="mt-16 space-y-4">
-          <Skeleton className="h-4 w-52 rounded-md" />
-
-          <div className="rounded-3xl border border-black/8 dark:border-white/10 bg-black/1 dark:bg-white/2 p-6 sm:p-8 space-y-6">
-            {/* Architecture Blueprint callout */}
-            <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 dark:bg-indigo-500/10 p-5 space-y-3">
-              <Skeleton className="h-4 w-40 rounded-md" />
-              <Skeleton className="h-3 w-full rounded-md" />
-              <Skeleton className="h-3 w-5/6 rounded-md" />
-              <Skeleton className="h-3 w-4/6 rounded-md" />
+        <section className="mt-10 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-3.5 w-3.5 rounded-full" />
+              <Skeleton className="h-3.5 w-32 rounded-md" />
             </div>
+            <Skeleton className="h-3 w-40 rounded-md hidden sm:block" />
+          </div>
 
-            {/* Architecture Diagram */}
-            <Skeleton className="aspect-video w-full rounded-2xl" />
-
-            {/* Implementation Details */}
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-36 rounded-md" />
-              <Skeleton className="h-3.5 w-full rounded-md" />
-              <Skeleton className="h-3.5 w-11/12 rounded-md" />
-              <Skeleton className="h-3.5 w-4/5 rounded-md" />
-            </div>
-
-            {/* Development Challenge */}
-            <div className="space-y-2 pt-2">
-              <Skeleton className="h-4 w-32 rounded-md" />
-              <Skeleton className="h-3.5 w-full rounded-md" />
-              <Skeleton className="h-3.5 w-3/4 rounded-md" />
-            </div>
-
-            {/* Highlights */}
-            <div className="space-y-3 pt-2">
-              <Skeleton className="h-4 w-36 rounded-md" />
-              <div className="space-y-2">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <Skeleton className="h-4 w-4 rounded-full shrink-0" />
-                    <Skeleton className="h-3.5 w-5/6 rounded-md" />
-                  </div>
-                ))}
-              </div>
+          <div className="flex flex-col items-center">
+            <Skeleton className="w-full max-w-2xl aspect-video rounded-2xl" />
+            <div className="mt-4 flex items-center justify-center gap-2.5 sm:gap-3 flex-wrap max-w-2xl w-full px-1">
+              {[1, 2, 3].map((i) => (
+                <Skeleton
+                  key={i}
+                  className="h-14 w-20 sm:h-16 sm:w-24 rounded-xl"
+                />
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Technologies */}
-        <section className="space-y-4 pt-4">
-          <Skeleton className="h-4 w-48 rounded-md" />
-          <div className="flex flex-wrap gap-2">
-            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <Skeleton key={i} className="h-8 w-24 rounded-xl" />
+        <section className="mt-14 space-y-4">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-3.5 w-3.5 rounded-full" />
+            <Skeleton className="h-3.5 w-44 rounded-md" />
+          </div>
+          <div className="flex flex-wrap gap-2.5">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} className="h-9 w-24 sm:w-28 rounded-xl" />
             ))}
           </div>
         </section>
 
-        {/* Footer Navigation */}
-        <footer className="pt-8 border-t border-black/8 dark:border-white/8 flex items-center justify-between">
-          <div className="space-y-2">
+        <footer className="mt-20 pt-8 border-t border-black/8 dark:border-white/8 flex items-center justify-between gap-4">
+          <div className="space-y-1.5 max-w-[45%]">
             <Skeleton className="h-3 w-24 rounded-md" />
-            <Skeleton className="h-4 w-32 rounded-md" />
+            <Skeleton className="h-4 w-36 rounded-md" />
           </div>
-          <div className="space-y-2 flex flex-col items-end">
-            <Skeleton className="h-3 w-24 rounded-md" />
+          <div className="space-y-1.5 flex flex-col items-end max-w-[45%] ml-auto">
+            <Skeleton className="h-3 w-20 rounded-md" />
             <Skeleton className="h-4 w-32 rounded-md" />
           </div>
         </footer>

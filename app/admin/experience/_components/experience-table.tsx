@@ -2,54 +2,16 @@
 
 import { useState, useEffect, useTransition } from "react"
 import Link from "next/link"
-import {
-  Edit3,
-  Trash2,
-  Briefcase,
-  Loader2,
-  Plus,
-  MapPin,
-  Calendar,
-} from "lucide-react"
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core"
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
+import { Edit3, Trash2, Briefcase, Plus, MapPin, Calendar } from "lucide-react"
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core"
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import { toast } from "sonner"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-} from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog"
-import {
-  deleteExperienceAction,
-  reorderExperiencesAction,
-} from "../actions"
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
+import { DeleteConfirmDialog } from "@/app/admin/_components/delete-confirm-dialog"
+import { deleteExperienceAction, reorderExperiencesAction } from "../actions"
 import { DragHandle, SortableRow } from "@/components/ui/sortable-row"
 
 export interface PopulatedSkill {
@@ -82,7 +44,6 @@ export function ExperienceTable({ experiences: initialExperiences }: ExperienceT
   const [experiences, setExperiences] = useState<SerializedExperience[]>(initialExperiences)
   const [, startTransition] = useTransition()
 
-  // Delete Dialog state
   const [experienceToDelete, setExperienceToDelete] = useState<SerializedExperience | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -204,119 +165,113 @@ export function ExperienceTable({ experiences: initialExperiences }: ExperienceT
                     <SortableRow key={exp._id} id={exp._id}>
                       {({ attributes, listeners }) => (
                         <>
-                          {/* Drag Handle */}
                           <TableCell className="text-center py-3">
                             <DragHandle attributes={attributes} listeners={listeners} />
                           </TableCell>
 
-                      {/* Role & Company */}
-                      <TableCell className="py-3">
-                        <div className="space-y-1">
-                          <span className="font-semibold text-sm text-foreground hover:underline">
-                            <Link href={`/admin/experience/${exp._id}`}>
-                              {exp.role}
-                            </Link>
-                          </span>
-                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <span className="font-medium text-foreground/80">{exp.company}</span>
-                          </div>
-                        </div>
-                      </TableCell>
+                          <TableCell className="py-3">
+                            <div className="space-y-1">
+                              <span className="font-semibold text-sm text-foreground hover:underline">
+                                <Link href={`/admin/experience/${exp._id}`}>
+                                  {exp.role}
+                                </Link>
+                              </span>
+                              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                <span className="font-medium text-foreground/80">{exp.company}</span>
+                              </div>
+                            </div>
+                          </TableCell>
 
-                      {/* Period */}
-                      <TableCell className="py-3">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="h-3 w-3 text-muted-foreground shrink-0" />
-                          <span className="text-xs font-mono text-muted-foreground whitespace-nowrap">
-                            {exp.period}
-                          </span>
-                          {isCurrent && (
-                            <Badge
-                              variant="outline"
-                              className="text-[10px] px-1.5 py-0 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 shrink-0"
-                            >
-                              Current
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-
-                      {/* Location & Type */}
-                      <TableCell className="py-3">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <MapPin className="h-3 w-3 shrink-0" />
-                            <span>
-                              {exp.locationType &&
-                              exp.locationType !== "Remote" &&
-                              !exp.location.toLowerCase().includes(exp.locationType.toLowerCase())
-                                ? `${exp.location} (${exp.locationType})`
-                                : exp.location || exp.locationType || "Remote"}
-                            </span>
-                          </div>
-                          <Badge variant="secondary" className="text-[10px] font-normal px-1.5 py-0">
-                            {exp.type}
-                          </Badge>
-                        </div>
-                      </TableCell>
-
-                      {/* Technologies */}
-                      <TableCell className="py-3">
-                        <div className="flex flex-wrap gap-1 max-w-xs">
-                          {Array.isArray(exp.skills) && exp.skills.length > 0 ? (
-                            exp.skills.slice(0, 4).map((skill) => {
-                              const name = typeof skill === "object" ? skill.name : String(skill)
-                              return (
-                                <span
-                                  key={typeof skill === "object" ? skill._id : skill}
-                                  className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border truncate"
+                          <TableCell className="py-3">
+                            <div className="flex items-center gap-1.5">
+                              <Calendar className="h-3 w-3 text-muted-foreground shrink-0" />
+                              <span className="text-xs font-mono text-muted-foreground whitespace-nowrap">
+                                {exp.period}
+                              </span>
+                              {isCurrent && (
+                                <Badge
+                                  variant="outline"
+                                  className="text-[10px] px-1.5 py-0 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 shrink-0"
                                 >
-                                  {name}
-                                </span>
-                              )
-                            })
-                          ) : (
-                            <span className="text-xs text-muted-foreground italic">None</span>
-                          )}
-                          {Array.isArray(exp.skills) && exp.skills.length > 4 && (
-                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted/60 text-muted-foreground">
-                              +{exp.skills.length - 4}
-                            </span>
-                          )}
-                        </div>
-                      </TableCell>
+                                  Current
+                                </Badge>
+                              )}
+                            </div>
+                          </TableCell>
 
-                      {/* Actions */}
-                      <TableCell className="py-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Link
-                            href={`/admin/experience/${exp._id}`}
-                            className={buttonVariants({
-                              variant: "ghost",
-                              size: "icon",
-                              className: "h-8 w-8 text-muted-foreground hover:text-foreground",
-                            })}
-                            title="Edit experience"
-                          >
-                            <Edit3 className="h-4 w-4" />
-                            <span className="sr-only">Edit</span>
-                          </Link>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setExperienceToDelete(exp)}
-                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                            title="Delete experience"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            <span className="sr-only">Delete</span>
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </>
-                  )}
-                </SortableRow>
-              )
+                          <TableCell className="py-3">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <MapPin className="h-3 w-3 shrink-0" />
+                                <span>
+                                  {exp.locationType &&
+                                    exp.locationType !== "Remote" &&
+                                    !exp.location.toLowerCase().includes(exp.locationType.toLowerCase())
+                                    ? `${exp.location} (${exp.locationType})`
+                                    : exp.location || exp.locationType || "Remote"}
+                                </span>
+                              </div>
+                              <Badge variant="secondary" className="text-[10px] font-normal px-1.5 py-0">
+                                {exp.type}
+                              </Badge>
+                            </div>
+                          </TableCell>
+
+                          <TableCell className="py-3">
+                            <div className="flex flex-wrap gap-1 max-w-xs">
+                              {Array.isArray(exp.skills) && exp.skills.length > 0 ? (
+                                exp.skills.slice(0, 4).map((skill) => {
+                                  const name = typeof skill === "object" ? skill.name : String(skill)
+                                  return (
+                                    <span
+                                      key={typeof skill === "object" ? skill._id : skill}
+                                      className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border truncate"
+                                    >
+                                      {name}
+                                    </span>
+                                  )
+                                })
+                              ) : (
+                                <span className="text-xs text-muted-foreground italic">None</span>
+                              )}
+                              {Array.isArray(exp.skills) && exp.skills.length > 4 && (
+                                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted/60 text-muted-foreground">
+                                  +{exp.skills.length - 4}
+                                </span>
+                              )}
+                            </div>
+                          </TableCell>
+
+                          <TableCell className="py-3 text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <Link
+                                href={`/admin/experience/${exp._id}`}
+                                className={buttonVariants({
+                                  variant: "ghost",
+                                  size: "icon",
+                                  className: "h-8 w-8 text-muted-foreground hover:text-foreground",
+                                })}
+                                title="Edit experience"
+                              >
+                                <Edit3 className="h-4 w-4" />
+                                <span className="sr-only">Edit</span>
+                              </Link>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setExperienceToDelete(exp)}
+                                className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                title="Delete experience"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">Delete</span>
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </>
+                      )}
+                    </SortableRow>
+                  )
                 })}
               </SortableContext>
             </TableBody>
@@ -324,51 +279,24 @@ export function ExperienceTable({ experiences: initialExperiences }: ExperienceT
         </DndContext>
       </div>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog
+      <DeleteConfirmDialog
         open={Boolean(experienceToDelete)}
         onOpenChange={(open) => !open && setExperienceToDelete(null)}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Delete Experience Entry</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete the experience role{" "}
-              <strong className="text-foreground font-semibold">
-                &ldquo;{experienceToDelete?.role} at {experienceToDelete?.company}&rdquo;
-              </strong>
-              ? This action cannot be undone and will remove it from your public portfolio.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
-              onClick={() => setExperienceToDelete(null)}
-              disabled={isDeleting}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="gap-2"
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Deleting...</span>
-                </>
-              ) : (
-                <>
-                  <Trash2 className="h-4 w-4" />
-                  <span>Delete Experience</span>
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        title="Delete Experience Entry"
+        itemName={experienceToDelete ? `${experienceToDelete.role} at ${experienceToDelete.company}` : undefined}
+        description={
+          <>
+            Are you sure you want to delete the experience role{" "}
+            <strong className="text-foreground font-semibold">
+              &ldquo;{experienceToDelete?.role} at {experienceToDelete?.company}&rdquo;
+            </strong>
+            ? This action cannot be undone and will remove it from your public portfolio.
+          </>
+        }
+        confirmText="Delete Experience"
+        isDeleting={isDeleting}
+        onConfirm={handleDelete}
+      />
     </>
   )
 }
