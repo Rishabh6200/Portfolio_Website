@@ -1,12 +1,14 @@
 import ImageKit from "imagekit"
 
-const publicKey = process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || ""
-const privateKey = process.env.IMAGEKIT_PRIVATE_KEY || ""
-export const urlEndpoint = process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT || ""
-
 export function isImageKitConfigured(): boolean {
-  return Boolean(publicKey && privateKey && urlEndpoint)
+  return Boolean(
+    process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY &&
+    process.env.IMAGEKIT_PRIVATE_KEY &&
+    process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT
+  )
 }
+
+export const urlEndpoint = process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT || ""
 
 /**
  * Returns the configured root directory in ImageKit from IMAGEKIT_ROOT_DIR env variable.
@@ -40,8 +42,42 @@ export function getImageKitProjectFolder(slug?: string): string {
   return `/${root}/projects/${cleanSlug}`
 }
 
-export const imagekit = new ImageKit({
-  publicKey,
-  privateKey,
-  urlEndpoint,
+let imagekitInstance: ImageKit | null = null
+
+export function getImageKit(): ImageKit {
+  const publicKey = process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY
+  const privateKey = process.env.IMAGEKIT_PRIVATE_KEY
+  const endpoint = process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT
+
+  if (!publicKey || !privateKey || !endpoint) {
+    throw new Error(
+      "ImageKit is not configured. Please set NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY, IMAGEKIT_PRIVATE_KEY, and NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT."
+    )
+  }
+
+  if (!imagekitInstance) {
+    imagekitInstance = new ImageKit({
+      publicKey,
+      privateKey,
+      urlEndpoint: endpoint,
+    })
+  }
+
+  return imagekitInstance
+}
+
+/**
+ * Lazy proxy to ImageKit client. Avoids throwing at module evaluation time
+ * during static page data collection (e.g. Next.js /_not-found) on Vercel builds.
+ */
+export const imagekit = new Proxy({} as ImageKit, {
+  get(_target, prop: string | symbol) {
+    const instance = getImageKit()
+    const val = Reflect.get(instance, prop)
+    if (typeof val === "function") {
+      return val.bind(instance)
+    }
+    return val
+  },
 })
+
