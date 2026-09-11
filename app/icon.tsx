@@ -1,12 +1,17 @@
 import { ImageResponse } from "next/og"
 
+import { profileService } from "@/services"
+
 export const size = {
   width: 32,
   height: 32,
 }
 export const contentType = "image/png"
 
-export default function Icon() {
+export default async function Icon() {
+  const profile = await profileService.getProfile()
+  const initial = profile.name ? profile.name.charAt(0).toUpperCase() : "R"
+
   return new ImageResponse((
     <div
       style={{
@@ -24,7 +29,7 @@ export default function Icon() {
         boxShadow: "inset 0 1px 1px rgba(255, 255, 255, 0.4)",
       }}
     >
-      R
+      {initial}
     </div>
   ),
     {

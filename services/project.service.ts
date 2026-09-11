@@ -185,7 +185,7 @@ export class ProjectService {
     const updated = await Project.findByIdAndUpdate(
       id,
       updatePayload,
-      { new: true }
+      { returnDocument: "after" }
     ).lean()
 
     if (!updated) {

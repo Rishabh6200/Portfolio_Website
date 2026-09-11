@@ -4,15 +4,10 @@ import { useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion } from "motion/react"
-import {
-  Home,
-  ArrowLeft,
-  Compass,
-  Sparkles,
-  Terminal,
-} from "lucide-react"
+import { Home, ArrowLeft, Compass, Sparkles, Terminal } from "lucide-react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { DEFAULT_PROFILE } from "@/lib/constants/profile"
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -112,10 +107,10 @@ export default function NotFound() {
           className="flex items-center gap-2 group transition-opacity hover:opacity-80"
         >
           <div className="h-7 w-7 rounded-lg bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center text-xs font-bold text-indigo-400 font-mono">
-            R
+            {DEFAULT_PROFILE.name.charAt(0)}
           </div>
           <span className="text-sm font-semibold tracking-tight text-foreground">
-            Rishabh
+            {DEFAULT_PROFILE.name}
           </span>
         </Link>
 
@@ -245,7 +240,7 @@ export default function NotFound() {
         transition={{ duration: 0.5, delay: 0.3 }}
         className="w-full max-w-5xl flex items-center justify-center text-[11px] font-mono text-muted-foreground/50 z-10 pb-1 shrink-0"
       >
-        <span>Rishabh • Full-Stack Developer</span>
+        <span>{DEFAULT_PROFILE.name} • {DEFAULT_PROFILE.role}</span>
       </motion.footer>
     </div>
   )

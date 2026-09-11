@@ -166,7 +166,7 @@ export async function seedSkills(dataset: CategorySeedGroup[] = skillSeedData) {
             order: catData.order ?? 0,
           },
         },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
+        { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
       )
 
       totalCategoriesSeeded++

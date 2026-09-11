@@ -138,7 +138,7 @@ export class SkillService {
     const skill = await Skill.findByIdAndUpdate(
       id,
       { level },
-      { new: true }
+      { returnDocument: "after" }
     ).lean()
     if (!skill) {
       throw new Error("Skill not found.")

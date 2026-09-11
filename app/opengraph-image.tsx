@@ -1,15 +1,19 @@
 import { ImageResponse } from "next/og"
+import { profileService } from "@/services"
 
 export const runtime = "nodejs"
 
-export const alt = "Rishabh — Full-Stack & Systems Developer"
+export const alt = "Developer Portfolio"
 export const size = {
   width: 1200,
   height: 630,
 }
 export const contentType = "image/png"
 
-export default function OpenGraphImage() {
+export default async function OpenGraphImage() {
+  const profile = await profileService.getProfile()
+  const initial = profile.name ? profile.name.charAt(0).toUpperCase() : "R"
+
   return new ImageResponse(
     (
       <div
@@ -67,7 +71,7 @@ export default function OpenGraphImage() {
               boxShadow: "0 8px 24px rgba(99, 102, 241, 0.4)",
             }}
           >
-            R
+            {initial}
           </div>
           <div
             style={{
@@ -85,7 +89,7 @@ export default function OpenGraphImage() {
               textTransform: "uppercase",
             }}
           >
-            ● Available for high-impact roles
+            ● {profile.status || "Available for high-impact roles"}
           </div>
         </div>
 
@@ -102,7 +106,7 @@ export default function OpenGraphImage() {
               color: "transparent",
             }}
           >
-            Rishabh
+            {profile.name}
           </div>
           <div
             style={{
@@ -112,7 +116,7 @@ export default function OpenGraphImage() {
               color: "#818cf8",
             }}
           >
-            Full-Stack & Systems Developer
+            {profile.role}
           </div>
           <div
             style={{
@@ -122,7 +126,7 @@ export default function OpenGraphImage() {
               lineHeight: 1.5,
             }}
           >
-            High-throughput distributed architectures, resilient cloud backends, and pixel-precise interactive web experiences.
+            {profile.tagline || profile.bio}
           </div>
         </div>
 

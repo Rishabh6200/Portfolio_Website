@@ -1,12 +1,17 @@
 import { ImageResponse } from "next/og"
 
+import { profileService } from "@/services"
+
 export const size = {
   width: 180,
   height: 180,
 }
 export const contentType = "image/png"
 
-export default function AppleIcon() {
+export default async function AppleIcon() {
+  const profile = await profileService.getProfile()
+  const initial = profile.name ? profile.name.charAt(0).toUpperCase() : "R"
+
   return new ImageResponse(
     (
       <div
@@ -25,7 +30,7 @@ export default function AppleIcon() {
           border: "2px solid rgba(255, 255, 255, 0.15)",
         }}
       >
-        R
+        {initial}
       </div>
     ),
     {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Geist_Mono, Inter } from "next/font/google"
-
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
 import { ProgressProvider } from "@/components/progress-provider"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -19,34 +20,46 @@ const fontMono = Geist_Mono({
   display: "swap",
 })
 
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL!),
-  title: "Rishabh — Full-Stack & Systems Developer",
-  description: "Portfolio of Rishabh. Specializing in high-throughput distributed architectures, resilient cloud backends, and pixel-precise interactive web experiences.",
-  keywords: [
-    "Full-Stack Developer",
-    "Systems Architect",
-    "Next.js",
-    "React 19",
-    "TypeScript",
-    "Distributed Systems",
-    "Tailwind CSS",
-  ],
-  authors: [{ name: "Rishabh" }],
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    title: "Rishabh — Full-Stack & Systems Developer",
-    description: "Architecting high-throughput distributed systems & polished interactive web experiences.",
-    type: "website",
-    locale: "en_US",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Rishabh — Full-Stack & Systems Developer",
-    description: "Architecting high-throughput distributed systems & polished interactive web experiences.",
-  },
+import { profileService } from "@/services"
+
+export async function generateMetadata(): Promise<Metadata> {
+  const profile = await profileService.getProfile()
+  const title = `${profile.name} — ${profile.role}`
+  const description =
+    profile.bio ||
+    profile.tagline ||
+    "Portfolio of high-throughput distributed systems and fluid web applications."
+
+  return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL!),
+    title,
+    description,
+    keywords: [
+      profile.role,
+      "Full-Stack Developer",
+      "Systems Architect",
+      "Next.js",
+      "React 19",
+      "TypeScript",
+      "Distributed Systems",
+      "Tailwind CSS",
+    ],
+    authors: [{ name: profile.name }],
+    alternates: {
+      canonical: "/",
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  }
 }
 
 export default function RootLayout({
@@ -65,6 +78,15 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <ProgressProvider>{children}</ProgressProvider>
           <Toaster />
+          <Analytics
+            beforeSend={(event) => {
+              if (event.url.includes("/admin")) {
+                return null
+              }
+              return event
+            }}
+          />
+          <SpeedInsights />
         </ThemeProvider>
       </body>
     </html>

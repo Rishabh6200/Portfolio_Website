@@ -93,7 +93,7 @@ export class ExperienceService {
     }
 
     const updated = await Experience.findByIdAndUpdate(id, updatePayload, {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     }).lean()
 

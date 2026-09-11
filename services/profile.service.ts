@@ -39,7 +39,7 @@ export class ProfileService {
     const updated = await Profile.findOneAndUpdate(
       {},
       { $set: data },
-      { new: true, upsert: true, runValidators: true }
+      { returnDocument: "after", upsert: true, runValidators: true }
     ).lean<IProfile>()
 
     revalidatePath("/")

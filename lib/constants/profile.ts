@@ -29,8 +29,8 @@ export interface ProfileData {
 export const DEFAULT_PROFILE: ProfileData = {
   name: "Rishabh",
   role: "Full-Stack & Systems Developer",
-  tagline: "I build robust, high-throughput backend APIs and polished web applications.",
-  bio: "I’m a full-stack developer specializing in scalable backend architectures and dynamic web applications. Over the last 6+ years, I’ve architected modular microservice APIs with NestJS, production web platforms with Laravel, and interactive frontend dashboards using React and Next.js.",
+  tagline: "Architecting high-throughput systems & fluid web products.",
+  bio: "I’m a full-stack developer specializing in scalable backend architectures and dynamic web applications. I’ve architected modular APIs with NestJS, production web platforms with Laravel, and interactive frontend dashboards using React and Next.js.",
   status: "Open for Work",
   location: "Mohali, India (IST)",
   timezone: "Asia/Kolkata",

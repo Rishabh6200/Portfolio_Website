@@ -5,7 +5,7 @@ import type { Metadata } from "next"
 import { ArrowLeft, ArrowRight, ExternalLink, Layers, Sparkles } from "lucide-react"
 import { GithubIcon } from "@/components/custom-ui/icons"
 import { Badge } from "@/components/ui/badge"
-import { projectService } from "@/services"
+import { projectService, profileService } from "@/services"
 import { ProjectImageGallery } from "./_components/project-image-gallery"
 
 interface PageProps {
@@ -16,7 +16,10 @@ export const dynamic = "force-dynamic"
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const data = await projectService.getBySlugWithContext(slug)
+  const [data, profile] = await Promise.all([
+    projectService.getBySlugWithContext(slug),
+    profileService.getProfile(),
+  ])
 
   if (!data || !data.project) {
     return {
@@ -27,7 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { project } = data
 
   return {
-    title: `${project.title} — Case Study | Rishabh`,
+    title: `${project.title} — Case Study | ${profile.name}`,
     description: project.tagline || project.description,
     openGraph: {
       title: `${project.title} — Case Study`,

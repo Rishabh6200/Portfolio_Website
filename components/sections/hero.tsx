@@ -110,11 +110,27 @@ export function HeroSection({ initialProfile }: HeroSectionProps) {
             transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="text-4xl sm:text-6xl md:text-7xl xl:text-7xl 2xl:text-[5rem] font-bold tracking-tight text-neutral-900 dark:text-white leading-[1.08]"
           >
-            Architecting{" "}
-            <span className="bg-linear-to-r from-indigo-600 via-cyan-500 to-emerald-500 dark:from-indigo-400 dark:via-cyan-300 dark:to-emerald-400 bg-clip-text text-transparent">
-              high-throughput
-            </span>{" "}
-            systems & fluid web products.
+            {profile.tagline ? (
+              profile.tagline.includes("high-throughput") ? (
+                <>
+                  {profile.tagline.split("high-throughput")[0]}
+                  <span className="bg-linear-to-r from-indigo-600 via-cyan-500 to-emerald-500 dark:from-indigo-400 dark:via-cyan-300 dark:to-emerald-400 bg-clip-text text-transparent">
+                    high-throughput
+                  </span>
+                  {profile.tagline.split("high-throughput")[1]}
+                </>
+              ) : (
+                profile.tagline
+              )
+            ) : (
+              <>
+                Architecting{" "}
+                <span className="bg-linear-to-r from-indigo-600 via-cyan-500 to-emerald-500 dark:from-indigo-400 dark:via-cyan-300 dark:to-emerald-400 bg-clip-text text-transparent">
+                  high-throughput
+                </span>{" "}
+                systems & fluid web products.
+              </>
+            )}
           </motion.h1>
 
           <motion.p
