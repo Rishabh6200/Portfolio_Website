@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { Geist_Mono, Inter } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
+import { PortfolioAnalytics } from "@/components/analytics"
 import "./globals.css"
 import { ProgressProvider } from "@/components/progress-provider"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -77,14 +77,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <ProgressProvider>{children}</ProgressProvider>
           <Toaster />
-          <Analytics
-            beforeSend={(event) => {
-              if (event.url.includes("/admin")) {
-                return null
-              }
-              return event
-            }}
-          />
+          <PortfolioAnalytics />
         </ThemeProvider>
       </body>
     </html>
