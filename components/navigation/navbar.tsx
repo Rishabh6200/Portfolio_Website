@@ -107,12 +107,12 @@ export function Navbar({ initialProfile }: NavbarProps) {
         )}
       </AnimatePresence>
 
-      <header className="fixed top-0 left-0 right-0 z-40 flex justify-center p-4 sm:p-6 pointer-events-none">
+      <header className="fixed top-0 left-0 right-0 z-40 flex justify-center px-4 sm:px-8 md:px-10 py-3 sm:py-6 pointer-events-none">
         <motion.div
           initial={{ y: -16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="pointer-events-auto w-[70%] min-w-67.5 max-w-[90%] sm:min-w-0 sm:w-auto"
+          className="pointer-events-auto w-full sm:w-auto max-w-xl sm:max-w-none"
         >
           <motion.nav
             animate={{
@@ -129,13 +129,13 @@ export function Navbar({ initialProfile }: NavbarProps) {
                 : "border-black/8 bg-white/30 shadow-[0_4px_24px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.7)] backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 dark:bg-black/35 dark:shadow-[0_4px_24px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.08)]"
               }`}
           >
-            <div className="flex items-center justify-between w-full gap-3 sm:gap-6 px-4 py-2 sm:py-2.5">
+            <div className="flex items-center justify-between w-full gap-3 sm:gap-6 px-4.5 sm:px-5 py-2.5 sm:py-2.5">
               <Link
                 href="/"
                 onClick={() => setMobileMenuOpen(false)}
                 className="group flex items-center gap-2.5 text-sm font-semibold text-neutral-900 dark:text-white tracking-tight shrink-0"
               >
-                <div className="relative flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-tr from-indigo-600 to-cyan-400 text-[10px] font-bold text-white shadow-md shrink-0">
+                <div className="relative flex h-7 w-7 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-linear-to-tr from-indigo-600 to-cyan-400 text-[11px] sm:text-[10px] font-bold text-white shadow-md shrink-0">
                   {profile.name.charAt(0)}
                   <span className="absolute -bottom-0.5 -right-0.5 flex h-2 w-2">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
@@ -160,13 +160,13 @@ export function Navbar({ initialProfile }: NavbarProps) {
                 ))}
               </div>
 
-              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <div className="flex items-center gap-2 sm:gap-2 shrink-0">
                 <motion.button
                   whileTap={{ scale: 0.88, rotate: 15 }}
                   whileHover={{ scale: 1.06 }}
                   transition={{ type: "spring", stiffness: 400, damping: 20 }}
                   onClick={toggleTheme}
-                  className="relative flex h-8 w-8 items-center justify-center rounded-full border border-black/8 bg-black/2 text-neutral-600 transition-colors hover:border-black/15 hover:bg-black/4 hover:text-neutral-900 dark:border-white/8 dark:bg-white/3 dark:text-neutral-400 dark:hover:border-white/20 dark:hover:bg-white/8 dark:hover:text-white select-none focus:outline-hidden overflow-hidden"
+                  className="relative flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-full border border-black/8 bg-black/2 text-neutral-600 transition-colors hover:border-black/15 hover:bg-black/4 hover:text-neutral-900 dark:border-white/8 dark:bg-white/3 dark:text-neutral-400 dark:hover:border-white/20 dark:hover:bg-white/8 dark:hover:text-white select-none focus:outline-hidden overflow-hidden"
                   aria-label="Toggle theme"
                 >
                   <AnimatePresence mode="wait" initial={false}>
@@ -198,7 +198,7 @@ export function Navbar({ initialProfile }: NavbarProps) {
 
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="sm:hidden flex h-8 w-8 items-center justify-center rounded-full border border-black/8 bg-black/2 text-neutral-700 transition-colors hover:border-black/15 hover:bg-black/4 hover:text-neutral-900 dark:border-white/8 dark:bg-white/3 dark:text-neutral-300 dark:hover:border-white/20 dark:hover:bg-white/8 dark:hover:text-white select-none focus:outline-hidden active:scale-95"
+                  className="sm:hidden flex h-9 w-9 items-center justify-center rounded-full border border-black/8 bg-black/2 text-neutral-700 transition-colors hover:border-black/15 hover:bg-black/4 hover:text-neutral-900 dark:border-white/8 dark:bg-white/3 dark:text-neutral-300 dark:hover:border-white/20 dark:hover:bg-white/8 dark:hover:text-white select-none focus:outline-hidden active:scale-95"
                   aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
                   aria-expanded={mobileMenuOpen}
                 >

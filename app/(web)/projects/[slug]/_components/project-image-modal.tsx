@@ -73,7 +73,7 @@ export function ProjectImageModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-10 bg-neutral-950/80 backdrop-blur-xl select-none"
+          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 md:p-10 bg-neutral-950/85 backdrop-blur-xl select-none"
           onClick={handleClose}
           role="dialog"
           aria-modal="true"
@@ -81,12 +81,12 @@ export function ProjectImageModal({
         >
           {/* Top Bar Floating Controls */}
           <div
-            className="absolute top-4 sm:top-6 left-0 right-0 px-4 sm:px-8 flex items-center justify-between z-20 pointer-events-none"
+            className="absolute top-3 sm:top-5 left-0 right-0 px-3 sm:px-6 md:px-8 flex items-center justify-between z-30 pointer-events-none"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Title & Image Counter */}
-            <div className="pointer-events-auto flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-neutral-900/80 border border-white/12 backdrop-blur-md shadow-2xl text-white">
-              <span className="text-xs font-semibold max-w-40 sm:max-w-xs truncate font-mono">
+            <div className="pointer-events-auto flex items-center gap-2 sm:gap-2.5 px-3 sm:px-3.5 py-1.5 rounded-full bg-neutral-900/80 border border-white/12 backdrop-blur-md shadow-2xl text-white">
+              <span className="text-xs font-semibold max-w-[45vw] sm:max-w-xs truncate font-mono">
                 {title}
               </span>
               {images.length > 1 && (
@@ -117,7 +117,7 @@ export function ProjectImageModal({
                 type="button"
                 onClick={handleClose}
                 aria-label="Close preview modal (Escape)"
-                className="flex items-center justify-center h-9 w-9 rounded-full bg-neutral-900/80 hover:bg-neutral-800 text-white/80 hover:text-white border border-white/12 backdrop-blur-md transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer"
+                className="flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-neutral-900/80 hover:bg-neutral-800 text-white/80 hover:text-white border border-white/12 backdrop-blur-md transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -133,9 +133,9 @@ export function ProjectImageModal({
                 prevImage()
               }}
               aria-label="Previous image"
-              className="absolute left-2 sm:left-6 z-20 flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-neutral-900/70 hover:bg-neutral-800 text-white border border-white/15 backdrop-blur-md shadow-2xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              className="absolute left-2 sm:left-4 md:left-6 z-20 flex items-center justify-center h-9 w-9 sm:h-11 sm:w-11 rounded-full bg-neutral-900/75 hover:bg-neutral-800 text-white border border-white/15 backdrop-blur-md shadow-2xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
             >
-              <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+              <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           )}
 
@@ -148,9 +148,9 @@ export function ProjectImageModal({
                 nextImage()
               }}
               aria-label="Next image"
-              className="absolute right-2 sm:right-6 z-20 flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-neutral-900/70 hover:bg-neutral-800 text-white border border-white/15 backdrop-blur-md shadow-2xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              className="absolute right-2 sm:right-4 md:right-6 z-20 flex items-center justify-center h-9 w-9 sm:h-11 sm:w-11 rounded-full bg-neutral-900/75 hover:bg-neutral-800 text-white border border-white/15 backdrop-blur-md shadow-2xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
             >
-              <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+              <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           )}
 
@@ -161,7 +161,12 @@ export function ProjectImageModal({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.96 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
-            className="relative max-h-[82vh] max-w-[92vw] flex items-center justify-center z-10"
+            className={cn(
+              "relative flex items-center justify-center z-10",
+              images.length > 1
+                ? "max-h-[58vh] sm:max-h-[72vh] md:max-h-[80vh] max-w-[94vw] sm:max-w-[88vw]"
+                : "max-h-[78vh] sm:max-h-[82vh] max-w-[94vw] sm:max-w-[88vw]"
+            )}
             onClick={(e) => e.stopPropagation()}
           >
             <Image
@@ -169,15 +174,20 @@ export function ProjectImageModal({
               alt={`${title} Full Preview ${modalIndex + 1}`}
               width={1920}
               height={1080}
-              sizes="(max-width: 1200px) 90vw, 1920px"
-              className="max-h-[80vh] sm:max-h-[82vh] max-w-[90vw] w-auto h-auto object-contain rounded-2xl shadow-2xl border border-white/15 ring-1 ring-white/10"
+              sizes="(max-width: 1200px) 95vw, 1920px"
+              className={cn(
+                "w-auto h-auto object-contain rounded-xl sm:rounded-2xl shadow-2xl border border-white/15 ring-1 ring-white/10",
+                images.length > 1
+                  ? "max-h-[58vh] sm:max-h-[72vh] md:max-h-[80vh] max-w-[94vw] sm:max-w-[88vw]"
+                  : "max-h-[78vh] sm:max-h-[82vh] max-w-[94vw] sm:max-w-[88vw]"
+              )}
             />
           </motion.div>
 
           {/* Bottom Dock Mini-Thumbnails (if more than 1 image) */}
           {images.length > 1 && (
             <div
-              className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 p-2 rounded-2xl bg-neutral-950/80 border border-white/15 backdrop-blur-xl shadow-2xl max-w-[92vw] overflow-x-auto scrollbar-none"
+              className="absolute bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 sm:gap-2.5 p-1.5 sm:p-2 rounded-2xl bg-neutral-950/80 border border-white/15 backdrop-blur-xl shadow-2xl max-w-[94vw] sm:max-w-[90vw] overflow-x-auto scrollbar-none overscroll-x-contain snap-x"
               onClick={(e) => e.stopPropagation()}
             >
               {images.map((img, idx) => (
@@ -187,7 +197,7 @@ export function ProjectImageModal({
                   onClick={() => setModalIndex(idx)}
                   aria-label={`Jump to image ${idx + 1}`}
                   className={cn(
-                    "relative w-16 sm:w-20 md:w-24 aspect-video rounded-xl overflow-hidden border shrink-0 transition-all duration-200 cursor-pointer",
+                    "relative w-14 sm:w-18 md:w-22 aspect-video rounded-lg sm:rounded-xl overflow-hidden border shrink-0 snap-center transition-all duration-200 cursor-pointer",
                     idx === modalIndex
                       ? "ring-2 ring-indigo-400 ring-offset-2 ring-offset-neutral-950 shadow-lg shadow-indigo-500/30 scale-105 opacity-100"
                       : "border-white/15 opacity-40 hover:opacity-100 hover:border-white/40"
@@ -197,7 +207,7 @@ export function ProjectImageModal({
                     src={img}
                     alt=""
                     fill
-                    sizes="(max-width: 640px) 70px, 96px"
+                    sizes="(max-width: 640px) 60px, 88px"
                     className="h-full w-full object-cover"
                   />
                 </button>
