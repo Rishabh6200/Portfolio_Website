@@ -5,21 +5,29 @@ import { Plus, Trash2, Upload, Link as LinkIcon, Loader2, Image as ImageIcon } f
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { uploadProjectMediaAction } from "../actions"
+import { uploadMediaAction, deleteMediaAction } from "@/app/admin/_actions/media.actions"
 
 interface GalleryUploaderProps {
   images: string[]
   onChange: (images: string[]) => void
+  projectSlug?: string
 }
 
-export function GalleryUploader({ images, onChange }: GalleryUploaderProps) {
+export function GalleryUploader({ images, onChange, projectSlug }: GalleryUploaderProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [urlInput, setUrlInput] = useState("")
   const [showUrlInput, setShowUrlInput] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const canUpload = Boolean(projectSlug && projectSlug.trim())
+
   async function handleFilesUpload(files: FileList | File[]) {
+    if (!canUpload) {
+      toast.error("Please enter a Project Title or URL Slug above before uploading screenshots.")
+      return
+    }
+
     const imageFiles = Array.from(files).filter((f) => f.type.startsWith("image/"))
     if (imageFiles.length === 0) {
       toast.error("Please upload image files (PNG, JPG, WebP, SVG)")
@@ -32,14 +40,22 @@ export function GalleryUploader({ images, onChange }: GalleryUploaderProps) {
 
     try {
       for (const file of imageFiles) {
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error(`"${file.name}" exceeds 5MB limit and was skipped.`)
+          hasError = true
+          continue
+        }
+
         const formData = new FormData()
         formData.append("file", file)
+        formData.append("projectSlug", projectSlug!.trim())
 
-        const res = await uploadProjectMediaAction(formData)
+        const res = await uploadMediaAction(formData)
         if (res.success && res.url) {
           uploadedUrls.push(res.url)
         } else {
           hasError = true
+          if (res.error) toast.error(res.error)
         }
       }
 
@@ -50,7 +66,7 @@ export function GalleryUploader({ images, onChange }: GalleryUploaderProps) {
         )
       }
 
-      if (hasError) {
+      if (hasError && uploadedUrls.length === 0) {
         toast.error("One or more images failed to upload")
       }
     } catch {
@@ -72,6 +88,10 @@ export function GalleryUploader({ images, onChange }: GalleryUploaderProps) {
   function handleDrop(e: React.DragEvent) {
     e.preventDefault()
     setDragOver(false)
+    if (!canUpload) {
+      toast.error("Please enter a Project Title or URL Slug above before uploading screenshots.")
+      return
+    }
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       handleFilesUpload(e.dataTransfer.files)
     }
@@ -93,7 +113,13 @@ export function GalleryUploader({ images, onChange }: GalleryUploaderProps) {
   }
 
   function handleRemove(index: number) {
+    const urlToRemove = images[index]
     onChange(images.filter((_, i) => i !== index))
+    if (urlToRemove && urlToRemove.includes("ik.imagekit.io")) {
+      deleteMediaAction(urlToRemove).catch((err) => {
+        console.error("Failed to delete removed gallery image from ImageKit:", err)
+      })
+    }
   }
 
   return (
@@ -128,7 +154,7 @@ export function GalleryUploader({ images, onChange }: GalleryUploaderProps) {
                   variant="destructive"
                   size="icon"
                   onClick={() => handleRemove(idx)}
-                  className="h-8 w-8 rounded-lg"
+                  className="h-8 w-8 rounded-lg cursor-pointer"
                   title="Remove image"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -144,15 +170,23 @@ export function GalleryUploader({ images, onChange }: GalleryUploaderProps) {
           <div
             onDragOver={(e) => {
               e.preventDefault()
-              setDragOver(true)
+              if (canUpload) setDragOver(true)
             }}
             onDragLeave={() => setDragOver(false)}
             onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-            className={`cursor-pointer aspect-video rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1.5 p-2 text-center transition-colors ${
-              dragOver
-                ? "border-primary bg-primary/10"
-                : "border-border hover:border-foreground/30 bg-muted/20 hover:bg-muted/40"
+            onClick={() => {
+              if (!canUpload) {
+                toast.error("Please enter a Project Title or URL Slug above before uploading screenshots.")
+                return
+              }
+              fileInputRef.current?.click()
+            }}
+            className={`aspect-video rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1.5 p-2 text-center transition-colors ${
+              !canUpload
+                ? "border-border/60 bg-muted/10 opacity-60 cursor-not-allowed"
+                : dragOver
+                ? "border-primary bg-primary/10 cursor-pointer"
+                : "border-border hover:border-foreground/30 bg-muted/20 hover:bg-muted/40 cursor-pointer"
             }`}
           >
             {isUploading ? (
@@ -161,7 +195,7 @@ export function GalleryUploader({ images, onChange }: GalleryUploaderProps) {
               <Plus className="h-5 w-5 text-muted-foreground" />
             )}
             <span className="text-xs font-medium text-muted-foreground">
-              {isUploading ? "Uploading..." : "Add / Drop image"}
+              {isUploading ? "Uploading..." : canUpload ? "Add / Drop image" : "Slug required"}
             </span>
           </div>
         </div>
@@ -172,15 +206,23 @@ export function GalleryUploader({ images, onChange }: GalleryUploaderProps) {
         <div
           onDragOver={(e) => {
             e.preventDefault()
-            setDragOver(true)
+            if (canUpload) setDragOver(true)
           }}
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
-          className={`relative cursor-pointer rounded-xl border-2 border-dashed p-7 text-center transition-colors ${
-            dragOver
-              ? "border-primary bg-primary/10"
-              : "border-border hover:border-foreground/30 bg-muted/10 hover:bg-muted/20"
+          onClick={() => {
+            if (!canUpload) {
+              toast.error("Please enter a Project Title or URL Slug above before uploading screenshots.")
+              return
+            }
+            fileInputRef.current?.click()
+          }}
+          className={`relative rounded-xl border-2 border-dashed p-7 text-center transition-colors ${
+            !canUpload
+              ? "border-border/60 bg-muted/10 opacity-60 cursor-not-allowed"
+              : dragOver
+              ? "border-primary bg-primary/10 cursor-pointer"
+              : "border-border hover:border-foreground/30 bg-muted/10 hover:bg-muted/20 cursor-pointer"
           }`}
         >
           <div className="flex flex-col items-center justify-center gap-2.5">
@@ -193,10 +235,16 @@ export function GalleryUploader({ images, onChange }: GalleryUploaderProps) {
             </div>
             <div>
               <p className="text-xs font-medium text-foreground">
-                {isUploading ? "Uploading files to ImageKit..." : "Click to select or drag & drop screenshots here"}
+                {isUploading
+                  ? "Uploading files..."
+                  : canUpload
+                  ? "Click to select or drag & drop screenshots here"
+                  : "Enter Project Title or URL Slug above to enable upload"}
               </p>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                PNG, JPG, WebP, or SVG (multiple files supported)
+                {canUpload
+                  ? "PNG, JPG, WebP, or SVG up to 5MB (multiple files supported)"
+                  : "Uploads are organized under your project's slug in ImageKit"}
               </p>
             </div>
           </div>
@@ -204,38 +252,53 @@ export function GalleryUploader({ images, onChange }: GalleryUploaderProps) {
       )}
 
       {/* Upload / Add Controls */}
-      <div className="flex flex-wrap items-center gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isUploading}
-          className="gap-2"
-        >
-          {isUploading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Uploading...</span>
-            </>
-          ) : (
-            <>
-              <Upload className="h-4 w-4" />
-              <span>Upload Screenshots</span>
-            </>
-          )}
-        </Button>
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              if (!canUpload) {
+                toast.error("Please enter a Project Title or URL Slug above before uploading screenshots.")
+                return
+              }
+              fileInputRef.current?.click()
+            }}
+            disabled={!canUpload || isUploading}
+            className="gap-2 cursor-pointer"
+          >
+            {isUploading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Uploading...</span>
+              </>
+            ) : (
+              <>
+                <Upload className="h-4 w-4" />
+                <span>Upload Screenshots</span>
+              </>
+            )}
+          </Button>
 
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowUrlInput(!showUrlInput)}
-          className="gap-1.5 text-muted-foreground hover:text-foreground"
-        >
-          <LinkIcon className="h-3.5 w-3.5" />
-          <span>Paste Image URL</span>
-        </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowUrlInput(!showUrlInput)}
+            className="gap-1.5 text-muted-foreground hover:text-foreground cursor-pointer"
+          >
+            <LinkIcon className="h-3.5 w-3.5" />
+            <span>Paste Image URL</span>
+          </Button>
+        </div>
+
+        {!canUpload && (
+          <p className="text-xs text-amber-500 font-medium flex items-center gap-1.5">
+            <span>⚠️</span>
+            <span>Enter Project Title or URL Slug above to enable screenshot uploads</span>
+          </p>
+        )}
       </div>
 
       {/* URL Input Form */}

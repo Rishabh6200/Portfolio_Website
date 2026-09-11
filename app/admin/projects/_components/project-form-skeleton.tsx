@@ -15,7 +15,7 @@ export function ProjectFormSkeleton({ isEditing = false }: ProjectFormSkeletonPr
       </div>
 
       {/* Form Content */}
-      <div className="space-y-10 max-w-4xl pb-16">
+      <div className="w-full space-y-10 pb-16">
         {/* Top Action Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-border">
           <div className="flex items-center gap-3">
@@ -132,10 +132,19 @@ export function ProjectFormSkeleton({ isEditing = false }: ProjectFormSkeletonPr
           </div>
 
           {/* Logo */}
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             <Skeleton className="h-4 w-48 rounded-md" />
             <Skeleton className="h-3.5 w-72 max-w-full rounded-md" />
-            <Skeleton className="h-40 w-40 rounded-xl aspect-square" />
+            <div className="rounded-2xl border border-border bg-card/60 p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-5">
+              <Skeleton className="h-24 w-24 sm:h-28 sm:w-28 rounded-2xl shrink-0" />
+              <div className="space-y-2.5 flex-1 w-full">
+                <div className="flex gap-2">
+                  <Skeleton className="h-9 w-44 rounded-lg" />
+                  <Skeleton className="h-9 w-36 rounded-lg" />
+                </div>
+                <Skeleton className="h-3.5 w-64 rounded-md" />
+              </div>
+            </div>
           </div>
 
           {/* Gallery */}

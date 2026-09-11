@@ -2,10 +2,42 @@ import ImageKit from "imagekit"
 
 const publicKey = process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || ""
 const privateKey = process.env.IMAGEKIT_PRIVATE_KEY || ""
-const urlEndpoint = process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT || ""
+export const urlEndpoint = process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT || ""
 
 export function isImageKitConfigured(): boolean {
   return Boolean(publicKey && privateKey && urlEndpoint)
+}
+
+/**
+ * Returns the configured root directory in ImageKit from IMAGEKIT_ROOT_DIR env variable.
+ * Defaults to "portfolio-site" if not set.
+ */
+export function getImageKitRootDir(): string {
+  const raw = process.env.IMAGEKIT_ROOT_DIR || "portfolio-site"
+  const clean = raw.trim().replace(/^\/+|\/+$/g, "")
+  return clean || "portfolio-site"
+}
+
+/**
+ * Returns the folder path for a project under the configured root directory.
+ * e.g. "/portfolio-site/projects/my-slug"
+ */
+export function getImageKitProjectFolder(slug?: string): string {
+  const root = getImageKitRootDir()
+  if (!slug) {
+    return root.endsWith("projects") ? `/${root}` : `/${root}/projects`
+  }
+
+  const cleanSlug = slug
+    .toLowerCase()
+    .replace(/[^a-z0-9-_]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "")
+
+  if (root.endsWith("projects")) {
+    return `/${root}/${cleanSlug}`
+  }
+  return `/${root}/projects/${cleanSlug}`
 }
 
 export const imagekit = new ImageKit({
@@ -13,26 +45,3 @@ export const imagekit = new ImageKit({
   privateKey,
   urlEndpoint,
 })
-
-export async function uploadToImageKit(
-  fileBase64OrBuffer: string | Buffer,
-  fileName: string,
-  folder: string = "/portfolio/projects"
-): Promise<{ url: string; fileId: string }> {
-  if (!isImageKitConfigured()) {
-    throw new Error(
-      "ImageKit credentials are not configured. Please add NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY, IMAGEKIT_PRIVATE_KEY, and NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT to .env.local"
-    )
-  }
-
-  const response = await imagekit.upload({
-    file: fileBase64OrBuffer,
-    fileName,
-    folder,
-  })
-
-  return {
-    url: response.url,
-    fileId: response.fileId,
-  }
-}

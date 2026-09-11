@@ -41,9 +41,29 @@ export function SkillSelector({
     return availableSkills.filter((s) => selectedSkillIds.includes(s._id))
   }, [availableSkills, selectedSkillIds])
 
+  // Check if search contains comma-separated items (e.g. pasted list of skills)
+  const commaSeparatedTerms = useMemo(() => {
+    if (!search.includes(",")) return []
+    return search
+      .split(",")
+      .map((t) => t.trim().toLowerCase())
+      .filter((t) => t.length > 0)
+  }, [search])
+
+  const commaMatches = useMemo(() => {
+    if (commaSeparatedTerms.length === 0) return []
+    return availableSkills.filter((s) => {
+      const sName = s.name.toLowerCase()
+      return commaSeparatedTerms.some((term) => sName === term || sName.includes(term))
+    })
+  }, [availableSkills, commaSeparatedTerms])
+
   // Filter skills based on search term
   const filteredSkills = useMemo(() => {
     if (!search.trim()) return availableSkills
+    if (commaSeparatedTerms.length > 0) {
+      return commaMatches
+    }
     const term = search.toLowerCase()
     return availableSkills.filter((s) => {
       const nameMatch = s.name.toLowerCase().includes(term)
@@ -51,7 +71,7 @@ export function SkillSelector({
         typeof s.categoryId === "object" ? s.categoryId?.name?.toLowerCase() : ""
       return nameMatch || (catName && catName.includes(term))
     })
-  }, [availableSkills, search])
+  }, [availableSkills, search, commaSeparatedTerms, commaMatches])
 
   // Group filtered skills by Category
   const groupedSkills = useMemo(() => {
@@ -129,15 +149,36 @@ export function SkillSelector({
       </div>
 
       {/* Search Input */}
-      <div className="relative">
-        <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Filter skills by name or category (e.g. React, PostgreSQL, Docker)..."
-          className="pl-9 text-xs"
-        />
+      <div className="space-y-2">
+        <div className="relative">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Filter skills or paste comma-separated list (e.g. React, Docker, Node.js)..."
+            className="pl-9 text-xs"
+          />
+        </div>
+
+        {commaMatches.length > 0 && (
+          <div className="flex items-center justify-between p-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs">
+            <span className="text-foreground font-medium">
+              Found {commaMatches.length} matching skill{commaMatches.length > 1 ? "s" : ""} from your input string
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                const matchedIds = commaMatches.map((s) => s._id)
+                onChange(Array.from(new Set([...selectedSkillIds, ...matchedIds])))
+                setSearch("")
+              }}
+              className="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors cursor-pointer"
+            >
+              Select All ({commaMatches.length})
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Category-Grouped Skill Chips */}

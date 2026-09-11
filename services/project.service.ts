@@ -1,5 +1,7 @@
 import { dbConnect } from "@/lib/db/connect"
 import { Project } from "@/lib/db/models"
+import { mediaService } from "./media.service"
+import { getImageKitProjectFolder } from "@/lib/imagekit"
 // Ensure Skill and Category models are registered in Mongoose for population
 import "@/lib/db/models/category.model"
 import "@/lib/db/models/skill.model"
@@ -199,6 +201,36 @@ export class ProjectService {
     const deleted = await Project.findByIdAndDelete(id)
     if (!deleted) {
       throw new Error("Project not found or already deleted.")
+    }
+
+    // Collect all media URLs to clean up from ImageKit
+    const mediaUrlsToDelete: string[] = []
+    if (deleted.logo) {
+      mediaUrlsToDelete.push(deleted.logo)
+    }
+    if (Array.isArray(deleted.images)) {
+      deleted.images.forEach((img: string) => {
+        if (img) mediaUrlsToDelete.push(img)
+      })
+    }
+
+    // 1. Delete the entire project folder in ImageKit if slug exists
+    if (deleted.slug) {
+      try {
+        const folderPath = getImageKitProjectFolder(deleted.slug)
+        await mediaService.deleteFolder(folderPath)
+      } catch (err) {
+        console.error(`Error deleting project folder from ImageKit:`, err)
+      }
+    }
+
+    // 2. Fallback: Also purge any specific media URLs that were outside the slug folder
+    if (mediaUrlsToDelete.length > 0) {
+      try {
+        await mediaService.deleteMultipleByUrls(mediaUrlsToDelete)
+      } catch (err) {
+        console.error("Error auto-deleting media from ImageKit during project deletion:", err)
+      }
     }
 
     return { success: true }

@@ -3,20 +3,7 @@
 import { useState, useTransition } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import {
-  FolderGit2,
-  PlusCircle,
-  ExternalLink,
-  Menu,
-  X,
-  Terminal,
-  Database,
-  ChevronRight,
-  Layers,
-  Sparkles,
-  Briefcase,
-  LogOut,
-} from "lucide-react"
+import { FolderGit2, PlusCircle, ExternalLink, Menu, X, Terminal, Database, ChevronRight, Layers, Sparkles, Briefcase, LogOut } from "lucide-react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { logoutAdminAction } from "../login/actions"
@@ -47,12 +34,6 @@ export function AdminShell({ children }: AdminShellProps) {
       href: "/admin",
       icon: FolderGit2,
       exact: true,
-    },
-    {
-      title: "Add Project",
-      href: "/admin/projects/new",
-      icon: PlusCircle,
-      exact: false,
     },
     {
       title: "Categories",
@@ -99,9 +80,8 @@ export function AdminShell({ children }: AdminShellProps) {
 
       {/* Sidebar - 100% Fixed and Stationary */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 shrink-0 border-r border-border bg-card flex flex-col transition-transform duration-200 md:static md:h-full md:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 shrink-0 border-r border-border bg-card flex flex-col transition-transform duration-200 md:static md:h-full md:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         {/* Sidebar Header */}
         <div className="h-14 shrink-0 border-b border-border flex items-center justify-between px-4">
@@ -142,11 +122,10 @@ export function AdminShell({ children }: AdminShellProps) {
                   key={item.href}
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                    isActive
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${isActive
                       ? "bg-accent text-accent-foreground font-semibold"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  }`}
+                    }`}
                 >
                   <Icon className="h-4 w-4" />
                   <span>{item.title}</span>
