@@ -14,6 +14,7 @@ export interface EducationInput {
   description: string
   highlights?: string[]
   skills?: string[]
+  status?: "published" | "draft"
   order?: number
 }
 
@@ -32,6 +33,25 @@ export class EducationService {
       .lean()
 
     return JSON.parse(JSON.stringify(docs || []))
+  }
+
+  async getPublished() {
+    try {
+      await dbConnect()
+      const docs = await Education.find({ status: { $ne: "draft" } })
+        .populate({
+          path: "skills",
+          select: "name level categoryId",
+          strictPopulate: false,
+          populate: { path: "categoryId", select: "name slug color", strictPopulate: false },
+        })
+        .sort({ order: 1, createdAt: -1 })
+        .lean()
+      return JSON.parse(JSON.stringify(docs || []))
+    } catch (err) {
+      console.error("Error fetching published education records:", err)
+      return []
+    }
   }
 
   async getById(id: string) {
@@ -68,6 +88,7 @@ export class EducationService {
       description: data.description.trim(),
       highlights: (data.highlights || []).map((h) => h.trim()).filter(Boolean),
       skills: data.skills || [],
+      status: data.status || "published",
       order,
     })
 
@@ -88,6 +109,10 @@ export class EducationService {
       description: data.description.trim(),
       highlights: (data.highlights || []).map((h) => h.trim()).filter(Boolean),
       skills: data.skills || [],
+    }
+
+    if (data.status !== undefined) {
+      updatePayload.status = data.status
     }
 
     if (data.order !== undefined) {
@@ -113,6 +138,17 @@ export class EducationService {
       throw new Error(`Education record with ID ${id} not found`)
     }
     return JSON.parse(JSON.stringify(deleted))
+  }
+
+  async toggleStatus(id: string) {
+    await dbConnect()
+    const doc = await Education.findById(id)
+    if (!doc) {
+      throw new Error(`Education record with ID ${id} not found`)
+    }
+    doc.status = doc.status === "draft" ? "published" : "draft"
+    await doc.save()
+    return JSON.parse(JSON.stringify(doc))
   }
 
   async reorder(items: { id: string; order: number }[]) {

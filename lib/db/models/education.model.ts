@@ -11,6 +11,7 @@ export interface IEducation extends Document {
   description: string
   highlights: string[]
   skills: Types.ObjectId[]
+  status: "published" | "draft"
   order: number
   createdAt: Date
   updatedAt: Date
@@ -68,6 +69,12 @@ const EducationSchema = new Schema<IEducation>(
         ref: "Skill",
       },
     ],
+    status: {
+      type: String,
+      enum: ["published", "draft"],
+      default: "published",
+      index: true,
+    },
     order: {
       type: Number,
       default: 0,

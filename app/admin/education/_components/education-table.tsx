@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition, useId } from "react"
 import Link from "next/link"
-import { Edit3, Trash2, GraduationCap, Plus, MapPin, Calendar, Award } from "lucide-react"
+import { Edit3, Trash2, GraduationCap, Plus, MapPin, Calendar, Award, Loader2 } from "lucide-react"
 import { DndContext, closestCenter } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { DeleteConfirmDialog } from "@/app/admin/_components/delete-confirm-dialog"
 import { EmptyState } from "@/components/custom-ui/empty-state"
-import { deleteEducationAction, reorderEducationAction } from "../actions"
+import { deleteEducationAction, reorderEducationAction, toggleEducationStatusAction } from "../actions"
 import { DragHandle, SortableRow } from "@/components/ui/sortable-row"
 
 export interface PopulatedSkill {
@@ -35,6 +35,7 @@ export interface SerializedEducation {
   description: string
   highlights?: string[]
   skills?: (PopulatedSkill | string)[]
+  status?: "published" | "draft"
   order: number
   updatedAt?: string
 }
@@ -44,6 +45,7 @@ interface EducationTableProps {
 }
 
 export function EducationTable({ educationList: initialList }: EducationTableProps) {
+  const dndId = useId()
   const {
     items,
     setItems,
@@ -56,8 +58,27 @@ export function EducationTable({ educationList: initialList }: EducationTablePro
     errorMessage: "Failed to save new order",
   })
 
+  const [, startTransition] = useTransition()
+  const [togglingId, setTogglingId] = useState<string | null>(null)
   const [itemToDelete, setItemToDelete] = useState<SerializedEducation | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  function handleToggleStatus(id: string, currentStatus: "published" | "draft") {
+    setTogglingId(id)
+    startTransition(async () => {
+      const res = await toggleEducationStatusAction(id, currentStatus)
+      if (res.success && res.status) {
+        const nextStatus = res.status as "published" | "draft"
+        setItems((prev) =>
+          prev.map((e) => (e._id === id ? { ...e, status: nextStatus } : e))
+        )
+        toast.success(`Education status updated to ${res.status}`)
+      } else {
+        toast.error("Failed to update status")
+      }
+      setTogglingId(null)
+    })
+  }
 
   const handleDelete = async () => {
     if (!itemToDelete) return
@@ -95,6 +116,7 @@ export function EducationTable({ educationList: initialList }: EducationTablePro
     <>
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <DndContext
+          id={dndId}
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
@@ -110,6 +132,7 @@ export function EducationTable({ educationList: initialList }: EducationTablePro
                 <TableHead className="min-w-28">Type</TableHead>
                 <TableHead className="min-w-35">Period & Location</TableHead>
                 <TableHead className="min-w-44">Related Skills</TableHead>
+                <TableHead className="min-w-28">Status</TableHead>
                 <TableHead className="w-24 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -204,6 +227,30 @@ export function EducationTable({ educationList: initialList }: EducationTablePro
                                 </span>
                               )}
                             </div>
+                          </TableCell>
+
+                          <TableCell className="py-3">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleStatus(edu._id, edu.status || "published")}
+                              disabled={togglingId === edu._id}
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                                edu.status !== "draft"
+                                  ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
+                                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                              }`}
+                            >
+                              {togglingId === edu._id ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <span
+                                  className={`h-2 w-2 rounded-full ${
+                                    edu.status !== "draft" ? "bg-emerald-500" : "bg-muted-foreground"
+                                  }`}
+                                />
+                              )}
+                              <span className="capitalize">{edu.status || "published"}</span>
+                            </button>
                           </TableCell>
 
                           <TableCell className="py-3 text-right">

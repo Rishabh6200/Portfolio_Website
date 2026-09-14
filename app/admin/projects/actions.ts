@@ -25,6 +25,7 @@ export async function createProjectAction(data: ProjectInput) {
     const created = await projectService.create(parsed.data)
 
     revalidatePath("/admin")
+    revalidatePath("/admin/projects")
     revalidatePath("/")
 
     return { success: true, project: created }
@@ -51,6 +52,7 @@ export async function updateProjectAction(id: string, data: ProjectInput) {
     const updated = await projectService.update(id, parsed.data)
 
     revalidatePath("/admin")
+    revalidatePath("/admin/projects")
     revalidatePath("/")
     if (updated.slug) {
       revalidatePath(`/projects/${updated.slug}`)
@@ -72,6 +74,7 @@ export async function deleteProjectAction(id: string) {
     await projectService.delete(id)
 
     revalidatePath("/admin")
+    revalidatePath("/admin/projects")
     revalidatePath("/")
 
     return { success: true }
@@ -90,6 +93,7 @@ export async function toggleProjectStatusAction(id: string, _currentStatus?: "pu
     const updated = await projectService.toggleStatus(id)
 
     revalidatePath("/admin")
+    revalidatePath("/admin/projects")
     revalidatePath("/")
 
     return { success: true, status: updated.status }
@@ -107,6 +111,7 @@ export async function reorderProjectsAction(items: { id: string; order: number }
 
     await projectService.reorder(items)
     revalidatePath("/admin")
+    revalidatePath("/admin/projects")
     revalidatePath("/")
     return { success: true }
   } catch (error: unknown) {

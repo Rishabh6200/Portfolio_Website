@@ -218,7 +218,7 @@ export function ProjectForm({
         const res = await updateProjectAction(initialData._id, payload)
         if (res.success) {
           toast.success("Project updated successfully!")
-          router.push("/admin")
+          router.push("/admin/projects")
         } else {
           toast.error(res.error || "Failed to update project")
         }
@@ -226,7 +226,7 @@ export function ProjectForm({
         const res = await createProjectAction(payload)
         if (res.success) {
           toast.success("Project created successfully!")
-          router.push("/admin")
+          router.push("/admin/projects")
         } else {
           toast.error(res.error || "Failed to create project")
         }
@@ -240,7 +240,7 @@ export function ProjectForm({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-border">
         <div className="flex items-center gap-3">
           <Link
-            href="/admin"
+            href="/admin/projects"
             className={buttonVariants({ variant: "outline", size: "sm" })}
           >
             <ArrowLeft className="h-4 w-4" />
@@ -265,7 +265,7 @@ export function ProjectForm({
           </Button>
 
           <Link
-            href="/admin"
+            href="/admin/projects"
             className={buttonVariants({ variant: "outline", size: "sm" })}
           >
             Cancel
@@ -538,7 +538,7 @@ export function ProjectForm({
       {/* Bottom Save Button */}
       <div className="flex items-center justify-end gap-3 pt-6 border-t border-border">
         <Link
-          href="/admin"
+          href="/admin/projects"
           className={buttonVariants({ variant: "outline", size: "default" })}
         >
           Cancel

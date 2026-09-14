@@ -35,6 +35,7 @@ export const educationSchema = z.object({
     .max(1000, "Description must be 1000 characters or less"),
   highlights: z.array(z.string()),
   skills: z.array(z.string()),
+  status: z.enum(["published", "draft"]).default("published").optional(),
   order: z.number().int().min(0, "Order must be 0 or higher").optional(),
 })
 

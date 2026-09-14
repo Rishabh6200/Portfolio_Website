@@ -23,6 +23,7 @@ export function DragHandle({
   return (
     <button
       type="button"
+      suppressHydrationWarning
       {...attributes}
       {...listeners}
       aria-label="Drag to reorder"

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useId } from "react"
 import Link from "next/link"
 import {
   Edit3,
@@ -71,6 +71,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
 }
 
 export function CategoryTable({ categories: initialCategories }: CategoryTableProps) {
+  const dndId = useId()
   const {
     items: categories,
     setItems: setCategories,
@@ -134,6 +135,7 @@ export function CategoryTable({ categories: initialCategories }: CategoryTablePr
     <>
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <DndContext
+          id={dndId}
           sensors={sensors}
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}

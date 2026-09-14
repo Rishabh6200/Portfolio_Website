@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useTransition } from "react"
+import { useState, useEffect, useTransition, useId } from "react"
 import Link from "next/link"
 import {
   Edit3,
@@ -90,6 +90,7 @@ export function SkillTable({
   categories,
   activeCategoryId,
 }: SkillTableProps) {
+  const dndId = useId()
   const [skills, setSkills] = useState<SerializedSkill[]>(initialSkills)
   const [, startTransition] = useTransition()
 
@@ -212,6 +213,7 @@ export function SkillTable({
     <>
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <DndContext
+          id={dndId}
           sensors={sensors}
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}

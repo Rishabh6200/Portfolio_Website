@@ -22,6 +22,7 @@ export function EducationTableSkeleton() {
             <TableHead className="min-w-30">Type</TableHead>
             <TableHead className="min-w-35">Period & Location</TableHead>
             <TableHead className="min-w-50">Related Skills</TableHead>
+            <TableHead className="min-w-28">Status</TableHead>
             <TableHead className="w-24 text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -56,6 +57,10 @@ export function EducationTableSkeleton() {
                   <Skeleton className="h-5 w-20 rounded-md" />
                   <Skeleton className="h-5 w-14 rounded-md" />
                 </div>
+              </TableCell>
+
+              <TableCell className="py-3">
+                <Skeleton className="h-6 w-20 rounded-md" />
               </TableCell>
 
               <TableCell className="text-right py-3">

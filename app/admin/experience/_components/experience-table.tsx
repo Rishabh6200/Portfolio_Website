@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useId } from "react"
 import Link from "next/link"
 import { Edit3, Trash2, Briefcase, Plus, MapPin, Calendar } from "lucide-react"
 import { DndContext, closestCenter } from "@dnd-kit/core"
@@ -43,6 +43,7 @@ interface ExperienceTableProps {
 }
 
 export function ExperienceTable({ experiences: initialExperiences }: ExperienceTableProps) {
+  const dndId = useId()
   const {
     items: experiences,
     setItems: setExperiences,
@@ -94,6 +95,7 @@ export function ExperienceTable({ experiences: initialExperiences }: ExperienceT
     <>
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <DndContext
+          id={dndId}
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}

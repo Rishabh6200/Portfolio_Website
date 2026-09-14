@@ -24,7 +24,7 @@ async function AsyncProjectsSection() {
 async function AsyncExperienceSection() {
   const [experiences, educations] = await Promise.all([
     experienceService.getAll(),
-    educationService.getAll(),
+    educationService.getPublished(),
   ])
   return <ExperienceSection initialExperiences={experiences} initialEducations={educations} />
 }

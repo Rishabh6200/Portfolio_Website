@@ -1,9 +1,9 @@
 import Link from "next/link"
 import { buttonVariants } from "@/components/ui/button"
 import { Plus } from "lucide-react"
-import { ProjectsDashboardSkeleton } from "./projects/_components/projects-skeleton"
+import { ProjectsDashboardSkeleton } from "./_components/projects-skeleton"
 
-export default function AdminDashboardLoading() {
+export default function ProjectsLoading() {
   return (
     <div className="space-y-6">
       {/* Static Page Header - Loaded Instantly */}

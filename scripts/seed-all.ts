@@ -357,6 +357,7 @@ export async function seedAll() {
             description: edu.description,
             highlights: edu.highlights,
             skills: resolveSkillIds(edu.skillNames),
+            status: "published",
             order: edu.order,
           },
         },

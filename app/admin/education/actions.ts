@@ -78,6 +78,25 @@ export async function deleteEducationAction(id: string) {
   }
 }
 
+export async function toggleEducationStatusAction(id: string, _currentStatus?: "published" | "draft") {
+  try {
+    if (!(await isAdminAuthenticated())) {
+      return { success: false, error: "Unauthorized. Please log in to perform this action." }
+    }
+
+    const updated = await educationService.toggleStatus(id)
+
+    revalidatePath("/admin/education")
+    revalidatePath("/admin", "layout")
+    revalidatePath("/")
+
+    return { success: true, status: updated.status }
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to toggle education status"
+    return { success: false, error: message }
+  }
+}
+
 export async function reorderEducationAction(items: { id: string; order: number }[]) {
   try {
     if (!(await isAdminAuthenticated())) {

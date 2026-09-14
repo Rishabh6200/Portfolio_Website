@@ -31,9 +31,9 @@ export function AdminShell({ children }: AdminShellProps) {
   const navItems = [
     {
       title: "All Projects",
-      href: "/admin",
+      href: "/admin/projects",
       icon: FolderGit2,
-      exact: true,
+      exact: false,
     },
     {
       title: "Categories",
@@ -296,7 +296,7 @@ export function AdminShell({ children }: AdminShellProps) {
                 )
               ) : isNew ? (
                 <>
-                  <Link href="/admin" className="hover:text-foreground transition-colors">
+                  <Link href="/admin/projects" className="hover:text-foreground transition-colors">
                     Projects
                   </Link>
                   <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
@@ -304,7 +304,7 @@ export function AdminShell({ children }: AdminShellProps) {
                 </>
               ) : isEdit ? (
                 <>
-                  <Link href="/admin" className="hover:text-foreground transition-colors">
+                  <Link href="/admin/projects" className="hover:text-foreground transition-colors">
                     Projects
                   </Link>
                   <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useTransition, useId } from "react"
 import Link from "next/link"
 import {
   Edit3,
@@ -70,6 +70,7 @@ interface ProjectTableProps {
 }
 
 export function ProjectTable({ projects: initialProjects }: ProjectTableProps) {
+  const dndId = useId()
   const {
     items: projects,
     setItems: setProjects,
@@ -142,6 +143,7 @@ export function ProjectTable({ projects: initialProjects }: ProjectTableProps) {
     <>
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <DndContext
+          id={dndId}
           sensors={sensors}
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}

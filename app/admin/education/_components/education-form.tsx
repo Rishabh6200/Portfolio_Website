@@ -48,6 +48,11 @@ const EDUCATION_TYPES = [
   { value: "Course", label: "Course / Workshop" },
 ]
 
+const STATUS_OPTIONS = [
+  { value: "published", label: "Published (Visible on portfolio)" },
+  { value: "draft", label: "Draft (Hidden from public site)" },
+]
+
 export function EducationForm({
   availableSkills,
   initialData,
@@ -89,11 +94,13 @@ export function EducationForm({
       description: initialData?.description || "",
       highlights: initialData?.highlights || [],
       skills: initialSkillIds,
+      status: (initialData?.status as "published" | "draft") || "published",
       order: initialData?.order,
     },
   })
 
   const currentType = watch("type") || "Degree"
+  const currentStatus = watch("status") || "published"
 
   const onSubmit = async (data: EducationFormValues) => {
     const cleanedHighlights = highlights.map((h) => h.trim()).filter(Boolean)
@@ -109,6 +116,7 @@ export function EducationForm({
       description: data.description.trim(),
       highlights: cleanedHighlights,
       skills: selectedSkills,
+      status: data.status || "published",
       ...(isEditing && initialData?.order !== undefined ? { order: initialData.order } : {}),
     }
 
@@ -265,7 +273,7 @@ export function EducationForm({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {/* Period */}
             <div className="space-y-2">
               <Label htmlFor="period" className="text-xs font-medium">
@@ -312,6 +320,33 @@ export function EducationForm({
               {errors.grade && (
                 <p className="text-xs text-destructive">{errors.grade.message}</p>
               )}
+            </div>
+
+            {/* Publication Status */}
+            <div className="space-y-2">
+              <Label htmlFor="status" className="text-xs font-medium">
+                Publication Status
+              </Label>
+              <Select
+                value={currentStatus}
+                onValueChange={(val) => {
+                  if (val === "published" || val === "draft") {
+                    setValue("status", val, { shouldValidate: true })
+                  }
+                }}
+                items={STATUS_OPTIONS}
+              >
+                <SelectTrigger id="status" className="w-full">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUS_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value} label={opt.label}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
