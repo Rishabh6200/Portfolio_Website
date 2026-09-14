@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { FolderGit2, PlusCircle, ExternalLink, Menu, X, Terminal, Database, ChevronRight, Layers, Sparkles, Briefcase, LogOut, UserCircle } from "lucide-react"
+import { FolderGit2, PlusCircle, ExternalLink, Menu, X, Terminal, Database, ChevronRight, Layers, Sparkles, Briefcase, GraduationCap, LogOut, UserCircle } from "lucide-react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { logoutAdminAction } from "../login/actions"
@@ -54,6 +54,12 @@ export function AdminShell({ children }: AdminShellProps) {
       exact: false,
     },
     {
+      title: "Education",
+      href: "/admin/education",
+      icon: GraduationCap,
+      exact: false,
+    },
+    {
       title: "Profile & Socials",
       href: "/admin/profile",
       icon: UserCircle,
@@ -74,6 +80,9 @@ export function AdminShell({ children }: AdminShellProps) {
   const isExperience = pathname.startsWith("/admin/experience")
   const isNewExperience = pathname === "/admin/experience/new"
   const isEditExperience = isExperience && !isNewExperience && pathname !== "/admin/experience"
+  const isEducation = pathname.startsWith("/admin/education")
+  const isNewEducation = pathname === "/admin/education/new"
+  const isEditEducation = isEducation && !isNewEducation && pathname !== "/admin/education"
 
   return (
     <div className="h-screen w-full overflow-hidden flex bg-background text-foreground">
@@ -205,6 +214,26 @@ export function AdminShell({ children }: AdminShellProps) {
               <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
               {isProfile ? (
                 <span className="text-foreground font-semibold">Profile & Socials</span>
+              ) : isEducation ? (
+                isNewEducation ? (
+                  <>
+                    <Link href="/admin/education" className="hover:text-foreground transition-colors">
+                      Education
+                    </Link>
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
+                    <span className="text-foreground font-semibold">New Education</span>
+                  </>
+                ) : isEditEducation ? (
+                  <>
+                    <Link href="/admin/education" className="hover:text-foreground transition-colors">
+                      Education
+                    </Link>
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
+                    <span className="text-foreground font-semibold">Edit Education</span>
+                  </>
+                ) : (
+                  <span className="text-foreground font-semibold">Education</span>
+                )
               ) : isExperience ? (
                 isNewExperience ? (
                   <>

@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { experienceService, profileService, projectService, skillService } from "@/services"
+import { experienceService, profileService, projectService, skillService, educationService } from "@/services"
 import { HeroSection } from "@/components/sections/hero"
 import { BentoGridSection } from "@/components/sections/bento-grid"
 import { BentoGridSkeleton } from "@/components/sections/bento-grid-skeleton"
@@ -22,8 +22,11 @@ async function AsyncProjectsSection() {
 }
 
 async function AsyncExperienceSection() {
-  const experiences = await experienceService.getAll()
-  return <ExperienceSection initialExperiences={experiences} />
+  const [experiences, educations] = await Promise.all([
+    experienceService.getAll(),
+    educationService.getAll(),
+  ])
+  return <ExperienceSection initialExperiences={experiences} initialEducations={educations} />
 }
 
 export default async function HomePage() {

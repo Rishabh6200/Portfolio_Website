@@ -10,7 +10,9 @@
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
-    "generate-totp": "node scripts/generate-totp-secret.mjs"
+    "generate-totp": "node scripts/generate-totp-secret.mjs",
+    "seed": "tsx scripts/seed-all.ts",
+    "seed:all": "tsx scripts/seed-all.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
