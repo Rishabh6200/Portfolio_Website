@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "motion/react"
 import { X, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react"
@@ -25,6 +25,7 @@ export function ProjectImageModal({
 }: ProjectImageModalProps) {
   const [modalIndex, setModalIndex] = useState(initialIndex)
   const [prevInitialIndex, setPrevInitialIndex] = useState(initialIndex)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   // Sync state during render when initialIndex changes
   if (initialIndex !== prevInitialIndex) {
@@ -43,6 +44,13 @@ export function ProjectImageModal({
   const prevImage = useCallback(() => {
     setModalIndex((prev) => (prev - 1 + images.length) % images.length)
   }, [images.length])
+
+  // Reset scroll position to top whenever the displayed image changes
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: "instant" })
+    }
+  }, [modalIndex])
 
   useEffect(() => {
     if (!isOpen) return
@@ -73,15 +81,14 @@ export function ProjectImageModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 md:p-10 bg-neutral-950/85 backdrop-blur-xl select-none"
-          onClick={handleClose}
+          className="fixed inset-0 z-50 bg-neutral-950/85 backdrop-blur-xl select-none"
           role="dialog"
           aria-modal="true"
           aria-label={`${title} Full Preview`}
         >
-          {/* Top Bar Floating Controls */}
+          {/* Top Bar Floating Controls - Fixed to Viewport */}
           <div
-            className="absolute top-3 sm:top-5 left-0 right-0 px-3 sm:px-6 md:px-8 flex items-center justify-between z-30 pointer-events-none"
+            className="fixed top-3 sm:top-5 left-0 right-0 px-3 sm:px-6 md:px-8 flex items-center justify-between z-30 pointer-events-none"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Title & Image Counter */}
@@ -124,7 +131,7 @@ export function ProjectImageModal({
             </div>
           </div>
 
-          {/* Left Navigation Arrow */}
+          {/* Left Navigation Arrow - Fixed to Viewport Center */}
           {images.length > 1 && (
             <button
               type="button"
@@ -133,13 +140,13 @@ export function ProjectImageModal({
                 prevImage()
               }}
               aria-label="Previous image"
-              className="absolute left-2 sm:left-4 md:left-6 z-20 flex items-center justify-center h-9 w-9 sm:h-11 sm:w-11 rounded-full bg-neutral-900/75 hover:bg-neutral-800 text-white border border-white/15 backdrop-blur-md shadow-2xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              className="fixed left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center h-9 w-9 sm:h-11 sm:w-11 rounded-full bg-neutral-900/75 hover:bg-neutral-800 text-white border border-white/15 backdrop-blur-md shadow-2xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
             >
               <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           )}
 
-          {/* Right Navigation Arrow */}
+          {/* Right Navigation Arrow - Fixed to Viewport Center */}
           {images.length > 1 && (
             <button
               type="button"
@@ -148,46 +155,50 @@ export function ProjectImageModal({
                 nextImage()
               }}
               aria-label="Next image"
-              className="absolute right-2 sm:right-4 md:right-6 z-20 flex items-center justify-center h-9 w-9 sm:h-11 sm:w-11 rounded-full bg-neutral-900/75 hover:bg-neutral-800 text-white border border-white/15 backdrop-blur-md shadow-2xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              className="fixed right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center h-9 w-9 sm:h-11 sm:w-11 rounded-full bg-neutral-900/75 hover:bg-neutral-800 text-white border border-white/15 backdrop-blur-md shadow-2xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
             >
               <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           )}
 
-          {/* Full Image Preview Container */}
-          <motion.div
-            key={modalIndex}
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.96 }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
-            className={cn(
-              "relative flex items-center justify-center z-10",
-              images.length > 1
-                ? "max-h-[58vh] sm:max-h-[72vh] md:max-h-[80vh] max-w-[94vw] sm:max-w-[88vw]"
-                : "max-h-[78vh] sm:max-h-[82vh] max-w-[94vw] sm:max-w-[88vw]"
-            )}
-            onClick={(e) => e.stopPropagation()}
+          {/* Scrollable Viewport Area */}
+          <div
+            ref={scrollContainerRef}
+            className="fixed inset-0 z-20 overflow-y-auto overflow-x-hidden overscroll-contain"
+            onClick={handleClose}
           >
-            <Image
-              src={images[modalIndex]}
-              alt={`${title} Full Preview ${modalIndex + 1}`}
-              width={1920}
-              height={1080}
-              sizes="(max-width: 1200px) 95vw, 1920px"
+            <div
               className={cn(
-                "w-auto h-auto object-contain rounded-xl sm:rounded-2xl shadow-2xl border border-white/15 ring-1 ring-white/10",
-                images.length > 1
-                  ? "max-h-[58vh] sm:max-h-[72vh] md:max-h-[80vh] max-w-[94vw] sm:max-w-[88vw]"
-                  : "max-h-[78vh] sm:max-h-[82vh] max-w-[94vw] sm:max-w-[88vw]"
+                "min-h-full w-full flex flex-col items-center justify-center px-4 sm:px-14 md:px-20 pt-16 sm:pt-20",
+                images.length > 1 ? "pb-24 sm:pb-28" : "pb-16 sm:pb-20"
               )}
-            />
-          </motion.div>
+            >
+              <motion.div
+                key={modalIndex}
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.22, ease: "easeOut" }}
+                className="relative flex items-center justify-center my-auto max-w-[94vw] sm:max-w-[88vw] md:max-w-5xl xl:max-w-6xl w-auto cursor-default"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Image
+                  src={images[modalIndex]}
+                  alt={`${title} Full Preview ${modalIndex + 1}`}
+                  width={1920}
+                  height={1080}
+                  sizes="(max-width: 1200px) 95vw, 1920px"
+                  priority
+                  className="w-auto h-auto max-w-full rounded-xl sm:rounded-2xl shadow-2xl border border-white/15 ring-1 ring-white/10"
+                />
+              </motion.div>
+            </div>
+          </div>
 
-          {/* Bottom Dock Mini-Thumbnails (if more than 1 image) */}
+          {/* Bottom Dock Mini-Thumbnails (if more than 1 image) - Fixed to Viewport Bottom */}
           {images.length > 1 && (
             <div
-              className="absolute bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 sm:gap-2.5 p-1.5 sm:p-2 rounded-2xl bg-neutral-950/80 border border-white/15 backdrop-blur-xl shadow-2xl max-w-[94vw] sm:max-w-[90vw] overflow-x-auto scrollbar-none overscroll-x-contain snap-x"
+              className="fixed bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 sm:gap-2.5 p-1.5 sm:p-2 rounded-2xl bg-neutral-950/80 border border-white/15 backdrop-blur-xl shadow-2xl max-w-[94vw] sm:max-w-[90vw] overflow-x-auto scrollbar-none overscroll-x-contain snap-x"
               onClick={(e) => e.stopPropagation()}
             >
               {images.map((img, idx) => (

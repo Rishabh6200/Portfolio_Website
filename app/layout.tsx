@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Geist_Mono, Inter } from "next/font/google"
 import { PortfolioAnalytics } from "@/components/analytics"
 import "./globals.css"
@@ -20,6 +20,13 @@ const fontMono = Geist_Mono({
 })
 
 import { profileService } from "@/services"
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#07090e" },
+    { media: "(prefers-color-scheme: light)", color: "#6366f1" },
+  ],
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const profile = await profileService.getProfile()
