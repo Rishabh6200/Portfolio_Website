@@ -209,3 +209,8 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(120, 120, 120, 0.4);
 }
+
+/* Hide floating Google reCAPTCHA badge (disclaimer is displayed on form) */
+.grecaptcha-badge {
+  visibility: hidden;
+}

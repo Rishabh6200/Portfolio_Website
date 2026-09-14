@@ -4,6 +4,7 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { verifyTOTP } from "@/lib/auth/totp"
 import { createSessionToken, setSessionCookie, clearSessionCookie } from "@/lib/auth/session"
+import { verifyRecaptcha } from "@/lib/auth/recaptcha"
 
 // In-memory rate limiting map for login attempts
 interface RateLimitEntry {
@@ -85,7 +86,7 @@ export async function getLoginStatusAction() {
   }
 }
 
-export async function verifyAdminTotpAction(code: string) {
+export async function verifyAdminTotpAction(code: string, recaptchaToken?: string) {
   const ip = await getClientIp()
   const rateLimit = checkRateLimit(ip)
 
@@ -95,6 +96,16 @@ export async function verifyAdminTotpAction(code: string) {
       isLockedOut: true,
       remainingMinutes: rateLimit.remainingMinutes,
       error: `Too many failed attempts. Please wait ${rateLimit.remainingMinutes} minute(s) before trying again.`,
+    }
+  }
+
+  // Verify reCAPTCHA token
+  const botVerification = await verifyRecaptcha(recaptchaToken, "admin_login")
+  if (!botVerification.success) {
+    return {
+      success: false,
+      isLockedOut: false,
+      error: botVerification.error || "Security check failed. Suspicious activity detected.",
     }
   }
 

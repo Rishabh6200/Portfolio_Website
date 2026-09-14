@@ -112,6 +112,8 @@ export function ContactSection({ initialProfile }: ContactSectionProps) {
 
               <a
                 href={`mailto:${profile.email}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-5 py-2 rounded-full bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 text-xs font-semibold transition-all hover:shadow-md active:scale-95"
               >
                 <span>Say Hello</span>

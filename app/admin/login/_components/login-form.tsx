@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import { REGEXP_ONLY_DIGITS } from "input-otp"
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 import { Button } from "@/components/ui/button"
 import {
   InputOTP,
@@ -26,6 +27,7 @@ export function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl") || "/admin"
+  const { executeRecaptcha } = useGoogleReCaptcha()
 
   const [code, setCode] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -55,7 +57,16 @@ export function LoginForm() {
 
     startTransition(async () => {
       try {
-        const res = await verifyAdminTotpAction(codeToSubmit)
+        let recaptchaToken: string | undefined = undefined
+        if (executeRecaptcha) {
+          try {
+            recaptchaToken = await executeRecaptcha("admin_login")
+          } catch (e) {
+            console.warn("reCAPTCHA execution skipped:", e)
+          }
+        }
+
+        const res = await verifyAdminTotpAction(codeToSubmit, recaptchaToken)
         if (res.success) {
           toast.success("Authentication successful! Welcome back.")
           router.push(callbackUrl)
@@ -187,6 +198,29 @@ export function LoginForm() {
               </>
             )}
           </Button>
+
+          {/* Google reCAPTCHA Compliance Disclosure */}
+          <p className="text-[10px] text-center text-muted-foreground/60 leading-relaxed pt-1">
+            Protected by reCAPTCHA. Google{" "}
+            <a
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noreferrer"
+              className="underline hover:text-muted-foreground transition-colors"
+            >
+              Privacy Policy
+            </a>{" "}
+            and{" "}
+            <a
+              href="https://policies.google.com/terms"
+              target="_blank"
+              rel="noreferrer"
+              className="underline hover:text-muted-foreground transition-colors"
+            >
+              Terms of Service
+            </a>{" "}
+            apply.
+          </p>
         </div>
       </motion.div>
     </div>

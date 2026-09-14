@@ -3,9 +3,11 @@ import { Geist_Mono, Inter } from "next/font/google"
 import { PortfolioAnalytics } from "@/components/analytics"
 import "./globals.css"
 import { ProgressProvider } from "@/components/progress-provider"
+import { RecaptchaProvider } from "@/components/providers/recaptcha-provider"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { cn } from "@/lib/utils"
+import { profileService } from "@/services"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,8 +20,6 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
   display: "swap",
 })
-
-import { profileService } from "@/services"
 
 export const viewport: Viewport = {
   themeColor: [
@@ -82,7 +82,9 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-background font-sans text-foreground selection:bg-indigo-500/20 selection:text-indigo-300">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <ProgressProvider>{children}</ProgressProvider>
+          <RecaptchaProvider>
+            <ProgressProvider>{children}</ProgressProvider>
+          </RecaptchaProvider>
           <Toaster />
           <PortfolioAnalytics />
         </ThemeProvider>

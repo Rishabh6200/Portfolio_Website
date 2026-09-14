@@ -511,6 +511,8 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
               {socialEmail && (
                 <a
                   href={`mailto:${socialEmail}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="p-2 rounded-lg border border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground shrink-0"
                   title="Test email link"
                 >
