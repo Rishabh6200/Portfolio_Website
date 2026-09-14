@@ -18,7 +18,7 @@ export function EducationTableSkeleton() {
             <TableHead className="w-10 text-center">
               <span className="sr-only">Reorder</span>
             </TableHead>
-            <TableHead className="min-w-55">Degree / Certification & Institution</TableHead>
+            <TableHead className="min-w-55">Degree & Institution</TableHead>
             <TableHead className="min-w-30">Type</TableHead>
             <TableHead className="min-w-35">Period & Location</TableHead>
             <TableHead className="min-w-50">Related Skills</TableHead>

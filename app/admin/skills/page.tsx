@@ -1,11 +1,12 @@
 import { Suspense } from "react"
-import Link from "next/link"
 import { skillService, categoryService } from "@/services"
 import { SkillTable } from "./_components/skill-table"
 import { SkillTabs } from "./_components/skill-tabs"
 import { SkillsTableSkeleton } from "./_components/skills-skeleton"
-import { buttonVariants } from "@/components/ui/button"
-import { Plus, AlertCircle, Sparkles } from "lucide-react"
+import { AdminPageHeader } from "../_components/admin-page-header"
+import { DbConnectionAlert } from "../_components/db-connection-alert"
+import { EmptyState } from "@/components/custom-ui/empty-state"
+import { Sparkles } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 
@@ -42,65 +43,27 @@ export default async function AdminSkillsPage({ searchParams }: AdminSkillsPageP
 
   return (
     <div className="w-full space-y-6">
-      {/* Static Page Header - Renders Immediately */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-border">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-            Skills & Competencies
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Manage production technologies, frameworks, and tools bound to technical categories.
-          </p>
-        </div>
-
-        <div>
-          <Link
-            href={
-              activeCategory
-                ? `/admin/skills/new?categoryId=${activeCategory._id}`
-                : "/admin/skills/new"
-            }
-            className={buttonVariants({ size: "default" })}
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add Skill</span>
-          </Link>
-        </div>
-      </div>
+      <AdminPageHeader
+        title="Skills & Competencies"
+        description="Manage production technologies, frameworks, and tools bound to technical categories."
+        actionLabel="Add Skill"
+        actionHref={
+          activeCategory
+            ? `/admin/skills/new?categoryId=${activeCategory._id}`
+            : "/admin/skills/new"
+        }
+      />
 
       {categoryError ? (
-        <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-5 space-y-3">
-          <div className="flex items-center gap-2 text-destructive font-medium text-sm">
-            <AlertCircle className="h-4 w-4" />
-            <span>Database Connection Notice</span>
-          </div>
-          <p className="text-xs font-mono text-muted-foreground leading-relaxed">
-            {categoryError}
-          </p>
-        </div>
+        <DbConnectionAlert error={categoryError} />
       ) : categories.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border p-12 text-center space-y-4 bg-card/50">
-          <div className="inline-flex p-3.5 rounded-2xl bg-muted text-muted-foreground">
-            <Sparkles className="h-8 w-8 text-indigo-500" />
-          </div>
-          <div className="max-w-md mx-auto">
-            <h3 className="text-lg font-semibold text-foreground">
-              No categories found
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Skills must belong to a technical category. Create your first category before adding skills.
-            </p>
-          </div>
-          <div className="flex items-center justify-center pt-3">
-            <Link
-              href="/admin/categories/new"
-              className={buttonVariants({ size: "default" })}
-            >
-              <Plus className="h-4 w-4" />
-              <span>Create Category</span>
-            </Link>
-          </div>
-        </div>
+        <EmptyState
+          icon={Sparkles}
+          title="No categories found"
+          description="Skills must belong to a technical category. Create your first category before adding skills."
+          actionLabel="Create Category"
+          actionHref="/admin/categories/new"
+        />
       ) : (
         <div className="space-y-4">
           {/* Category Tabs (No "All" tab - query per tab) */}
@@ -153,17 +116,7 @@ async function SkillsTableData({ categoryId, categories }: SkillsTableDataProps)
   }
 
   if (dbError) {
-    return (
-      <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-5 space-y-3">
-        <div className="flex items-center gap-2 text-destructive font-medium text-sm">
-          <AlertCircle className="h-4 w-4" />
-          <span>Database Connection Notice</span>
-        </div>
-        <p className="text-xs font-mono text-muted-foreground leading-relaxed">
-          {dbError}
-        </p>
-      </div>
-    )
+    return <DbConnectionAlert error={dbError} />
   }
 
   return (

@@ -35,6 +35,7 @@ import {
   TableCell,
 } from "@/components/ui/table"
 import { DeleteConfirmDialog } from "@/app/admin/_components/delete-confirm-dialog"
+import { EmptyState } from "@/components/custom-ui/empty-state"
 import { deleteSkillAction, reorderSkillsAction, updateSkillLevelAction } from "@/app/admin/skills/actions"
 import { DragHandle, SortableRow } from "@/components/ui/sortable-row"
 import { cn } from "@/lib/utils"
@@ -193,32 +194,17 @@ export function SkillTable({
 
   if (skills.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-border p-12 text-center space-y-4 bg-card/50">
-        <div className="inline-flex p-3.5 rounded-2xl bg-muted text-muted-foreground">
-          <Sparkles className="h-8 w-8 text-indigo-500" />
-        </div>
-        <div className="max-w-md mx-auto">
-          <h3 className="text-lg font-semibold text-foreground">
-            No skills found in this category
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            There are no technologies registered under this category yet. Add your first technology to get started.
-          </p>
-        </div>
-        <div className="flex items-center justify-center pt-3">
-          <Link
-            href={
-              activeCategoryId
-                ? `/admin/skills/new?categoryId=${activeCategoryId}`
-                : "/admin/skills/new"
-            }
-            className={buttonVariants({ size: "default" })}
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add Skill</span>
-          </Link>
-        </div>
-      </div>
+      <EmptyState
+        icon={Sparkles}
+        title="No skills found in this category"
+        description="There are no technologies registered under this category yet. Add your first technology to get started."
+        actionLabel="Add Skill"
+        actionHref={
+          activeCategoryId
+            ? `/admin/skills/new?categoryId=${activeCategoryId}`
+            : "/admin/skills/new"
+        }
+      />
     )
   }
 

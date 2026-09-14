@@ -1,16 +1,18 @@
 "use client"
 
-import { useState, useEffect, useTransition } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { Edit3, Trash2, GraduationCap, Plus, MapPin, Calendar, Award } from "lucide-react"
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core"
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { DndContext, closestCenter } from "@dnd-kit/core"
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import { toast } from "sonner"
+import { useReorderableList } from "@/lib/hooks/use-reorderable-list"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { DeleteConfirmDialog } from "@/app/admin/_components/delete-confirm-dialog"
+import { EmptyState } from "@/components/custom-ui/empty-state"
 import { deleteEducationAction, reorderEducationAction } from "../actions"
 import { DragHandle, SortableRow } from "@/components/ui/sortable-row"
 
@@ -42,54 +44,20 @@ interface EducationTableProps {
 }
 
 export function EducationTable({ educationList: initialList }: EducationTableProps) {
-  const [items, setItems] = useState<SerializedEducation[]>(initialList)
-  const [, startTransition] = useTransition()
+  const {
+    items,
+    setItems,
+    sensors,
+    handleDragEnd,
+  } = useReorderableList({
+    initialItems: initialList,
+    onReorder: reorderEducationAction,
+    successMessage: "Order updated successfully",
+    errorMessage: "Failed to save new order",
+  })
 
   const [itemToDelete, setItemToDelete] = useState<SerializedEducation | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
-
-  useEffect(() => {
-    setItems(initialList)
-  }, [initialList])
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 4,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    if (!over || active.id === over.id) return
-
-    const oldIndex = items.findIndex((e) => e._id === active.id)
-    const newIndex = items.findIndex((e) => e._id === over.id)
-
-    if (oldIndex === -1 || newIndex === -1) return
-
-    const newOrder = arrayMove(items, oldIndex, newIndex)
-    setItems(newOrder)
-
-    const payload = newOrder.map((item, index) => ({
-      id: item._id,
-      order: index,
-    }))
-
-    startTransition(async () => {
-      const res = await reorderEducationAction(payload)
-      if (res.success) {
-        toast.success("Order updated successfully")
-      } else {
-        toast.error(res.error || "Failed to save new order")
-        setItems(initialList)
-      }
-    })
-  }
 
   const handleDelete = async () => {
     if (!itemToDelete) return
@@ -113,22 +81,13 @@ export function EducationTable({ educationList: initialList }: EducationTablePro
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-16 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground mb-4">
-          <GraduationCap className="h-6 w-6" />
-        </div>
-        <h3 className="text-base font-semibold text-foreground">No education entries found</h3>
-        <p className="text-xs text-muted-foreground mt-1 max-w-sm">
-          Add degrees, certifications, or coursework to showcase your formal qualifications and learning milestones.
-        </p>
-        <Link
-          href="/admin/education/new"
-          className={buttonVariants({ size: "sm", className: "mt-4 gap-1.5" })}
-        >
-          <Plus className="h-4 w-4" />
-          <span>Add First Education</span>
-        </Link>
-      </div>
+      <EmptyState
+        icon={GraduationCap}
+        title="No education entries found"
+        description="Add degrees, certifications, or coursework to showcase your formal qualifications and learning milestones."
+        actionLabel="Add First Education"
+        actionHref="/admin/education/new"
+      />
     )
   }
 

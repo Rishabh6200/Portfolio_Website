@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useTransition } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import {
   Edit3,
@@ -19,20 +19,14 @@ import {
 import {
   DndContext,
   closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
 } from "@dnd-kit/core"
 import {
-  arrayMove,
   SortableContext,
-  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import { toast } from "sonner"
+import { useReorderableList } from "@/lib/hooks/use-reorderable-list"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -45,6 +39,7 @@ import {
   TableCell,
 } from "@/components/ui/table"
 import { DeleteConfirmDialog } from "@/app/admin/_components/delete-confirm-dialog"
+import { EmptyState } from "@/components/custom-ui/empty-state"
 import {
   deleteCategoryAction,
   reorderCategoriesAction,
@@ -76,56 +71,22 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
 }
 
 export function CategoryTable({ categories: initialCategories }: CategoryTableProps) {
-  const [categories, setCategories] = useState<SerializedCategory[]>(initialCategories)
-  const [, startTransition] = useTransition()
+  const {
+    items: categories,
+    setItems: setCategories,
+    sensors,
+    handleDragEnd,
+  } = useReorderableList({
+    initialItems: initialCategories,
+    onReorder: reorderCategoriesAction,
+    successMessage: "Category order updated",
+    errorMessage: "Failed to update category order",
+  })
 
   // Delete Dialog state
   const [categoryToDelete, setCategoryToDelete] = useState<SerializedCategory | null>(null)
   const [deleteWithSkills, setDeleteWithSkills] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-
-  useEffect(() => {
-    setCategories(initialCategories)
-  }, [initialCategories])
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 4,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
-
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
-    if (!over || active.id === over.id) return
-
-    const oldIndex = categories.findIndex((c) => c._id === active.id)
-    const newIndex = categories.findIndex((c) => c._id === over.id)
-
-    if (oldIndex !== -1 && newIndex !== -1) {
-      const reordered = arrayMove(categories, oldIndex, newIndex)
-      setCategories(reordered)
-
-      const payload = reordered.map((item, idx) => ({
-        id: item._id,
-        order: idx,
-      }))
-
-      startTransition(async () => {
-        const res = await reorderCategoriesAction(payload)
-        if (res.success) {
-          toast.success("Category order updated", { duration: 1500 })
-        } else {
-          toast.error("Failed to update category order")
-          setCategories(categories) // rollback
-        }
-      })
-    }
-  }
 
   async function confirmDelete() {
     if (!categoryToDelete) return
@@ -159,28 +120,13 @@ export function CategoryTable({ categories: initialCategories }: CategoryTablePr
 
   if (categories.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-border p-12 text-center space-y-4 bg-card/50">
-        <div className="inline-flex p-3.5 rounded-2xl bg-muted text-muted-foreground">
-          <Layers className="h-8 w-8" />
-        </div>
-        <div className="max-w-md mx-auto">
-          <h3 className="text-lg font-semibold text-foreground">
-            No categories found
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            Categories organize your portfolio projects and technical competencies. Create your first category to get started.
-          </p>
-        </div>
-        <div className="flex items-center justify-center pt-3">
-          <Link
-            href="/admin/categories/new"
-            className={buttonVariants({ size: "default" })}
-          >
-            <Plus className="h-4 w-4" />
-            <span>Create Category</span>
-          </Link>
-        </div>
-      </div>
+      <EmptyState
+        icon={Layers}
+        title="No categories found"
+        description="Categories organize your portfolio projects and technical competencies. Create your first category to get started."
+        actionLabel="Create Category"
+        actionHref="/admin/categories/new"
+      />
     )
   }
 

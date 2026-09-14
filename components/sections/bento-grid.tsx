@@ -13,6 +13,8 @@ import {
   Terminal,
   CheckCircle2,
 } from "lucide-react"
+import { SectionHeader } from "@/components/custom-ui/section-header"
+import { EmptyState } from "@/components/custom-ui/empty-state"
 const ICON_COMPONENTS: Record<string, React.ComponentType<{ className?: string }>> = {
   Server,
   Layout,
@@ -54,34 +56,20 @@ export function BentoGridSection({ initialCategories = [] }: BentoGridSectionPro
       <div id="skills" className="scroll-mt-24 sm:scroll-mt-28" />
       <div className="mx-auto max-w-5xl xl:max-w-6xl 2xl:max-w-7xl">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5 }}
-          className="mb-14 sm:mb-16"
-        >
-          <div className="font-mono text-xs uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-2 flex items-center gap-2">
-            <Layers className="h-3.5 w-3.5" />
-            <span>Technical Stack & Core Competencies</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl xl:text-5xl font-bold tracking-tight text-neutral-900 dark:text-white">
-            Skills & Technical Capabilities.
-          </h2>
-          <p className="text-neutral-600 dark:text-neutral-400 text-sm sm:text-base xl:text-lg mt-2.5 max-w-2xl leading-relaxed">
-            A comprehensive breakdown of the languages, frameworks, database systems, and infrastructure tools I leverage in production.
-          </p>
-        </motion.div>
+        <SectionHeader
+          eyebrow="Technical Stack & Core Competencies"
+          icon={Layers}
+          title="Skills & Technical Capabilities."
+          description="A comprehensive breakdown of the languages, frameworks, database systems, and infrastructure tools I leverage in production."
+        />
 
         {/* Dynamic Category & Skills Grid */}
         {displayCategories.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-black/10 dark:border-white/10 p-12 text-center bg-black/2 dark:bg-white/2">
-            <Layers className="h-8 w-8 text-muted-foreground mx-auto mb-3 opacity-60" />
-            <h3 className="text-base font-semibold text-foreground">No technical competencies published yet</h3>
-            <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
-              Skills and categories will appear here once published from the admin dashboard.
-            </p>
-          </div>
+          <EmptyState
+            icon={Layers}
+            title="No technical competencies published yet"
+            description="Skills and categories will appear here once published from the admin dashboard."
+          />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8 items-stretch">
             {displayCategories.map((category, catIdx) => {

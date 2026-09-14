@@ -1,37 +1,21 @@
 import { Suspense } from "react"
-import Link from "next/link"
 import { categoryService } from "@/services"
 import { CategoryTable } from "./_components/category-table"
 import { CategoriesTableSkeleton } from "./_components/categories-skeleton"
-import { buttonVariants } from "@/components/ui/button"
-import { Plus, AlertCircle } from "lucide-react"
+import { AdminPageHeader } from "../_components/admin-page-header"
+import { DbConnectionAlert } from "../_components/db-connection-alert"
 
 export const dynamic = "force-dynamic"
 
 export default function AdminCategoriesPage() {
   return (
     <div className="w-full space-y-6">
-      {/* Static Page Header - Renders Immediately */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-border">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-            Categories
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Manage domains and classifications for portfolio systems and competencies.
-          </p>
-        </div>
-
-        <div>
-          <Link
-            href="/admin/categories/new"
-            className={buttonVariants({ size: "default" })}
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add Category</span>
-          </Link>
-        </div>
-      </div>
+      <AdminPageHeader
+        title="Categories"
+        description="Manage domains and classifications for portfolio systems and competencies."
+        actionLabel="Add Category"
+        actionHref="/admin/categories/new"
+      />
 
       {/* Partial Streaming with Suspense for Table Data */}
       <Suspense fallback={<CategoriesTableSkeleton />}>
@@ -53,17 +37,7 @@ async function CategoriesTableData() {
   }
 
   if (dbError) {
-    return (
-      <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-5 space-y-3">
-        <div className="flex items-center gap-2 text-destructive font-medium text-sm">
-          <AlertCircle className="h-4 w-4" />
-          <span>Database Connection Notice</span>
-        </div>
-        <p className="text-xs font-mono text-muted-foreground leading-relaxed">
-          {dbError}
-        </p>
-      </div>
-    )
+    return <DbConnectionAlert error={dbError} />
   }
 
   return (

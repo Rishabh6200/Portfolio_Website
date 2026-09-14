@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ArrowLeft, Save, Loader2, Plus, Trash2 } from "lucide-react"
+import { ArrowLeft, Save, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { StringListEditor } from "@/components/custom-ui/string-list-editor"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
@@ -22,7 +23,7 @@ import {
 import {
   SkillSelector,
   type AvailableSkill,
-} from "@/app/admin/projects/_components/skill-selector"
+} from "@/app/admin/_components/skill-selector"
 import {
   createEducationAction,
   updateEducationAction,
@@ -93,22 +94,6 @@ export function EducationForm({
   })
 
   const currentType = watch("type") || "Degree"
-
-  const handleAddHighlight = () => {
-    setHighlights((prev) => [...prev, ""])
-  }
-
-  const handleHighlightChange = (index: number, value: string) => {
-    setHighlights((prev) => {
-      const next = [...prev]
-      next[index] = value
-      return next
-    })
-  }
-
-  const handleRemoveHighlight = (index: number) => {
-    setHighlights((prev) => prev.filter((_, i) => i !== index))
-  }
 
   const onSubmit = async (data: EducationFormValues) => {
     const cleanedHighlights = highlights.map((h) => h.trim()).filter(Boolean)
@@ -353,51 +338,14 @@ export function EducationForm({
 
       {/* Section 2: Key Modules & Highlights */}
       <section className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Key Modules & Highlights</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Specific coursework, honors, senior projects, or key domains covered.
-            </p>
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleAddHighlight}
-            className="gap-1.5 text-xs"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            <span>Add Item</span>
-          </Button>
-        </div>
-
-        <div className="space-y-3">
-          {highlights.map((highlight, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-mono text-muted-foreground">
-                {index + 1}
-              </div>
-              <Input
-                value={highlight}
-                onChange={(e) => handleHighlightChange(index, e.target.value)}
-                placeholder="e.g. Data Structures & Algorithms, Distributed Systems, Senior Thesis on Microservices"
-                className="flex-1"
-              />
-              {highlights.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleRemoveHighlight(index)}
-                  className="h-9 w-9 text-muted-foreground hover:text-destructive shrink-0"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          ))}
-        </div>
+        <StringListEditor
+          title="Key Modules & Highlights"
+          description="Specific coursework, honors, senior projects, or key domains covered."
+          items={highlights}
+          onChange={setHighlights}
+          placeholder="e.g. Data Structures & Algorithms, Distributed Systems, Senior Thesis on Microservices"
+          addButtonLabel="Add Item"
+        />
       </section>
 
       <Separator />

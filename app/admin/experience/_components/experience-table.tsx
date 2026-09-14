@@ -1,16 +1,18 @@
 "use client"
 
-import { useState, useEffect, useTransition } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { Edit3, Trash2, Briefcase, Plus, MapPin, Calendar } from "lucide-react"
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core"
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { DndContext, closestCenter } from "@dnd-kit/core"
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import { toast } from "sonner"
+import { useReorderableList } from "@/lib/hooks/use-reorderable-list"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { DeleteConfirmDialog } from "@/app/admin/_components/delete-confirm-dialog"
+import { EmptyState } from "@/components/custom-ui/empty-state"
 import { deleteExperienceAction, reorderExperiencesAction } from "../actions"
 import { DragHandle, SortableRow } from "@/components/ui/sortable-row"
 
@@ -41,54 +43,20 @@ interface ExperienceTableProps {
 }
 
 export function ExperienceTable({ experiences: initialExperiences }: ExperienceTableProps) {
-  const [experiences, setExperiences] = useState<SerializedExperience[]>(initialExperiences)
-  const [, startTransition] = useTransition()
+  const {
+    items: experiences,
+    setItems: setExperiences,
+    sensors,
+    handleDragEnd,
+  } = useReorderableList({
+    initialItems: initialExperiences,
+    onReorder: reorderExperiencesAction,
+    successMessage: "Order updated successfully",
+    errorMessage: "Failed to save new order",
+  })
 
   const [experienceToDelete, setExperienceToDelete] = useState<SerializedExperience | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
-
-  useEffect(() => {
-    setExperiences(initialExperiences)
-  }, [initialExperiences])
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 4,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    if (!over || active.id === over.id) return
-
-    const oldIndex = experiences.findIndex((e) => e._id === active.id)
-    const newIndex = experiences.findIndex((e) => e._id === over.id)
-
-    if (oldIndex === -1 || newIndex === -1) return
-
-    const newOrder = arrayMove(experiences, oldIndex, newIndex)
-    setExperiences(newOrder)
-
-    const payload = newOrder.map((item, index) => ({
-      id: item._id,
-      order: index,
-    }))
-
-    startTransition(async () => {
-      const res = await reorderExperiencesAction(payload)
-      if (res.success) {
-        toast.success("Order updated successfully")
-      } else {
-        toast.error(res.error || "Failed to save new order")
-        setExperiences(initialExperiences)
-      }
-    })
-  }
 
   const handleDelete = async () => {
     if (!experienceToDelete) return
@@ -112,22 +80,13 @@ export function ExperienceTable({ experiences: initialExperiences }: ExperienceT
 
   if (experiences.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-16 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground mb-4">
-          <Briefcase className="h-6 w-6" />
-        </div>
-        <h3 className="text-base font-semibold text-foreground">No experience entries found</h3>
-        <p className="text-xs text-muted-foreground mt-1 max-w-sm">
-          Add your career milestones, roles, and companies to display your track record on your portfolio.
-        </p>
-        <Link
-          href="/admin/experience/new"
-          className={buttonVariants({ size: "sm", className: "mt-4 gap-1.5" })}
-        >
-          <Plus className="h-4 w-4" />
-          <span>Add First Experience</span>
-        </Link>
-      </div>
+      <EmptyState
+        icon={Briefcase}
+        title="No experience entries found"
+        description="Add your career milestones, roles, and companies to display your track record on your portfolio."
+        actionLabel="Add First Experience"
+        actionHref="/admin/experience/new"
+      />
     )
   }
 

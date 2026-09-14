@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useTransition } from "react"
+import { useState, useTransition } from "react"
 import Link from "next/link"
 import {
   Edit3,
@@ -14,20 +14,14 @@ import {
 import {
   DndContext,
   closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
 } from "@dnd-kit/core"
 import {
-  arrayMove,
   SortableContext,
-  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import { toast } from "sonner"
+import { useReorderableList } from "@/lib/hooks/use-reorderable-list"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -45,6 +39,7 @@ import {
   reorderProjectsAction,
 } from "../actions"
 import { DragHandle, SortableRow } from "@/components/ui/sortable-row"
+import { EmptyState } from "@/components/custom-ui/empty-state"
 
 export interface PopulatedSkill {
   _id: string
@@ -75,56 +70,24 @@ interface ProjectTableProps {
 }
 
 export function ProjectTable({ projects: initialProjects }: ProjectTableProps) {
-  const [projects, setProjects] = useState<SerializedProject[]>(initialProjects)
+  const {
+    items: projects,
+    setItems: setProjects,
+    sensors,
+    handleDragEnd,
+  } = useReorderableList({
+    initialItems: initialProjects,
+    onReorder: reorderProjectsAction,
+    successMessage: "Project order updated",
+    errorMessage: "Failed to update project order",
+  })
+
   const [, startTransition] = useTransition()
   const [togglingId, setTogglingId] = useState<string | null>(null)
 
   // Delete Dialog state
   const [projectToDelete, setProjectToDelete] = useState<SerializedProject | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
-
-  useEffect(() => {
-    setProjects(initialProjects)
-  }, [initialProjects])
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 4,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
-
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
-    if (!over || active.id === over.id) return
-
-    const oldIndex = projects.findIndex((p) => p._id === active.id)
-    const newIndex = projects.findIndex((p) => p._id === over.id)
-
-    if (oldIndex !== -1 && newIndex !== -1) {
-      const reordered = arrayMove(projects, oldIndex, newIndex)
-      setProjects(reordered)
-
-      const payload = reordered.map((item, idx) => ({
-        id: item._id,
-        order: idx,
-      }))
-
-      startTransition(async () => {
-        const res = await reorderProjectsAction(payload)
-        if (res.success) {
-          toast.success("Project order updated", { duration: 1500 })
-        } else {
-          toast.error("Failed to update project order")
-          setProjects(projects) // rollback
-        }
-      })
-    }
-  }
 
   function handleToggleStatus(id: string, currentStatus: "published" | "draft") {
     setTogglingId(id)
@@ -165,28 +128,13 @@ export function ProjectTable({ projects: initialProjects }: ProjectTableProps) {
 
   if (projects.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-border p-12 text-center space-y-4 bg-card/50">
-        <div className="inline-flex p-3.5 rounded-2xl bg-muted text-muted-foreground">
-          <FolderGit2 className="h-8 w-8" />
-        </div>
-        <div className="max-w-md mx-auto">
-          <h3 className="text-lg font-semibold text-foreground">
-            No projects found
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            Your portfolio currently has no projects. Create your first project to get started.
-          </p>
-        </div>
-        <div className="flex items-center justify-center pt-3">
-          <Link
-            href="/admin/projects/new"
-            className={buttonVariants({ size: "default" })}
-          >
-            <Plus className="h-4 w-4" />
-            <span>Create Project</span>
-          </Link>
-        </div>
-      </div>
+      <EmptyState
+        icon={FolderGit2}
+        title="No projects found"
+        description="Your portfolio currently has no projects. Create your first project to get started."
+        actionLabel="Create Project"
+        actionHref="/admin/projects/new"
+      />
     )
   }
 

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select"
 import { MediaUploader } from "./media-uploader"
 import { GalleryUploader } from "./gallery-uploader"
-import { SkillSelector, type AvailableSkill } from "./skill-selector"
+import { SkillSelector, type AvailableSkill } from "@/app/admin/_components/skill-selector"
 import {
   createProjectAction,
   updateProjectAction,

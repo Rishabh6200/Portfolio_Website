@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ArrowLeft, Save, Loader2, Plus, Trash2 } from "lucide-react"
+import { ArrowLeft, Save, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { StringListEditor } from "@/components/custom-ui/string-list-editor"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
@@ -22,7 +23,7 @@ import {
 import {
   SkillSelector,
   type AvailableSkill,
-} from "@/app/admin/projects/_components/skill-selector"
+} from "@/app/admin/_components/skill-selector"
 import {
   createExperienceAction,
   updateExperienceAction,
@@ -125,22 +126,6 @@ export function ExperienceForm({
   })
 
   const currentType = watch("type") || "Full-Time"
-
-  const handleAddAchievement = () => {
-    setAchievements((prev) => [...prev, ""])
-  }
-
-  const handleAchievementChange = (index: number, value: string) => {
-    setAchievements((prev) => {
-      const next = [...prev]
-      next[index] = value
-      return next
-    })
-  }
-
-  const handleRemoveAchievement = (index: number) => {
-    setAchievements((prev) => prev.filter((_, i) => i !== index))
-  }
 
   const onSubmit = async (data: ExperienceFormValues) => {
     const cleanedAchievements = achievements.map((a) => a.trim()).filter(Boolean)
@@ -392,55 +377,14 @@ export function ExperienceForm({
 
       {/* Section 2: Key Achievements */}
       <section className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight text-foreground">
-              Key Achievements & Milestones
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              Bulleted engineering achievements, metrics, and high-impact deliverables.
-            </p>
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleAddAchievement}
-            className="gap-1.5 self-start sm:self-auto"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add Point</span>
-          </Button>
-        </div>
-
-        <div className="space-y-3">
-          {achievements.map((item, index) => (
-            <div key={index} className="flex items-start gap-2.5">
-              <span className="font-mono text-xs text-muted-foreground w-6 text-center pt-2.5 shrink-0">
-                #{index + 1}
-              </span>
-              <Input
-                type="text"
-                value={item}
-                onChange={(e) => handleAchievementChange(index, e.target.value)}
-                placeholder="e.g. Architected modular NestJS microservices handling 15,000+ req/sec..."
-                className="flex-1"
-              />
-              {achievements.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleRemoveAchievement(index)}
-                  className="text-muted-foreground hover:text-destructive shrink-0"
-                  title="Remove point"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          ))}
-        </div>
+        <StringListEditor
+          title="Key Achievements & Milestones"
+          description="Bulleted engineering achievements, metrics, and high-impact deliverables."
+          items={achievements}
+          onChange={setAchievements}
+          placeholder="e.g. Architected modular NestJS microservices handling 15,000+ req/sec..."
+          addButtonLabel="Add Point"
+        />
       </section>
 
       <Separator />

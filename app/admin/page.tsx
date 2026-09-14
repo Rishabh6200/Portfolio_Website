@@ -1,37 +1,23 @@
 import { Suspense } from "react"
-import Link from "next/link"
 import { projectService } from "@/services"
 import { ProjectTable } from "./projects/_components/project-table"
 import { ProjectsDashboardSkeleton } from "./projects/_components/projects-skeleton"
-import { buttonVariants } from "@/components/ui/button"
-import { Plus, AlertCircle, FolderGit2, CheckCircle2, Clock, Sparkles } from "lucide-react"
+import { AdminPageHeader } from "./_components/admin-page-header"
+import { DbConnectionAlert } from "./_components/db-connection-alert"
+import { FolderGit2, CheckCircle2, Clock, Sparkles } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 
 export default function AdminDashboardPage() {
   return (
     <div className="space-y-6">
-      {/* Static Page Header - Loaded Immediately */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-border">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground">
-            Projects
-          </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Manage your project case studies and ImageKit media assets.
-          </p>
-        </div>
-
-        <div>
-          <Link
-            href="/admin/projects/new"
-            className={buttonVariants({ size: "sm" })}
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add Project</span>
-          </Link>
-        </div>
-      </div>
+      <AdminPageHeader
+        title="Projects"
+        description="Manage your project case studies and ImageKit media assets."
+        actionLabel="Add Project"
+        actionHref="/admin/projects/new"
+        actionSize="sm"
+      />
 
       {/* Partial Streaming with Suspense for Dashboard Metrics & Table Data */}
       <Suspense fallback={<ProjectsDashboardSkeleton />}>
@@ -53,21 +39,7 @@ async function ProjectsDashboardData() {
   }
 
   if (dbError) {
-    return (
-      <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-5 space-y-3">
-        <div className="flex items-center gap-2 text-destructive font-medium text-sm">
-          <AlertCircle className="h-4 w-4" />
-          <span>Database Connection Notice</span>
-        </div>
-        <p className="text-xs font-mono text-muted-foreground leading-relaxed">
-          {dbError}
-        </p>
-        <div className="pt-1 text-xs text-muted-foreground">
-          Please add your <code className="font-mono text-foreground font-semibold">MONGODB_URI</code> to{" "}
-          <code className="font-mono text-foreground">.env.local</code> and restart the development server.
-        </div>
-      </div>
-    )
+    return <DbConnectionAlert error={dbError} />
   }
 
   const totalCount = projects.length
