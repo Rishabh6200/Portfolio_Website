@@ -73,8 +73,8 @@ export default async function OpenGraphImage() {
             <img
               src={logoBase64}
               alt="Logo"
-              width="44"
-              height="44"
+              width={44}
+              height={44}
               style={{
                 borderRadius: "12px",
                 border: "1px solid rgba(255, 255, 255, 0.2)",
@@ -188,8 +188,8 @@ export default async function OpenGraphImage() {
               <img
                 src={logoBase64}
                 alt="Brand Emblem"
-                width="170"
-                height="170"
+                width={170}
+                height={170}
                 style={{
                   width: "100%",
                   height: "100%",
