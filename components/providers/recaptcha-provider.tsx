@@ -12,6 +12,15 @@ export function RecaptchaProvider({ children }: RecaptchaProviderProps) {
 
   // If site key is not configured, render children without error
   if (!siteKey) {
+    if (process.env.NODE_ENV === "production") {
+      console.error(
+        "[reCAPTCHA:Provider] CRITICAL: NEXT_PUBLIC_RECAPTCHA_SITE_KEY is missing in production environment!"
+      )
+    } else {
+      console.warn(
+        "[reCAPTCHA:Provider] NEXT_PUBLIC_RECAPTCHA_SITE_KEY is not defined. reCAPTCHA provider will not initialize."
+      )
+    }
     return <>{children}</>
   }
 

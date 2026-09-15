@@ -88,9 +88,15 @@ export async function getLoginStatusAction() {
 
 export async function verifyAdminTotpAction(code: string, recaptchaToken?: string) {
   const ip = await getClientIp()
+  const tokenLength = recaptchaToken?.length || 0
+  console.log(
+    `[Auth:Login] Login verification requested from IP: ${ip} | reCAPTCHA token present: ${Boolean(recaptchaToken)} (${tokenLength} chars)`
+  )
+
   const rateLimit = checkRateLimit(ip)
 
   if (!rateLimit.allowed) {
+    console.warn(`[Auth:Login] Rate limited IP: ${ip}`)
     return {
       success: false,
       isLockedOut: true,
@@ -100,14 +106,22 @@ export async function verifyAdminTotpAction(code: string, recaptchaToken?: strin
   }
 
   // Verify reCAPTCHA token
+  console.log(`[Auth:Login] Validating reCAPTCHA token with Google for IP: ${ip}...`)
   const botVerification = await verifyRecaptcha(recaptchaToken, "admin_login")
   if (!botVerification.success) {
+    console.warn(
+      `[Auth:Login] reCAPTCHA check FAILED for IP: ${ip} - Error: "${botVerification.error}" | Score: ${botVerification.score ?? "none"} | Hostname: ${botVerification.hostname ?? "none"}`
+    )
     return {
       success: false,
       isLockedOut: false,
       error: botVerification.error || "Security check failed. Suspicious activity detected.",
     }
   }
+
+  console.log(
+    `[Auth:Login] reCAPTCHA check PASSED for IP: ${ip} | Score: ${botVerification.score ?? "none"} | Action: ${botVerification.action ?? "none"}`
+  )
 
   const secret = getTotpSecret()
   const isValid = verifyTOTP(code, secret, 1)

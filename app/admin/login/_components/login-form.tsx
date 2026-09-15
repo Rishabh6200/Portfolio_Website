@@ -1,26 +1,15 @@
 "use client"
 
-import React, { useState, useEffect, useTransition } from "react"
+import { useState, useEffect, useTransition } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { motion, AnimatePresence } from "motion/react"
-import {
-  ShieldCheck,
-  Loader2,
-  ArrowRight,
-  ArrowLeft,
-  Lock,
-} from "lucide-react"
+import { ShieldCheck, Loader2, ArrowRight, ArrowLeft, Lock } from "lucide-react"
 import { toast } from "sonner"
 import { REGEXP_ONLY_DIGITS } from "input-otp"
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 import { Button } from "@/components/ui/button"
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-  InputOTPSeparator,
-} from "@/components/ui/input-otp"
+import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/input-otp"
 import { verifyAdminTotpAction, getLoginStatusAction } from "../actions"
 
 export function LoginForm() {
@@ -60,18 +49,33 @@ export function LoginForm() {
         let recaptchaToken: string | undefined = undefined
         if (executeRecaptcha) {
           try {
+            console.log("[reCAPTCHA:Client] Requesting token for action 'admin_login'...")
+            const start = performance.now()
             recaptchaToken = await executeRecaptcha("admin_login")
+            const elapsed = (performance.now() - start).toFixed(1)
+            console.log(
+              `[reCAPTCHA:Client] Token generated in ${elapsed}ms (length: ${recaptchaToken?.length || 0})`
+            )
           } catch (e) {
-            console.warn("reCAPTCHA execution skipped:", e)
+            console.error("[reCAPTCHA:Client] Failed to execute reCAPTCHA:", e)
           }
+        } else {
+          console.warn(
+            "[reCAPTCHA:Client] executeRecaptcha is not available. Site key may not be set or script hasn't finished loading."
+          )
         }
 
+        console.log(
+          `[Auth:Login:Client] Submitting verification (hasRecaptchaToken: ${Boolean(recaptchaToken)})`
+        )
         const res = await verifyAdminTotpAction(codeToSubmit, recaptchaToken)
         if (res.success) {
+          console.log("[Auth:Login:Client] Authentication successful!")
           toast.success("Authentication successful! Welcome back.")
           router.push(callbackUrl)
           router.refresh()
         } else {
+          console.warn("[Auth:Login:Client] Authentication rejected:", res.error)
           setError(res.error || "Invalid code. Please try again.")
           setShake(true)
           setTimeout(() => setShake(false), 500)
@@ -82,7 +86,7 @@ export function LoginForm() {
           }
         }
       } catch (err) {
-        console.error("Login error:", err)
+        console.error("[Auth:Login:Client] Unexpected login error:", err)
         setError("An unexpected error occurred. Please try again.")
       }
     })
@@ -112,11 +116,10 @@ export function LoginForm() {
         {/* Card Header */}
         <div className="text-center space-y-2">
           <div
-            className={`mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border shadow-inner transition-colors ${
-              isLockedOut
-                ? "bg-destructive/10 text-destructive border-destructive/20"
-                : "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20"
-            }`}
+            className={`mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border shadow-inner transition-colors ${isLockedOut
+              ? "bg-destructive/10 text-destructive border-destructive/20"
+              : "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20"
+              }`}
           >
             {isLockedOut ? <Lock className="h-6 w-6" /> : <ShieldCheck className="h-6 w-6" />}
           </div>
