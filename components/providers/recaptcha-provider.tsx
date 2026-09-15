@@ -9,7 +9,7 @@ interface RecaptchaProviderProps {
 
 export function RecaptchaProvider({ children }: RecaptchaProviderProps) {
   const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
-
+  console.log("NEXT_PUBLIC_RECAPTCHA_SITE_KEY", siteKey)
   // If site key is not configured, render children without error
   if (!siteKey) {
     if (process.env.NODE_ENV === "production") {
