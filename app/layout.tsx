@@ -21,6 +21,8 @@ const fontMono = Geist_Mono({
   display: "swap",
 })
 
+export const dynamic = "force-dynamic"
+
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: dark)", color: "#07090e" },
