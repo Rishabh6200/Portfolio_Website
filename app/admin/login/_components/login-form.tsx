@@ -49,33 +49,18 @@ export function LoginForm() {
         let recaptchaToken: string | undefined = undefined
         if (executeRecaptcha) {
           try {
-            console.log("[reCAPTCHA:Client] Requesting token for action 'admin_login'...")
-            const start = performance.now()
             recaptchaToken = await executeRecaptcha("admin_login")
-            const elapsed = (performance.now() - start).toFixed(1)
-            console.log(
-              `[reCAPTCHA:Client] Token generated in ${elapsed}ms (length: ${recaptchaToken?.length || 0})`
-            )
           } catch (e) {
-            console.error("[reCAPTCHA:Client] Failed to execute reCAPTCHA:", e)
+            console.warn("reCAPTCHA execution skipped:", e)
           }
-        } else {
-          console.warn(
-            "[reCAPTCHA:Client] executeRecaptcha is not available. Site key may not be set or script hasn't finished loading."
-          )
         }
 
-        console.log(
-          `[Auth:Login:Client] Submitting verification (hasRecaptchaToken: ${Boolean(recaptchaToken)})`
-        )
         const res = await verifyAdminTotpAction(codeToSubmit, recaptchaToken)
         if (res.success) {
-          console.log("[Auth:Login:Client] Authentication successful!")
           toast.success("Authentication successful! Welcome back.")
           router.push(callbackUrl)
           router.refresh()
         } else {
-          console.warn("[Auth:Login:Client] Authentication rejected:", res.error)
           setError(res.error || "Invalid code. Please try again.")
           setShake(true)
           setTimeout(() => setShake(false), 500)

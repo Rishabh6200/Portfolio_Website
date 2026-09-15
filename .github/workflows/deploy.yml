@@ -39,11 +39,14 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build Next.js
+        env:
+          NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${{ vars.NEXT_PUBLIC_RECAPTCHA_SITE_KEY }}
         run: pnpm build
 
       - name: Prepare standalone package
         run: |
           mkdir -p .next/standalone/.next
+
           cp -r .next/static .next/standalone/.next/
 
           if [ -d "public" ]; then
@@ -114,6 +117,8 @@ jobs:
 
             cd "$APP_DIR"
 
+            echo "Preparing new deployment..."
+
             rm -rf "$NEW_RELEASE"
             mkdir -p "$NEW_RELEASE"
 
@@ -122,6 +127,8 @@ jobs:
 
             rm -f /tmp/portfolio.tar.gz
 
+            echo "Replacing standalone build..."
+
             rm -rf "$RELEASE_DIR"
             mv "$NEW_RELEASE" "$RELEASE_DIR"
 
@@ -129,6 +136,8 @@ jobs:
               echo "ERROR: server.js was not found."
               exit 1
             fi
+
+            echo "Restarting PM2..."
 
             if pm2 describe portfolio > /dev/null 2>&1; then
               PORT=3000 \
@@ -142,6 +151,8 @@ jobs:
             fi
 
             pm2 save
+
+            echo "PM2 status:"
             pm2 status
 
             echo "Deployment completed successfully."

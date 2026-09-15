@@ -9,18 +9,8 @@ interface RecaptchaProviderProps {
 
 export function RecaptchaProvider({ children }: RecaptchaProviderProps) {
   const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
-  console.log("NEXT_PUBLIC_RECAPTCHA_SITE_KEY", siteKey)
 
   if (!siteKey) {
-    if (process.env.NODE_ENV === "production") {
-      console.error(
-        "[reCAPTCHA:Provider] CRITICAL: NEXT_PUBLIC_RECAPTCHA_SITE_KEY is missing in production environment!"
-      )
-    } else {
-      console.warn(
-        "[reCAPTCHA:Provider] NEXT_PUBLIC_RECAPTCHA_SITE_KEY is not defined. reCAPTCHA provider will not initialize."
-      )
-    }
     return <>{children}</>
   }
 
