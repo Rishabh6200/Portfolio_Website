@@ -17,7 +17,6 @@ export async function verifyRecaptcha(
 ): Promise<RecaptchaVerificationResult> {
   const secretKey = process.env.RECAPTCHA_SECRET_KEY
 
-  // Safe fallback for local development if RECAPTCHA_SECRET_KEY is not yet added
   if (!secretKey) {
     if (process.env.NODE_ENV !== "production") {
       console.warn(
