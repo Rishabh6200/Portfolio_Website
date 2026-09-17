@@ -13,6 +13,12 @@ export async function verifyRecaptcha(
   token?: string,
   expectedAction?: string
 ): Promise<RecaptchaVerificationResult> {
+  // Emergency bypass flag for VPS/staging maintenance
+  if (process.env.DISABLE_RECAPTCHA === "true" || process.env.RECAPTCHA_BYPASS === "true") {
+    console.warn("[reCAPTCHA] Verification bypassed due to DISABLE_RECAPTCHA flag")
+    return { success: true, score: 1.0, action: expectedAction }
+  }
+
   const secretKey = process.env.RECAPTCHA_SECRET_KEY
 
   if (!secretKey) {
@@ -25,8 +31,20 @@ export async function verifyRecaptcha(
     }
   }
 
+  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || process.env.RECAPTCHA_SITE_KEY
+  if (!siteKey) {
+    console.error("[reCAPTCHA] Server has RECAPTCHA_SECRET_KEY, but NEXT_PUBLIC_RECAPTCHA_SITE_KEY is missing!")
+    return {
+      success: false,
+      error: "NEXT_PUBLIC_RECAPTCHA_SITE_KEY is missing in environment variables",
+    }
+  }
+
   if (!token) {
-    return { success: false, error: "Missing reCAPTCHA token" }
+    return {
+      success: false,
+      error: "Missing reCAPTCHA token. Please ensure Google reCAPTCHA is not blocked by your browser and try again.",
+    }
   }
 
   try {

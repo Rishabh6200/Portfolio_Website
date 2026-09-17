@@ -75,6 +75,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const recaptchaSiteKey =
+    process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || process.env.RECAPTCHA_SITE_KEY
+
   return (
     <html
       lang="en"
@@ -84,7 +87,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-background font-sans text-foreground selection:bg-indigo-500/20 selection:text-indigo-300">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <RecaptchaProvider>
+          <RecaptchaProvider siteKey={recaptchaSiteKey}>
             <ProgressProvider>{children}</ProgressProvider>
           </RecaptchaProvider>
           <Toaster />

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useTransition } from "react"
+import { useState, useEffect, useRef, useTransition } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { motion, AnimatePresence } from "motion/react"
@@ -17,6 +17,11 @@ export function LoginForm() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl") || "/admin"
   const { executeRecaptcha } = useGoogleReCaptcha()
+  const executeRecaptchaRef = useRef(executeRecaptcha)
+
+  useEffect(() => {
+    executeRecaptchaRef.current = executeRecaptcha
+  }, [executeRecaptcha])
 
   const [code, setCode] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -46,12 +51,27 @@ export function LoginForm() {
 
     startTransition(async () => {
       try {
+        let exec = executeRecaptcha || executeRecaptchaRef.current
+        if (!exec) {
+          // Wait up to 2.5 seconds for Google reCAPTCHA script to finish loading if needed
+          for (let i = 0; i < 10 && !exec; i++) {
+            await new Promise((resolve) => setTimeout(resolve, 250))
+            exec = executeRecaptchaRef.current
+          }
+        }
+
         let recaptchaToken: string | undefined = undefined
-        if (executeRecaptcha) {
+        if (exec) {
           try {
-            recaptchaToken = await executeRecaptcha("admin_login")
-          } catch (e) {
-            console.warn("reCAPTCHA execution skipped:", e)
+            recaptchaToken = await exec("admin_login")
+          } catch (recaptchaErr) {
+            console.error("[Auth:Login:reCAPTCHA] Execution failed:", recaptchaErr)
+            setError(
+              "Security verification error. If you are accessing via raw IP, uncheck 'Verify origin' in Google reCAPTCHA console, or disable ad-blockers."
+            )
+            setShake(true)
+            setTimeout(() => setShake(false), 500)
+            return
           }
         }
 
