@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next"
 import { Geist_Mono, Inter } from "next/font/google"
-import { PortfolioAnalytics } from "@/components/analytics"
 import "./globals.css"
 import { ProgressProvider } from "@/components/progress-provider"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -85,7 +84,6 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <ProgressProvider>{children}</ProgressProvider>
           <Toaster />
-          <PortfolioAnalytics />
         </ThemeProvider>
       </body>
     </html>
