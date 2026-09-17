@@ -52,26 +52,27 @@ export function LoginForm() {
     startTransition(async () => {
       try {
         let exec = executeRecaptcha || executeRecaptchaRef.current
-        if (!exec) {
-          // Wait up to 2.5 seconds for Google reCAPTCHA script to finish loading if needed
-          for (let i = 0; i < 10 && !exec; i++) {
+        const hasGrecaptcha =
+          typeof window !== "undefined" &&
+          (Boolean((window as unknown as { grecaptcha?: unknown }).grecaptcha) ||
+            Boolean(document.querySelector("script[src*='recaptcha']")))
+
+        if (!exec && hasGrecaptcha) {
+          for (let i = 0; i < 8 && !exec; i++) {
             await new Promise((resolve) => setTimeout(resolve, 250))
             exec = executeRecaptchaRef.current
           }
         }
 
         let recaptchaToken: string | undefined = undefined
+        let recaptchaExecutionError: string | null = null
         if (exec) {
           try {
             recaptchaToken = await exec("admin_login")
           } catch (recaptchaErr) {
             console.error("[Auth:Login:reCAPTCHA] Execution failed:", recaptchaErr)
-            setError(
-              "Security verification error. If you are accessing via raw IP, uncheck 'Verify origin' in Google reCAPTCHA console, or disable ad-blockers."
-            )
-            setShake(true)
-            setTimeout(() => setShake(false), 500)
-            return
+            recaptchaExecutionError =
+              recaptchaErr instanceof Error ? recaptchaErr.message : String(recaptchaErr)
           }
         }
 
@@ -81,7 +82,14 @@ export function LoginForm() {
           router.push(callbackUrl)
           router.refresh()
         } else {
-          setError(res.error || "Invalid code. Please try again.")
+          if (recaptchaExecutionError && !res.isLockedOut) {
+            const currentHost = typeof window !== "undefined" ? window.location.hostname : "your domain"
+            setError(
+              `reCAPTCHA error: Please add '${currentHost}' to Google reCAPTCHA Console Domains, ensure the key is v3 (Score based), or set DISABLE_RECAPTCHA=true in VPS .env.`
+            )
+          } else {
+            setError(res.error || "Invalid code. Please try again.")
+          }
           setShake(true)
           setTimeout(() => setShake(false), 500)
           setCode("")

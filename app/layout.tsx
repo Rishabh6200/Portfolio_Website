@@ -76,7 +76,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   const recaptchaSiteKey =
-    process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || process.env.RECAPTCHA_SITE_KEY
+    process.env.DISABLE_RECAPTCHA === "true" || process.env.RECAPTCHA_BYPASS === "true"
+      ? ""
+      : process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || process.env.RECAPTCHA_SITE_KEY
 
   return (
     <html
