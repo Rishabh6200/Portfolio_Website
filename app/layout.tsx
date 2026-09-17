@@ -3,7 +3,6 @@ import { Geist_Mono, Inter } from "next/font/google"
 import { PortfolioAnalytics } from "@/components/analytics"
 import "./globals.css"
 import { ProgressProvider } from "@/components/progress-provider"
-import { RecaptchaProvider } from "@/components/providers/recaptcha-provider"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { cn } from "@/lib/utils"
@@ -75,11 +74,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const recaptchaSiteKey =
-    process.env.DISABLE_RECAPTCHA === "true" || process.env.RECAPTCHA_BYPASS === "true"
-      ? ""
-      : process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || process.env.RECAPTCHA_SITE_KEY
-
   return (
     <html
       lang="en"
@@ -89,9 +83,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-background font-sans text-foreground selection:bg-indigo-500/20 selection:text-indigo-300">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <RecaptchaProvider siteKey={recaptchaSiteKey}>
-            <ProgressProvider>{children}</ProgressProvider>
-          </RecaptchaProvider>
+          <ProgressProvider>{children}</ProgressProvider>
           <Toaster />
           <PortfolioAnalytics />
         </ThemeProvider>

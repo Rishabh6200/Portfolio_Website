@@ -1,13 +1,12 @@
 "use client"
 
-import { useState, useEffect, useRef, useTransition } from "react"
+import { useState, useEffect, useTransition } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { motion, AnimatePresence } from "motion/react"
 import { ShieldCheck, Loader2, ArrowRight, ArrowLeft, Lock } from "lucide-react"
 import { toast } from "sonner"
 import { REGEXP_ONLY_DIGITS } from "input-otp"
-import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 import { Button } from "@/components/ui/button"
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/input-otp"
 import { verifyAdminTotpAction, getLoginStatusAction } from "../actions"
@@ -16,12 +15,6 @@ export function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl") || "/admin"
-  const { executeRecaptcha } = useGoogleReCaptcha()
-  const executeRecaptchaRef = useRef(executeRecaptcha)
-
-  useEffect(() => {
-    executeRecaptchaRef.current = executeRecaptcha
-  }, [executeRecaptcha])
 
   const [code, setCode] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -51,45 +44,13 @@ export function LoginForm() {
 
     startTransition(async () => {
       try {
-        let exec = executeRecaptcha || executeRecaptchaRef.current
-        const hasGrecaptcha =
-          typeof window !== "undefined" &&
-          (Boolean((window as unknown as { grecaptcha?: unknown }).grecaptcha) ||
-            Boolean(document.querySelector("script[src*='recaptcha']")))
-
-        if (!exec && hasGrecaptcha) {
-          for (let i = 0; i < 8 && !exec; i++) {
-            await new Promise((resolve) => setTimeout(resolve, 250))
-            exec = executeRecaptchaRef.current
-          }
-        }
-
-        let recaptchaToken: string | undefined = undefined
-        let recaptchaExecutionError: string | null = null
-        if (exec) {
-          try {
-            recaptchaToken = await exec("admin_login")
-          } catch (recaptchaErr) {
-            console.error("[Auth:Login:reCAPTCHA] Execution failed:", recaptchaErr)
-            recaptchaExecutionError =
-              recaptchaErr instanceof Error ? recaptchaErr.message : String(recaptchaErr)
-          }
-        }
-
-        const res = await verifyAdminTotpAction(codeToSubmit, recaptchaToken)
+        const res = await verifyAdminTotpAction(codeToSubmit)
         if (res.success) {
           toast.success("Authentication successful! Welcome back.")
           router.push(callbackUrl)
           router.refresh()
         } else {
-          if (recaptchaExecutionError && !res.isLockedOut) {
-            const currentHost = typeof window !== "undefined" ? window.location.hostname : "your domain"
-            setError(
-              `reCAPTCHA error: Please add '${currentHost}' to Google reCAPTCHA Console Domains, ensure the key is v3 (Score based), or set DISABLE_RECAPTCHA=true in VPS .env.`
-            )
-          } else {
-            setError(res.error || "Invalid code. Please try again.")
-          }
+          setError(res.error || "Invalid code. Please try again.")
           setShake(true)
           setTimeout(() => setShake(false), 500)
           setCode("")
@@ -214,29 +175,6 @@ export function LoginForm() {
               </>
             )}
           </Button>
-
-          {/* Google reCAPTCHA Compliance Disclosure */}
-          <p className="text-[10px] text-center text-muted-foreground/60 leading-relaxed pt-1">
-            Protected by reCAPTCHA. Google{" "}
-            <a
-              href="https://policies.google.com/privacy"
-              target="_blank"
-              rel="noreferrer"
-              className="underline hover:text-muted-foreground transition-colors"
-            >
-              Privacy Policy
-            </a>{" "}
-            and{" "}
-            <a
-              href="https://policies.google.com/terms"
-              target="_blank"
-              rel="noreferrer"
-              className="underline hover:text-muted-foreground transition-colors"
-            >
-              Terms of Service
-            </a>{" "}
-            apply.
-          </p>
         </div>
       </motion.div>
     </div>
