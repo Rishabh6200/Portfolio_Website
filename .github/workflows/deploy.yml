@@ -38,26 +38,27 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check environment variables
+        env:
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${{ vars.NEXT_PUBLIC_RECAPTCHA_SITE_KEY }}
+        run: |
+          echo "NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-NOT_SET}"
+          echo "NEXT_PUBLIC_RECAPTCHA_SITE_KEY length: ${#NEXT_PUBLIC_RECAPTCHA_SITE_KEY}"
+
       - name: Build Next.js
         env:
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
           NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${{ vars.NEXT_PUBLIC_RECAPTCHA_SITE_KEY }}
         run: pnpm build
 
-      - name: Prepare standalone package
-        run: |
-          mkdir -p .next/standalone/.next
-
-          cp -r .next/static .next/standalone/.next/
-
-          if [ -d "public" ]; then
-            cp -r public .next/standalone/
-          fi
-
       - name: Create deployment archive
         run: |
           tar -czf portfolio.tar.gz \
-            -C .next/standalone .
+            --exclude=.git \
+            --exclude=node_modules \
+            --exclude=.next/cache \
+            .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v6
@@ -108,8 +109,6 @@ jobs:
             set -e
 
             APP_DIR="/var/www/portfolio"
-            RELEASE_DIR="$APP_DIR/.next/standalone"
-            NEW_RELEASE="$APP_DIR/.next/standalone.new"
 
             if [ ! -d "$APP_DIR" ]; then
               echo "ERROR: Application directory does not exist: $APP_DIR"
@@ -118,38 +117,19 @@ jobs:
 
             cd "$APP_DIR"
 
-            echo "Preparing new deployment..."
+            echo "Extracting deployment..."
 
-            rm -rf "$NEW_RELEASE"
-            mkdir -p "$NEW_RELEASE"
-
-            tar -xzf /tmp/portfolio.tar.gz \
-              -C "$NEW_RELEASE"
+            tar -xzf /tmp/portfolio.tar.gz -C "$APP_DIR"
 
             rm -f /tmp/portfolio.tar.gz
 
-            echo "Replacing standalone build..."
+            echo "Installing dependencies..."
 
-            rm -rf "$RELEASE_DIR"
-            mv "$NEW_RELEASE" "$RELEASE_DIR"
-
-            if [ ! -f "$RELEASE_DIR/server.js" ]; then
-              echo "ERROR: server.js was not found."
-              exit 1
-            fi
+            pnpm install --frozen-lockfile
 
             echo "Restarting PM2..."
 
-            if pm2 describe portfolio > /dev/null 2>&1; then
-              PORT=3000 \
-              HOSTNAME=127.0.0.1 \
-              pm2 restart portfolio --update-env
-            else
-              PORT=3000 \
-              HOSTNAME=127.0.0.1 \
-              pm2 start "$RELEASE_DIR/server.js" \
-                --name portfolio
-            fi
+            pm2 restart ecosystem.config.cjs --update-env
 
             pm2 save
 

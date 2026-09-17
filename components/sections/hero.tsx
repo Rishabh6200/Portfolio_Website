@@ -6,8 +6,8 @@ import { ArrowRight, Copy, Check, Terminal, ExternalLink, ChevronDown } from "lu
 import { toast } from "sonner"
 import Link from "next/link"
 import { MeshConstellation } from "@/components/custom-ui/mesh-constellation"
-import { cn } from "@/lib/utils"
 import { DEFAULT_PROFILE, type ProfileData } from "@/lib/constants/profile"
+import { HeroStats } from "./hero-stats"
 
 
 interface HeroSectionProps {
@@ -182,40 +182,10 @@ export function HeroSection({ initialProfile }: HeroSectionProps) {
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-16 xl:mt-20 w-full border-t border-black/8 dark:border-white/8 pt-10 xl:pt-12"
-        >
-          <div
-            className={cn(
-              "grid gap-8 xl:gap-12 justify-center",
-              profile.stats.length === 1 && "grid-cols-1 max-w-xs mx-auto",
-              profile.stats.length === 2 && "grid-cols-1 sm:grid-cols-2 max-w-xl mx-auto",
-              profile.stats.length === 3 && "grid-cols-1 sm:grid-cols-3 max-w-4xl mx-auto",
-              profile.stats.length === 4 && "grid-cols-2 md:grid-cols-4 w-full",
-              profile.stats.length > 4 && "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 w-full"
-            )}
-          >
-            {profile.stats.map((stat, idx) => (
-              <div key={idx} className="flex flex-col items-center text-center">
-                <span className="font-mono text-2xl sm:text-3xl xl:text-4xl 2xl:text-5xl font-bold text-neutral-900 dark:text-white tracking-tight">
-                  {stat.value}
-                </span>
-                <span className="text-xs sm:text-sm xl:text-base font-medium text-neutral-700 dark:text-neutral-300 mt-1">
-                  {stat.label}
-                </span>
-                <span className="text-[11px] xl:text-xs text-neutral-500 mt-0.5 max-w-60">
-                  {stat.subtext}
-                </span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+        <HeroStats stats={profile.stats} />
       </div>
 
-      <div className="mx-auto mt-12 flex justify-center text-neutral-400 dark:text-neutral-600 animate-bounce">
+      <div className="mx-auto mt-8 sm:mt-12 flex justify-center text-neutral-400 dark:text-neutral-600 animate-bounce">
         <ChevronDown className="h-5 w-5" />
       </div>
     </section>
