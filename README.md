@@ -1,36 +1,37 @@
 # v3
 
-A minimal next app with Prisma 8 and Prisma Composer.
+A Next.js app with Prisma 8 ORM and PostgreSQL.
 
 ## Run locally
 
+1. Set up your `.env` file with your PostgreSQL database URL:
 ```bash
-pnpm run dev:composer
+cp .env.example .env
 ```
 
-This builds the app and starts it with Composer. PostgreSQL projects get a local Prisma Postgres database and apply the contract automatically.
-
-## Deploy
-
+2. Generate contract artifacts:
 ```bash
-pnpm run deploy
+pnpm run contract:emit
 ```
 
-The deploy script builds the framework output, provisions Prisma Postgres when selected, applies migrations, and deploys the app to Prisma Compute.
+3. Initialize database tables:
+```bash
+pnpm run db:init
+```
 
-The starter users are inserted idempotently from `src/prisma/seed.ts` on the first database query through the Composer service binding.
-
+4. Start development server:
+```bash
+pnpm run dev
+```
 
 ## Prisma
 
-- Contract: `src/prisma/contract.prisma`
-- Prisma and Composer config: `prisma.config.ts`
-- Composer app: `module.ts` and `service.ts`
+- Contract: `prisma/contract.prisma`
+- Prisma config: `prisma.config.ts`
+- Database client: `prisma/db.ts`
 
 After changing the contract, run:
 
 ```bash
 pnpm run contract:emit
 ```
-
-To use the framework's development server directly, run `pnpm run dev`. This direct mode requires `DATABASE_URL`.

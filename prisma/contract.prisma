@@ -1,0 +1,133 @@
+// use prisma-8
+
+enum SkillLevel {
+  Proficient
+  Advanced
+  Expert
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String   @default("")
+  icon        String   @default("Server")
+  order       Int      @default(0)
+  color       String   @default("#6366f1")
+  skills      Skill[]
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+}
+
+model Skill {
+  id          String            @id @default(uuid())
+  name        String
+  category    Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId  String
+  level       SkillLevel        @default(Advanced)
+  highlight   Boolean           @default(false)
+  order       Int               @default(0)
+  projects    ProjectSkill[]
+  experiences ExperienceSkill[]
+  educations  EducationSkill[]
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+
+  @@unique([categoryId, name])
+}
+
+model Project {
+  id          String         @id @default(uuid())
+  title       String
+  slug        String         @unique
+  tagline     String
+  description String
+  role        String         @default("Full-Stack Developer")
+  skills      ProjectSkill[]
+  logo        String         @default("")
+  images      String[]       @default([])
+  liveUrl     String         @default("")
+  githubUrl   String         @default("")
+  featured    Boolean        @default(false)
+  status      String         @default("published")
+  order       Int            @default(0)
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+}
+
+model ProjectSkill {
+  projectId String
+  skillId   String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  skill     Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, skillId])
+}
+
+model Experience {
+  id           String            @id @default(uuid())
+  company      String
+  role         String
+  period       String
+  location     String
+  locationType String            @default("Remote")
+  type         String            @default("Full-Time")
+  description  String
+  achievements String[]          @default([])
+  skills       ExperienceSkill[]
+  order        Int               @default(0)
+  createdAt    TimestamptzString @default(now())
+  updatedAt    temporal.updatedAtString()
+}
+
+model ExperienceSkill {
+  experienceId String
+  skillId      String
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  skill        Skill      @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([experienceId, skillId])
+}
+
+model Education {
+  id           String           @id @default(uuid())
+  institution  String
+  degree       String
+  fieldOfStudy String           @default("")
+  period       String
+  location     String
+  type         String           @default("Degree")
+  grade        String           @default("")
+  description  String
+  highlights   String[]         @default([])
+  skills       EducationSkill[]
+  status       String           @default("published")
+  order        Int              @default(0)
+  createdAt    TimestamptzString @default(now())
+  updatedAt    temporal.updatedAtString()
+}
+
+model EducationSkill {
+  educationId String
+  skillId     String
+  education   Education @relation(fields: [educationId], references: [id], onDelete: Cascade)
+  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([educationId, skillId])
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  name      String   @default("Rishabh")
+  role      String   @default("Full-Stack & Systems Developer")
+  tagline   String   @default("Architecting high-throughput systems & fluid web products.")
+  bio       String   @default("I’m a full-stack developer specializing in scalable backend architectures and dynamic web applications. I’ve architected modular APIs with NestJS, production web platforms with Laravel, and interactive frontend dashboards using React and Next.js.")
+  status    String   @default("Open for Work")
+  location  String   @default("Mohali, India (IST)")
+  timezone  String   @default("Asia/Kolkata")
+  email     String   @default("rc4556c@gmail.com")
+  socials   Json
+  stats     Json
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
