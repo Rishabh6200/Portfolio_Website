@@ -18,3 +18,11 @@ export function connectDatabase(): Promise<void> {
   });
   return connection;
 }
+
+export const ProjectStatus = db.enums.public.ProjectStatus;
+export type ProjectStatus = (typeof db.enums.public.ProjectStatus.values)[number];
+
+export const SkillLevel = db.enums.public.SkillLevel;
+export type SkillLevel = (typeof db.enums.public.SkillLevel.values)[number];
+
+

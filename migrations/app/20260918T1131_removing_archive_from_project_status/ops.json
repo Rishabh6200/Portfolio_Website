@@ -1,0 +1,86 @@
+[
+  {
+    "id": "dropCheckConstraint.project.project_status_check_bc64f66b",
+    "label": "Drop check constraint \"project_status_check_bc64f66b\" on \"project\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "project_status_check_bc64f66b",
+        "table": "project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"project_status_check_bc64f66b\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_status_check_bc64f66b",
+          "public",
+          "\"public\".\"project\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop check constraint \"project_status_check_bc64f66b\"",
+        "sql": "ALTER TABLE \"public\".\"project\" DROP CONSTRAINT \"project_status_check_bc64f66b\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"project_status_check_bc64f66b\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_status_check_bc64f66b",
+          "public",
+          "\"public\".\"project\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.project.project_status_check_1b4a7b6b",
+    "label": "Add check constraint \"project_status_check_1b4a7b6b\" on \"project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "project_status_check_1b4a7b6b",
+        "table": "project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"project_status_check_1b4a7b6b\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_status_check_1b4a7b6b",
+          "public",
+          "\"public\".\"project\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"project_status_check_1b4a7b6b\"",
+        "sql": "ALTER TABLE \"public\".\"project\" ADD CONSTRAINT \"project_status_check_1b4a7b6b\" CHECK (\"status\" IN ('DRAFT', 'PUBLISHED'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"project_status_check_1b4a7b6b\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_status_check_1b4a7b6b",
+          "public",
+          "\"public\".\"project\""
+        ]
+      }
+    ]
+  }
+]

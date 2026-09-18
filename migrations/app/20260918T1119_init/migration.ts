@@ -1,6 +1,6 @@
 #!/usr/bin/env -S node
-import type { Contract as End } from '../../snapshots/7d9dd21067c07793e74f71c02a0cf00a30370cfeb752366701a20b188174bbb7/contract';
-import endContract from '../../snapshots/7d9dd21067c07793e74f71c02a0cf00a30370cfeb752366701a20b188174bbb7/contract.json' with { type: 'json' };
+import type { Contract as End } from '../../snapshots/895ccc9a4f879da29d20d0230219e55ac67af94b95c79b7a63ea0218f1719ec3/contract';
+import endContract from '../../snapshots/895ccc9a4f879da29d20d0230219e55ac67af94b95c79b7a63ea0218f1719ec3/contract.json' with { type: 'json' };
 import {
   Migration,
   MigrationCLI,
@@ -290,7 +290,7 @@ export default class M extends Migration<never, End> {
           col('slug', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('status', 'text', {
             notNull: true,
-            default: lit('published'),
+            default: lit('DRAFT'),
             codecRef: { codecId: 'pg/text@1' },
           }),
           col('tagline', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
@@ -305,6 +305,10 @@ export default class M extends Migration<never, End> {
           checkExpression(
             'project_images_elem_not_null_2f12556f',
             'array_position("images", NULL) IS NULL',
+          ),
+          checkExpression(
+            'project_status_check_bc64f66b',
+            "\"status\" IN ('DRAFT', 'PUBLISHED', 'ARCHIVED')",
           ),
         ],
       }),

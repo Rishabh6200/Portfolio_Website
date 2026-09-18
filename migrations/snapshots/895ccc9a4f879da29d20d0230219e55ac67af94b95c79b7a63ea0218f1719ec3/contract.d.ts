@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'fc2514a5f96e607958427d6e6ec4a372ffc5ce0ad17d8c4c12047b93886af421'>;
+  StorageHashBase<'895ccc9a4f879da29d20d0230219e55ac67af94b95c79b7a63ea0218f1719ec3'>;
 export type ExecutionHash =
   ExecutionHashBase<'8851bae66ea8aac2f1a78248df2e139c5a892ba6114ebc66d12aa5dacfcfda1d'>;
 export type ProfileHash =
@@ -318,7 +318,7 @@ export type FieldOutputTypes = {
       readonly liveUrl: CodecTypes['pg/text@1']['output'];
       readonly githubUrl: CodecTypes['pg/text@1']['output'];
       readonly featured: CodecTypes['pg/bool@1']['output'];
-      readonly status: 'DRAFT' | 'PUBLISHED';
+      readonly status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
       readonly order: CodecTypes['pg/int4@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
@@ -417,7 +417,7 @@ export type FieldInputTypes = {
       readonly liveUrl: CodecTypes['pg/text@1']['input'];
       readonly githubUrl: CodecTypes['pg/text@1']['input'];
       readonly featured: CodecTypes['pg/bool@1']['input'];
-      readonly status: 'DRAFT' | 'PUBLISHED';
+      readonly status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
       readonly order: CodecTypes['pg/int4@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
@@ -516,7 +516,7 @@ export type StorageColumnTypes = {
       readonly order: CodecTypes['pg/int4@1']['output'];
       readonly role: CodecTypes['pg/text@1']['output'];
       readonly slug: CodecTypes['pg/text@1']['output'];
-      readonly status: 'DRAFT' | 'PUBLISHED';
+      readonly status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
       readonly tagline: CodecTypes['pg/text@1']['output'];
       readonly title: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
@@ -615,7 +615,7 @@ export type StorageColumnInputTypes = {
       readonly order: CodecTypes['pg/int4@1']['input'];
       readonly role: CodecTypes['pg/text@1']['input'];
       readonly slug: CodecTypes['pg/text@1']['input'];
-      readonly status: 'DRAFT' | 'PUBLISHED';
+      readonly status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
       readonly tagline: CodecTypes['pg/text@1']['input'];
       readonly title: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
@@ -678,7 +678,7 @@ export namespace Models {
     liveUrl: CodecTypes['pg/text@1']['output'];
     githubUrl: CodecTypes['pg/text@1']['output'];
     featured: CodecTypes['pg/bool@1']['output'];
-    status: 'DRAFT' | 'PUBLISHED';
+    status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
     order: CodecTypes['pg/int4@1']['output'];
     createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
     updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
@@ -1535,7 +1535,7 @@ type ContractBase = Omit<
           readonly valueSet: {
             readonly ProjectStatus: {
               readonly kind: 'valueSet';
-              readonly values: readonly ['DRAFT', 'PUBLISHED'];
+              readonly values: readonly ['DRAFT', 'PUBLISHED', 'ARCHIVED'];
             };
             readonly SkillLevel: {
               readonly kind: 'valueSet';
@@ -2285,6 +2285,7 @@ type ContractBase = Omit<
             readonly members: readonly [
               { readonly name: 'DRAFT'; readonly value: 'DRAFT' },
               { readonly name: 'PUBLISHED'; readonly value: 'PUBLISHED' },
+              { readonly name: 'ARCHIVED'; readonly value: 'ARCHIVED' },
             ];
           };
         };

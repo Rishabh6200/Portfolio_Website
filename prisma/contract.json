@@ -45,6 +45,19 @@
     "namespaces": {
       "public": {
         "enum": {
+          "ProjectStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "DRAFT",
+                "value": "DRAFT"
+              },
+              {
+                "name": "PUBLISHED",
+                "value": "PUBLISHED"
+              }
+            ]
+          },
           "SkillLevel": {
             "codecId": "pg/text@1",
             "members": [
@@ -851,6 +864,12 @@
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "ProjectStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
                 }
               },
               "tagline": {
@@ -1751,6 +1770,11 @@
                   "expression": "array_position(\"images\", NULL) IS NULL",
                   "name": "project_images_elem_not_null_2f12556f",
                   "prefix": "project_images_elem_not_null"
+                },
+                {
+                  "expression": "\"status\" IN ('DRAFT', 'PUBLISHED')",
+                  "name": "project_status_check_1b4a7b6b",
+                  "prefix": "project_status_check"
                 }
               ],
               "columns": {
@@ -1846,10 +1870,16 @@
                   "codecId": "pg/text@1",
                   "default": {
                     "kind": "literal",
-                    "value": "published"
+                    "value": "DRAFT"
                   },
                   "nativeType": "text",
-                  "nullable": false
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "ProjectStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
                 },
                 "tagline": {
                   "codecId": "pg/text@1",
@@ -2074,6 +2104,13 @@
             }
           },
           "valueSet": {
+            "ProjectStatus": {
+              "kind": "valueSet",
+              "values": [
+                "DRAFT",
+                "PUBLISHED"
+              ]
+            },
             "SkillLevel": {
               "kind": "valueSet",
               "values": [
@@ -2088,15 +2125,15 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "7d9dd21067c07793e74f71c02a0cf00a30370cfeb752366701a20b188174bbb7"
+    "storageHash": "fc2514a5f96e607958427d6e6ec4a372ffc5ce0ad17d8c4c12047b93886af421"
   },
   "execution": {
-    "executionHash": "3ec8b04e7fc4ed01818c87c240ef0c74f8e5c107812febd1ba8fb74116a1a7f5",
+    "executionHash": "8851bae66ea8aac2f1a78248df2e139c5a892ba6114ebc66d12aa5dacfcfda1d",
     "mutations": {
       "defaults": [
         {
           "onCreate": {
-            "id": "uuidv4",
+            "id": "cuid2",
             "kind": "generator"
           },
           "ref": {
@@ -2122,7 +2159,7 @@
         },
         {
           "onCreate": {
-            "id": "uuidv4",
+            "id": "cuid2",
             "kind": "generator"
           },
           "ref": {
@@ -2148,7 +2185,7 @@
         },
         {
           "onCreate": {
-            "id": "uuidv4",
+            "id": "cuid2",
             "kind": "generator"
           },
           "ref": {
@@ -2174,7 +2211,7 @@
         },
         {
           "onCreate": {
-            "id": "uuidv4",
+            "id": "cuid2",
             "kind": "generator"
           },
           "ref": {
@@ -2200,7 +2237,7 @@
         },
         {
           "onCreate": {
-            "id": "uuidv4",
+            "id": "cuid2",
             "kind": "generator"
           },
           "ref": {
@@ -2226,7 +2263,7 @@
         },
         {
           "onCreate": {
-            "id": "uuidv4",
+            "id": "cuid2",
             "kind": "generator"
           },
           "ref": {

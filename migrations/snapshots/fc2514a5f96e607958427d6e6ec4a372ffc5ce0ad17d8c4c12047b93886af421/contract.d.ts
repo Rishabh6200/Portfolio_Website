@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'7d9dd21067c07793e74f71c02a0cf00a30370cfeb752366701a20b188174bbb7'>;
+  StorageHashBase<'fc2514a5f96e607958427d6e6ec4a372ffc5ce0ad17d8c4c12047b93886af421'>;
 export type ExecutionHash =
-  ExecutionHashBase<'3ec8b04e7fc4ed01818c87c240ef0c74f8e5c107812febd1ba8fb74116a1a7f5'>;
+  ExecutionHashBase<'8851bae66ea8aac2f1a78248df2e139c5a892ba6114ebc66d12aa5dacfcfda1d'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -318,7 +318,7 @@ export type FieldOutputTypes = {
       readonly liveUrl: CodecTypes['pg/text@1']['output'];
       readonly githubUrl: CodecTypes['pg/text@1']['output'];
       readonly featured: CodecTypes['pg/bool@1']['output'];
-      readonly status: CodecTypes['pg/text@1']['output'];
+      readonly status: 'DRAFT' | 'PUBLISHED';
       readonly order: CodecTypes['pg/int4@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
@@ -417,7 +417,7 @@ export type FieldInputTypes = {
       readonly liveUrl: CodecTypes['pg/text@1']['input'];
       readonly githubUrl: CodecTypes['pg/text@1']['input'];
       readonly featured: CodecTypes['pg/bool@1']['input'];
-      readonly status: CodecTypes['pg/text@1']['input'];
+      readonly status: 'DRAFT' | 'PUBLISHED';
       readonly order: CodecTypes['pg/int4@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
@@ -516,7 +516,7 @@ export type StorageColumnTypes = {
       readonly order: CodecTypes['pg/int4@1']['output'];
       readonly role: CodecTypes['pg/text@1']['output'];
       readonly slug: CodecTypes['pg/text@1']['output'];
-      readonly status: CodecTypes['pg/text@1']['output'];
+      readonly status: 'DRAFT' | 'PUBLISHED';
       readonly tagline: CodecTypes['pg/text@1']['output'];
       readonly title: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
@@ -615,7 +615,7 @@ export type StorageColumnInputTypes = {
       readonly order: CodecTypes['pg/int4@1']['input'];
       readonly role: CodecTypes['pg/text@1']['input'];
       readonly slug: CodecTypes['pg/text@1']['input'];
-      readonly status: CodecTypes['pg/text@1']['input'];
+      readonly status: 'DRAFT' | 'PUBLISHED';
       readonly tagline: CodecTypes['pg/text@1']['input'];
       readonly title: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
@@ -678,7 +678,7 @@ export namespace Models {
     liveUrl: CodecTypes['pg/text@1']['output'];
     githubUrl: CodecTypes['pg/text@1']['output'];
     featured: CodecTypes['pg/bool@1']['output'];
-    status: CodecTypes['pg/text@1']['output'];
+    status: 'DRAFT' | 'PUBLISHED';
     order: CodecTypes['pg/int4@1']['output'];
     createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
     updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
@@ -1365,7 +1365,7 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly default: {
                     readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/text@1', 'published'>;
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'DRAFT'>;
                   };
                 };
                 readonly order: {
@@ -1533,6 +1533,10 @@ type ContractBase = Omit<
             };
           };
           readonly valueSet: {
+            readonly ProjectStatus: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['DRAFT', 'PUBLISHED'];
+            };
             readonly SkillLevel: {
               readonly kind: 'valueSet';
               readonly values: readonly ['Proficient', 'Advanced', 'Expert'];
@@ -2276,6 +2280,13 @@ type ContractBase = Omit<
               { readonly name: 'Expert'; readonly value: 'Expert' },
             ];
           };
+          readonly ProjectStatus: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'DRAFT'; readonly value: 'DRAFT' },
+              { readonly name: 'PUBLISHED'; readonly value: 'PUBLISHED' },
+            ];
+          };
         };
       };
     };
@@ -2309,7 +2320,7 @@ type ContractBase = Omit<
             readonly table: 'category';
             readonly column: 'id';
           };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'cuid2' };
         },
         {
           readonly ref: {
@@ -2326,7 +2337,7 @@ type ContractBase = Omit<
             readonly table: 'education';
             readonly column: 'id';
           };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'cuid2' };
         },
         {
           readonly ref: {
@@ -2343,7 +2354,7 @@ type ContractBase = Omit<
             readonly table: 'experience';
             readonly column: 'id';
           };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'cuid2' };
         },
         {
           readonly ref: {
@@ -2360,7 +2371,7 @@ type ContractBase = Omit<
             readonly table: 'profile';
             readonly column: 'id';
           };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'cuid2' };
         },
         {
           readonly ref: {
@@ -2377,7 +2388,7 @@ type ContractBase = Omit<
             readonly table: 'project';
             readonly column: 'id';
           };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'cuid2' };
         },
         {
           readonly ref: {
@@ -2394,7 +2405,7 @@ type ContractBase = Omit<
             readonly table: 'skill';
             readonly column: 'id';
           };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'cuid2' };
         },
         {
           readonly ref: {

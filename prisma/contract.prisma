@@ -7,7 +7,7 @@ enum SkillLevel {
 }
 
 model Category {
-  id          String   @id @default(uuid())
+  id          String   @id @default(cuid(2))
   name        String   @unique
   slug        String   @unique
   description String   @default("")
@@ -20,7 +20,7 @@ model Category {
 }
 
 model Skill {
-  id          String            @id @default(uuid())
+  id          String            @id @default(cuid(2))
   name        String
   category    Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId  String
@@ -36,8 +36,13 @@ model Skill {
   @@unique([categoryId, name])
 }
 
+enum ProjectStatus {
+  DRAFT
+  PUBLISHED
+}
+
 model Project {
-  id          String         @id @default(uuid())
+  id          String         @id @default(cuid(2))
   title       String
   slug        String         @unique
   tagline     String
@@ -49,7 +54,7 @@ model Project {
   liveUrl     String         @default("")
   githubUrl   String         @default("")
   featured    Boolean        @default(false)
-  status      String         @default("published")
+  status      ProjectStatus  @default(DRAFT)
   order       Int            @default(0)
   createdAt   TimestamptzString @default(now())
   updatedAt   temporal.updatedAtString()
@@ -65,7 +70,7 @@ model ProjectSkill {
 }
 
 model Experience {
-  id           String            @id @default(uuid())
+  id           String            @id @default(cuid(2))
   company      String
   role         String
   period       String
@@ -90,7 +95,7 @@ model ExperienceSkill {
 }
 
 model Education {
-  id           String           @id @default(uuid())
+  id           String           @id @default(cuid(2))
   institution  String
   degree       String
   fieldOfStudy String           @default("")
@@ -117,7 +122,7 @@ model EducationSkill {
 }
 
 model Profile {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid(2))
   name      String   @default("Rishabh")
   role      String   @default("Full-Stack & Systems Developer")
   tagline   String   @default("Architecting high-throughput systems & fluid web products.")

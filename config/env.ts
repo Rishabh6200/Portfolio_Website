@@ -1,0 +1,21 @@
+
+export const ENV = {
+   NODE_ENV: process.env.NODE_ENV!,
+
+   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL!,
+   NEXT_TELEMETRY_DISABLED: process.env.NEXT_TELEMETRY_DISABLED!,
+
+   SESSION_COOKIE_NAME: process.env.SESSION_COOKIE_NAME!,
+   SESSION_DURATION_DAYS: process.env.SESSION_DURATION_DAYS!,
+
+   DATABASE_URL: process.env.DATABASE_URL!,
+
+   AUTH_SECRET: process.env.AUTH_SECRET!,
+   ADMIN_TOTP_SECRET: process.env.ADMIN_TOTP_SECRET!,
+
+   S3_ENDPOINT_URL_S3: process.env.S3_ENDPOINT_URL_S3!,
+   S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID!,
+   S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY!,
+   S3_REGION: process.env.S3_REGION!,
+   S3_BUCKET: process.env.S3_BUCKET!,
+};
