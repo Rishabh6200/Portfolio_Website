@@ -5,7 +5,7 @@ import { ExternalLink, LogOut, Menu } from 'lucide-react'
 import Link from 'next/link'
 import { useTransition } from 'react'
 import AdminBreadcrumb from './breadcrumb'
-import { navItems } from './nav-config'
+import { toggleSidebar } from '@/hooks/use-sidebar'
 
 const AdminTopbar = () => {
     const [isLoggingOut, startLogout] = useTransition()
@@ -25,8 +25,8 @@ const AdminTopbar = () => {
             <div className="flex items-center gap-3">
                 <button
                     type="button"
-                    // onClick={() => setSidebarOpen(true)}
-                    className="md:hidden p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground"
+                    onClick={toggleSidebar}
+                    className="md:hidden p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground cursor-pointer"
                 >
                     <Menu className="h-4 w-4" />
                 </button>

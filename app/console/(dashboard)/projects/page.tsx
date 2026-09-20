@@ -2,9 +2,10 @@ import AdminPageHeader from '@/components/admin/common/admin-page-header';
 import Stats from '@/features/project/components/stats';
 import ProjectTable from '@/features/project/components/table';
 import { projectQueries } from '@/features/project/db/queries';
-import { Suspense } from 'react';
 
-const Page = async () => {
+const Page = () => {
+   const projectsPromise = projectQueries.getProjects();
+
    return (
       <>
          <AdminPageHeader
@@ -17,16 +18,9 @@ const Page = async () => {
          <div className="my-4">
             <Stats />
          </div>
-         <Suspense fallback={<p>loading...</p>}>
-            <ProjectTableLoader />
-         </Suspense>
+         <ProjectTable projects={projectsPromise} />
       </>
    )
 }
 
 export default Page;
-
-async function ProjectTableLoader() {
-   const projects = await projectQueries.getProjects();
-   return <ProjectTable projects={projects} />;
-}

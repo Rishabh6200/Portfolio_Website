@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import Link from "next/link"
 import { FolderGit2, Sparkles, ExternalLink, Edit3, Trash2 } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
@@ -9,42 +8,42 @@ import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import Image from "next/image"
 
+import { ProjectStatus } from "@/prisma/db"
+import { toast } from "@/components/ui/toast"
+import { reorderProjectsAction } from "../actions"
+import { useMemo, useState } from "react"
+import { ProjectStatusBadge } from "./status-badge"
+
 export interface ProjectItem {
    id: string
    title: string
    slug: string
    role: string
-   status: "published" | "draft"
+   status: ProjectStatus | "published" | "draft"
    featured: boolean
    logo?: string | null
    order: number
-   skills: {
-      id: string;
-      name: string;
-   }[];
+   skills: string[]
 }
 
-interface ProjectTableProps {
-   projects: ProjectItem[]
+export interface ProjectTableProps {
+   projects: ProjectItem[] | Promise<ProjectItem[]>
 }
 
 export default function ProjectTable({ projects }: ProjectTableProps) {
-   const [activeMessage, setActiveMessage] = React.useState<string | null>(null)
-
-   const handleToggleStatus = (id: string) => {
-
-   }
+   const [activeMessage, setActiveMessage] = useState<string | null>(null);
 
    const handleDelete = (id: string, title: string) => {
-      setTimeout(() => setActiveMessage(null), 3000)
-   }
+      toast.add({
+         title: "Project deleted",
+         description: "Project deleted successfully",
+         type: "success",
+      })
+   };
 
-   const columns = React.useMemo<ColumnDef<any, ProjectItem, any>[]>(
+   const columns = useMemo<ColumnDef<any, ProjectItem, unknown>[]>(
       () => [
-         // 1. Drag Handle Column
          createDragColumn<ProjectItem>(),
-
-         // 2. Project Title, Slug & Thumbnail
          {
             id: "project",
             header: "Project",
@@ -92,7 +91,6 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
             },
          },
 
-         // 3. Role
          {
             id: "role",
             header: "Role",
@@ -103,7 +101,6 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
             ),
          },
 
-         // 4. Skills Badges with Overflow
          {
             id: "skills",
             header: "Skills",
@@ -113,19 +110,36 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                const visibleSkills = skills.slice(0, maxVisible)
                const remainingCount = skills.length - maxVisible
                const remainingNames =
-                  remainingCount > 0 ? skills.slice(maxVisible).join(", ") : ""
+                  remainingCount > 0
+                     ? skills
+                        .slice(maxVisible)
+                        .map((s: any) => (typeof s === "string" ? s : s.name || s.skill?.name || ""))
+                        .filter(Boolean)
+                        .join(", ")
+                     : ""
 
                return (
                   <div className="flex flex-wrap items-center gap-1.5 max-w-72">
-                     {visibleSkills.map((skill) => (
-                        <Badge
-                           key={skill}
-                           variant="secondary"
-                           className="text-[11px] font-normal py-0 px-1.5 bg-muted/80 text-foreground/80 border-border/50 shrink-0"
-                        >
-                           {skill}
-                        </Badge>
-                     ))}
+                     {visibleSkills.map((skill: any, index) => {
+                        const name =
+                           typeof skill === "string"
+                              ? skill
+                              : skill.name || skill.skill?.name || ""
+                        const key =
+                           typeof skill === "string"
+                              ? skill
+                              : skill.id || skill.skillId || skill.skill?.id || index
+
+                        return (
+                           <Badge
+                              key={key}
+                              variant="secondary"
+                              className="text-[11px] font-normal py-0 px-1.5 bg-muted/80 text-foreground/80 border-border/50 shrink-0"
+                           >
+                              {name}
+                           </Badge>
+                        )
+                     })}
                      {remainingCount > 0 && (
                         <Badge
                            variant="outline"
@@ -140,34 +154,12 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
             },
          },
 
-         // 5. Interactive Status Pill
          {
             id: "status",
             header: "Status",
-            cell: ({ row }) => {
-               const p = row.original
-               const isPublished = p.status === "published"
-
-               return (
-                  <button
-                     type="button"
-                     onClick={() => handleToggleStatus(p.id)}
-                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${isPublished
-                        ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
-                        : "bg-muted text-muted-foreground hover:bg-muted/80"
-                        }`}
-                  >
-                     <span
-                        className={`h-2 w-2 rounded-full ${isPublished ? "bg-emerald-500" : "bg-muted-foreground"
-                           }`}
-                     />
-                     <span className="capitalize">{p.status}</span>
-                  </button>
-               )
-            },
+            cell: ({ row }) => <ProjectStatusBadge project={row.original} />,
          },
 
-         // 6. Actions
          {
             id: "actions",
             header: () => <div className="text-right">Actions</div>,
@@ -175,7 +167,7 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                const p = row.original
                return (
                   <div className="flex items-center justify-end gap-1">
-                     {p.status === "published" && (
+                     {p.status?.toLowerCase() === "published" && (
                         <a
                            href={`/projects/${p.slug}`}
                            target="_blank"
@@ -223,12 +215,15 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
             data={projects}
             reorderable={true}
             getRowId={(p) => p.id}
-            onReorder={(newItems, event) => {
-               setActiveMessage(
-                  `Reordered: moved "${event.movedItem.title}" from #${event.oldIndex + 1} to #${event.newIndex + 1}`
-               )
-               setTimeout(() => setActiveMessage(null), 3500)
+            onReorder={async (newItems) => {
+               const result = await reorderProjectsAction(newItems.map((p) => p.id))
+               toast.add({
+                  type: result.success ? "success" : "error",
+                  title: result.success ? "Success" : "Error",
+                  description: result.success ? "Projects reordered successfully" : result.error,
+               })
             }}
+
          />
       </div>
    )

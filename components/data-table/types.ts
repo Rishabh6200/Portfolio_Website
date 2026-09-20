@@ -13,7 +13,7 @@ export interface DataTableReorderEvent<TData> {
 
 export interface DataTableProps<TData extends RowData = Record<string, any>> {
   columns: ColumnDef<any, TData, any>[]
-  data: TData[]
+  data: TData[] | Promise<TData[]>
   getRowId?: (row: TData, index: number) => string
   reorderable?: boolean
   onReorder?: (

@@ -1,18 +1,78 @@
 "use client"
 
-import * as React from "react"
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core"
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import { useTable, FlexRender } from "@tanstack/react-table"
 import type { RowData } from "@tanstack/react-table"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
-import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import { DataTableRow } from "./data-table-row"
+import { DataTableSkeleton, DataTableSkeletonRows } from "./data-table-skeleton"
 import type { DataTableProps } from "./types"
+import { Suspense, use, useCallback, useEffect, useId, useMemo, useState } from "react"
+
+function isPromise<T>(value: any): value is Promise<T> {
+   return Boolean(value && typeof value.then === "function")
+}
 
 export function DataTable<TData extends RowData = Record<string, any>>({
+   data,
+   columns,
+   skeletonRowCount = 5,
+   className,
+   tableClassName,
+   headerClassName,
+   ...props
+}: DataTableProps<TData>) {
+   if (isPromise<TData[]>(data)) {
+      return (
+         <Suspense
+            fallback={
+               <DataTableSkeleton
+                  columns={columns}
+                  rowCount={skeletonRowCount}
+                  className={className}
+                  tableClassName={tableClassName}
+                  headerClassName={headerClassName}
+               />
+            }
+         >
+            <DataTableAsync
+               {...props}
+               dataPromise={data}
+               columns={columns}
+               skeletonRowCount={skeletonRowCount}
+               className={className}
+               tableClassName={tableClassName}
+               headerClassName={headerClassName}
+            />
+         </Suspense>
+      )
+   }
+
+   return (
+      <DataTableResolved
+         {...props}
+         data={data ?? []}
+         columns={columns}
+         skeletonRowCount={skeletonRowCount}
+         className={className}
+         tableClassName={tableClassName}
+         headerClassName={headerClassName}
+      />
+   )
+}
+
+function DataTableAsync<TData extends RowData = Record<string, any>>({
+   dataPromise,
+   ...props
+}: Omit<DataTableProps<TData>, "data"> & { dataPromise: Promise<TData[]> }) {
+   const resolvedData = use(dataPromise)
+   return <DataTableResolved {...props} data={resolvedData ?? []} />
+}
+
+function DataTableResolved<TData extends RowData = Record<string, any>>({
    columns,
    data,
    getRowId,
@@ -25,18 +85,18 @@ export function DataTable<TData extends RowData = Record<string, any>>({
    tableClassName,
    headerClassName,
    rowClassName,
-}: DataTableProps<TData>) {
-   const dndId = React.useId()
+}: Omit<DataTableProps<TData>, "data"> & { data: TData[] }) {
+   const dndId = useId()
    const isReorderEnabled = reorderable ?? Boolean(onReorder)
 
    // Local state for immediate smooth optimistic reordering
-   const [items, setItems] = React.useState<TData[]>(data)
+   const [items, setItems] = useState<TData[]>(data)
 
-   React.useEffect(() => {
+   useEffect(() => {
       setItems(data)
    }, [data])
 
-   const resolveRowId = React.useCallback(
+   const resolveRowId = useCallback(
       (row: TData, index: number): string => {
          if (getRowId) return getRowId(row, index)
          const record = row as Record<string, any>
@@ -45,7 +105,7 @@ export function DataTable<TData extends RowData = Record<string, any>>({
       [getRowId]
    )
 
-   const rowIds = React.useMemo(() => {
+   const rowIds = useMemo(() => {
       return items.map((item, index) => resolveRowId(item, index))
    }, [items, resolveRowId])
 
@@ -113,15 +173,7 @@ export function DataTable<TData extends RowData = Record<string, any>>({
 
    const renderContent = () => {
       if (isLoading) {
-         return Array.from({ length: skeletonRowCount }).map((_, rIndex) => (
-            <TableRow key={`skeleton-row-${rIndex}`}>
-               {Array.from({ length: columnCount }).map((_, cIndex) => (
-                  <TableCell key={`skeleton-cell-${rIndex}-${cIndex}`} className="py-3 px-4">
-                     <Skeleton className="h-5 w-full max-w-30" />
-                  </TableCell>
-               ))}
-            </TableRow>
-         ))
+         return <DataTableSkeletonRows columns={columns} rowCount={skeletonRowCount} />
       }
 
       if (rows.length === 0) {

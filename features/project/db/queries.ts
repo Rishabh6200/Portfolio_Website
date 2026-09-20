@@ -52,10 +52,17 @@ class ProjectQueries {
             "order",
             "logo"
          )
-         .include("skills")
+         .include("skills", (projectSkill) =>
+            projectSkill.include("skill", (s) => s.select("name"))
+         )
          .all();
 
-      return data;
+      return data.map((project) => ({
+         ...project,
+         skills: project.skills.flatMap((ps) =>
+            ps.skill ? [ps.skill.name] : []
+         ),
+      }));
    }
 }
 

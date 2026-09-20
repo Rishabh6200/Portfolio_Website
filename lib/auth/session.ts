@@ -124,3 +124,11 @@ export async function clearSessionCookie(): Promise<void> {
       path: "/",
    })
 }
+
+export async function isAdminAuthenticated(): Promise<boolean> {
+   const cookieStore = await cookies()
+   const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME)
+   if (!sessionCookie?.value) return false
+
+   return verifySessionToken(sessionCookie.value)
+}
