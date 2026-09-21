@@ -18,7 +18,7 @@ const FormSkeleton: FC<FormSkeletonProps> = ({ isEditing = false }) => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-border">
                <div className="flex items-center gap-3">
                   <Skeleton className="h-8 w-36 rounded-md" />
-                  <Separator orientation="vertical" className="h-4" />
+                  <Separator orientation="vertical" className="h-4 my-auto data-vertical:self-center" />
                   <Skeleton className="h-6 w-32 rounded-md" />
                </div>
                <div className="flex items-center gap-2.5">

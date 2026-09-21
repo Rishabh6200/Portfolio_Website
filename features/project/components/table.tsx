@@ -11,7 +11,7 @@ import Image from "next/image"
 import { ProjectStatus } from "@/prisma/db"
 import { toast } from "@/components/ui/toast"
 import { reorderProjectsAction } from "../actions"
-import { useMemo, useState } from "react"
+import { useMemo } from "react"
 import { ProjectStatusBadge } from "./status-badge"
 
 export interface ProjectItem {
@@ -31,8 +31,6 @@ export interface ProjectTableProps {
 }
 
 export default function ProjectTable({ projects }: ProjectTableProps) {
-   const [activeMessage, setActiveMessage] = useState<string | null>(null);
-
    const handleDelete = (id: string, title: string) => {
       toast.add({
          title: "Project deleted",
@@ -204,12 +202,6 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
 
    return (
       <div className="space-y-3">
-         {activeMessage && (
-            <div className="text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-lg inline-block">
-               {activeMessage}
-            </div>
-         )}
-
          <DataTable<ProjectItem>
             columns={columns}
             data={projects}

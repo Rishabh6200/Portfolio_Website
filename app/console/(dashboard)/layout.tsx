@@ -1,6 +1,5 @@
 import AdminSidebar from "@/components/layout/admin/sidebar"
 import AdminTopbar from "@/components/layout/admin/topbar"
-import { FolderGit2, Layers, Sparkles, Briefcase, GraduationCap, UserCircle } from "lucide-react"
 
 export default function AdminLayout({
   children,

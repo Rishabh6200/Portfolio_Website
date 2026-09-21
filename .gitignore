@@ -5,3 +5,4 @@ dist/
 /.alchemy
 /.prisma-composer
 *.tsbuildinfo
+.DS_Store
