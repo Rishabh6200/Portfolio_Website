@@ -141,13 +141,32 @@ export default function CategoryTable({ categories }: CategoryTableProps) {
                reorderable={true}
                getRowId={(p) => p.id}
                onReorder={async (newItems) => {
-                  startTransition(async () => {
-                     const result = await reorderCategoriesAction(newItems.map((c) => c.id))
-                     toast.add({
-                        type: result.success ? "success" : "error",
-                        title: result.success ? "Success" : "Error",
-                        description: result.success ? "Categories reordered successfully" : result.error,
-                     })
+                  const reorderPromise = new Promise<{ name: string }>(
+                     async (resolve, reject) => {
+                        try {
+                           const result = await reorderCategoriesAction(
+                              newItems.map((c) => c.id)
+                           )
+                           if (!result.success) {
+                              reject(
+                                 new Error(result.error || "Failed to update category order")
+                              )
+                           } else {
+                              resolve({ name: "Category order" })
+                           }
+                        } catch (err) {
+                           reject(err)
+                        }
+                     }
+                  )
+
+                  toast.promise(reorderPromise, {
+                     loading: "Updating category order…",
+                     success: (data) => `${data.name} updated.`,
+                     error: (err) =>
+                        err instanceof Error
+                           ? err.message
+                           : "Could not update category order.",
                   })
                }}
             />

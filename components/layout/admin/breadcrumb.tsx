@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import { FC } from "react";
-import { NavItem, navItems } from "./nav-config";
+import { navItems } from "./nav-config";
 
 // Default user-friendly labels for common admin routes
 const ROUTE_LABELS: Record<string, string> = {
@@ -38,12 +38,13 @@ function getEntitySingular(segment: string): string {
   return clean.replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-// Check if a URL segment is a dynamic identifier (MongoDB ObjectId, UUID, or numeric ID)
+// Check if a URL segment is a dynamic identifier (MongoDB ObjectId, UUID, Cuid, or numeric ID)
 function isDynamicIdentifier(segment: string): boolean {
   const isMongoId = /^[0-9a-fA-F]{24}$/.test(segment);
   const isUuid = /^[0-9a-fA-F-]{36}$/.test(segment);
+  const isCuid = /^c[a-z0-9]{20,32}$/i.test(segment);
   const isNumeric = /^\d+$/.test(segment);
-  return isMongoId || isUuid || isNumeric;
+  return isMongoId || isUuid || isCuid || isNumeric;
 }
 
 interface AdminBreadcrumbProps {
