@@ -96,6 +96,9 @@ importers:
         specifier: ^4.6.5
         version: 4.6.5
     devDependencies:
+      '@prisma/studio':
+        specifier: ^0.511.0
+        version: 0.511.0
       '@types/node':
         specifier: ^25.6.2
         version: 25.9.7
@@ -1669,6 +1672,9 @@ packages:
 
   '@prisma/query-plan-executor@7.2.0':
     resolution: {integrity: sha512-EOZmNzcV8uJ0mae3DhTsiHgoNCuu1J9mULQpGCh62zN3PxPTd+qI9tJvk5jOst8WHKQNwJWR3b39t0XvfBB0WQ==}
+
+  '@prisma/studio@0.511.0':
+    resolution: {integrity: sha512-JflDAbdF/meO72w05AJXk397G+vUVs+5fAVfJlXGs43Fuc6VhMWNOTwEMLHkZ5hsFHTDu3OqRc2NhhxKYwvNvA==}
 
   '@puppeteer/browsers@3.2.2':
     resolution: {integrity: sha512-q2BU4YfO9h/Wt7IcWPcggpOOqLk2Tbs1hDwolvKZrweRjy751OJBKMN9zO5bfD0pzU7X/tvKw/exQds4pM/LOg==}
@@ -7035,6 +7041,8 @@ snapshots:
       - typanion
 
   '@prisma/query-plan-executor@7.2.0': {}
+
+  '@prisma/studio@0.511.0': {}
 
   '@puppeteer/browsers@3.2.2(yauzl@3.4.0)':
     dependencies:

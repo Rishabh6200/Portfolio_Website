@@ -254,6 +254,7 @@ function DataTableResolved<TData extends RowData = Record<string, any>>({
                            colSpan={header.colSpan}
                            style={{
                               width: header.getSize ? header.getSize() : undefined,
+                              minWidth: header.getSize ? header.getSize() : undefined,
                            }}
                            className="py-3 px-4 font-semibold text-xs text-muted-foreground uppercase tracking-wider"
                         >

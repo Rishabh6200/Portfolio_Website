@@ -49,6 +49,7 @@
 }
 
 :root {
+    color-scheme: light;
     --background: #f8fafc;
     --foreground: #090a0f;
     --card: #ffffff;
@@ -84,6 +85,7 @@
 }
 
 .dark {
+    color-scheme: dark;
     --background: #07090e;
     --foreground: #f8fafc;
     --card: #0d111a;
@@ -123,13 +125,13 @@
     box-sizing: border-box;
   }
   html {
-    @apply font-sans;
+    @apply font-sans bg-background text-foreground;
   }
   html[data-scroll-behavior="smooth"] {
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased min-h-screen;
     overflow-x: hidden;
   }
   button:not(:disabled), [role="button"]:not(:disabled) {

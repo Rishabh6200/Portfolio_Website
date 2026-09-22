@@ -72,6 +72,7 @@ export default function SkillTable({ skills, activeCategoryId }: SkillTableProps
          {
             id: "name",
             header: "Skill / Technology",
+            size: 260,
             cell: ({ row }) => (
                <div className="flex items-center gap-2.5">
                   <Link
@@ -88,11 +89,11 @@ export default function SkillTable({ skills, activeCategoryId }: SkillTableProps
                   )}
                </div>
             ),
-            
          },
          {
             id: "category",
             header: "Category",
+            size: 200,
             cell: ({ row }) => {
                const cat = row.original.category;
                if (!cat) {
@@ -114,6 +115,7 @@ export default function SkillTable({ skills, activeCategoryId }: SkillTableProps
          {
             id: "level",
             header: "Proficiency",
+            size: 180,
             cell: ({ row }) => {
                const currentLevel = row.original.level;
                const isRowUpdating = updatingSkillId === row.original.id;
@@ -195,15 +197,17 @@ export default function SkillTable({ skills, activeCategoryId }: SkillTableProps
          {
             id: "order",
             header: "Order",
+            size: 90,
             cell: ({ row }) => (
                <Badge variant="outline" className="font-mono text-xs">
-                  #{row.original.order}
+                  #{row.original.order + 1}
                </Badge>
             ),
          },
          {
             id: "actions",
             header: () => <div className="text-right">Actions</div>,
+            size: 100,
             cell: ({ row }) => (
                <div className="flex items-center justify-end gap-1.5">
                   <Link

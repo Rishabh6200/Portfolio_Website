@@ -19,6 +19,22 @@ interface SkillTabsProps {
    activeCategoryId: string;
 }
 
+function hexToRgba(hex?: string, alpha = 0.2): string | undefined {
+   if (!hex || !hex.startsWith("#")) return undefined;
+   let clean = hex.slice(1);
+   if (clean.length === 3) {
+      clean = clean
+         .split("")
+         .map((c) => c + c)
+         .join("");
+   }
+   if (clean.length !== 6) return undefined;
+   const r = parseInt(clean.substring(0, 2), 16);
+   const g = parseInt(clean.substring(2, 4), 16);
+   const b = parseInt(clean.substring(4, 6), 16);
+   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 export function SkillTabs({
    categories,
    counts,
@@ -68,22 +84,49 @@ export function SkillTabs({
                      <TabsTrigger
                         key={cat.id}
                         value={cat.id}
-                        className="cursor-pointer gap-2 px-3 text-xs sm:text-sm font-medium"
+                        className="group/tab cursor-pointer gap-2 px-3 text-xs sm:text-sm font-medium select-none"
                      >
                         {cat.color && (
                            <span
-                              className="size-2 rounded-full shrink-0"
-                              style={{ backgroundColor: cat.color }}
+                              className={cn(
+                                 "size-2 rounded-full shrink-0 transition-all duration-200",
+                                 isActive
+                                    ? "scale-110 opacity-100"
+                                    : "opacity-40 group-hover/tab:opacity-75 group-hover/tab:scale-105"
+                              )}
+                              style={{
+                                 backgroundColor: cat.color,
+                                 ...(isActive && {
+                                    boxShadow: `0 0 0 2.5px ${hexToRgba(cat.color, 0.25)}, 0 0 8px ${hexToRgba(cat.color, 0.4)}`,
+                                 }),
+                              }}
                            />
                         )}
-                        <span>{cat.name}</span>
                         <span
                            className={cn(
-                              "text-[11px] font-mono px-1.5 py-0.2 rounded-full transition-colors",
+                              "transition-colors duration-150",
                               isActive
-                                 ? "bg-foreground/10 text-foreground font-medium"
-                                 : "bg-muted-foreground/10 text-muted-foreground"
+                                 ? "text-foreground font-semibold"
+                                 : "text-muted-foreground group-hover/tab:text-foreground"
                            )}
+                        >
+                           {cat.name}
+                        </span>
+                        <span
+                           className={cn(
+                              "h-4.5 min-w-4.5 px-1.5 inline-flex items-center justify-center rounded-full text-[11px] font-mono leading-none transition-all duration-150",
+                              isActive
+                                 ? "font-semibold text-foreground"
+                                 : "bg-muted-foreground/10 text-muted-foreground/80 group-hover/tab:text-muted-foreground group-hover/tab:bg-muted-foreground/15"
+                           )}
+                           style={
+                              isActive && cat.color
+                                 ? {
+                                      backgroundColor: hexToRgba(cat.color, 0.14),
+                                      boxShadow: `inset 0 0 0 1px ${hexToRgba(cat.color, 0.28)}`,
+                                   }
+                                 : undefined
+                           }
                         >
                            {count}
                         </span>

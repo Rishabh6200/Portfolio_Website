@@ -92,6 +92,7 @@ export function DataTableRow<TData extends RowData = Record<string, any>>({
             key={cell.id}
             style={{
               width: cell.column?.getSize ? cell.column.getSize() : undefined,
+              minWidth: cell.column?.getSize ? cell.column.getSize() : undefined,
             }}
           >
             <FlexRender cell={cell} />

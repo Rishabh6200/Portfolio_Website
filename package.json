@@ -11,7 +11,7 @@
     "db:seed": "node --env-file=.env --experimental-strip-types prisma/seed.ts",
     "db:update": "prisma db update",
     "db:verify": "prisma db verify",
-    "dev": "NODE_OPTIONS='--max-old-space-size=2048' next dev",
+    "dev": "next dev",
     "lint": "eslint",
     "migrate": "prisma db migrate --advance-ref db",
     "migration:plan": "prisma migration plan",
@@ -50,6 +50,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@prisma/studio": "^0.511.0",
     "@types/node": "^25.6.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
