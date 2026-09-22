@@ -1,7 +1,10 @@
 import AdminPageHeader from '@/components/admin/common/admin-page-header';
 import ProjectForm from '@/features/project/components/form';
+import { skillQueries } from '@/features/skills/db/queries';
 
-const Page = () => {
+const Page = async () => {
+   const availableSkills = await skillQueries.getSkills();
+
    return (
       <>
          <AdminPageHeader
@@ -10,7 +13,7 @@ const Page = () => {
          />
 
          <div className="mt-4">
-            <ProjectForm />
+            <ProjectForm availableSkills={availableSkills} />
          </div>
       </>
    )

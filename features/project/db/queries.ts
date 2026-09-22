@@ -64,6 +64,22 @@ class ProjectQueries {
          ),
       }));
    }
+
+   async getProjectById(id: string) {
+      const project = await db.orm.public.Project
+         .where({ id })
+         .include("skills", (projectSkill) =>
+            projectSkill.include("skill", (s) => s.select("id", "name"))
+         )
+         .first();
+
+      if (!project) return null;
+
+      return {
+         ...project,
+         skills: project.skills.map((ps) => ps.skillId),
+      };
+   }
 }
 
 export const projectQueries = new ProjectQueries();

@@ -3,6 +3,160 @@
 import { revalidatePath } from "next/cache"
 import { isAdminAuthenticated } from "@/lib/auth/session"
 import { db } from "@/prisma/db"
+import { projectSchema, type ProjectFormValues } from "./schema"
+
+export async function createProjectAction(data: ProjectFormValues) {
+    try {
+        if (!(await isAdminAuthenticated())) {
+            return { success: false, error: "Unauthorized. Please log in to perform this action." }
+        }
+
+        const parsed = projectSchema.safeParse(data)
+        if (!parsed.success) {
+            return {
+                success: false,
+                error: parsed.error.issues[0]?.message || "Invalid project data",
+            }
+        }
+
+        const cleanSlug = data.slug.trim().toLowerCase()
+
+        // Check if slug already exists
+        const existingSlug = await db.orm.public.Project
+            .where({ slug: cleanSlug })
+            .select("id")
+            .first()
+
+        if (existingSlug) {
+            return {
+                success: false,
+                error: `A project with the URL slug "/projects/${cleanSlug}" already exists. Please choose a different slug.`,
+            }
+        }
+
+        // Get next order
+        const lastProject = await db.orm.public.Project
+            .orderBy((p) => p.order.desc())
+            .select("order")
+            .first()
+
+        const nextOrder = (lastProject?.order ?? -1) + 1
+
+        const project = await db.orm.public.Project.create({
+            title: data.title.trim(),
+            slug: cleanSlug,
+            tagline: data.tagline.trim(),
+            description: data.description.trim(),
+            role: data.role.trim(),
+            logo: data.logo || "",
+            images: data.images || [],
+            liveUrl: data.liveUrl || "",
+            githubUrl: data.githubUrl || "",
+            featured: Boolean(data.featured),
+            status: data.status === "published" ? "PUBLISHED" : "DRAFT",
+            order: nextOrder,
+        })
+
+        // Insert selected skills
+        if (data.skillIds && data.skillIds.length > 0) {
+            for (const skillId of data.skillIds) {
+                await db.orm.public.ProjectSkill.create({
+                    projectId: project.id,
+                    skillId: skillId,
+                })
+            }
+        }
+
+        revalidatePath("/console/projects")
+        revalidatePath("/projects")
+        revalidatePath("/")
+
+        return { success: true, project }
+    } catch (err: unknown) {
+        console.error("Error in createProjectAction:", err)
+        const message = err instanceof Error ? err.message : "Failed to create project"
+        return { success: false, error: message }
+    }
+}
+
+export async function updateProjectAction(id: string, data: ProjectFormValues) {
+    try {
+        if (!(await isAdminAuthenticated())) {
+            return { success: false, error: "Unauthorized. Please log in to perform this action." }
+        }
+
+        const parsed = projectSchema.safeParse(data)
+        if (!parsed.success) {
+            return {
+                success: false,
+                error: parsed.error.issues[0]?.message || "Invalid project data",
+            }
+        }
+
+        const existingProject = await db.orm.public.Project
+            .where({ id })
+            .first()
+
+        if (!existingProject) {
+            return { success: false, error: "Project not found." }
+        }
+
+        const cleanSlug = data.slug.trim().toLowerCase()
+
+        // Check if slug already exists for another project
+        const slugMatch = await db.orm.public.Project
+            .where({ slug: cleanSlug })
+            .select("id")
+            .first()
+
+        if (slugMatch && slugMatch.id !== id) {
+            return {
+                success: false,
+                error: `A project with the URL slug "/projects/${cleanSlug}" already exists. Please choose a different slug.`,
+            }
+        }
+
+        const updated = await db.orm.public.Project
+            .where({ id })
+            .update({
+                title: data.title.trim(),
+                slug: cleanSlug,
+                tagline: data.tagline.trim(),
+                description: data.description.trim(),
+                role: data.role.trim(),
+                logo: data.logo || "",
+                images: data.images || [],
+                liveUrl: data.liveUrl || "",
+                githubUrl: data.githubUrl || "",
+                featured: Boolean(data.featured),
+                status: data.status === "published" ? "PUBLISHED" : "DRAFT",
+            })
+
+        // Sync skills
+        await db.orm.public.ProjectSkill
+            .where({ projectId: id })
+            .delete()
+
+        if (data.skillIds && data.skillIds.length > 0) {
+            for (const skillId of data.skillIds) {
+                await db.orm.public.ProjectSkill.create({
+                    projectId: id,
+                    skillId: skillId,
+                })
+            }
+        }
+
+        revalidatePath("/console/projects")
+        revalidatePath("/projects")
+        revalidatePath("/")
+
+        return { success: true, project: updated }
+    } catch (err: unknown) {
+        console.error("Error in updateProjectAction:", err)
+        const message = err instanceof Error ? err.message : "Failed to update project"
+        return { success: false, error: message }
+    }
+}
 
 export async function toggleProjectStatusAction(id: string, _currentStatus?: "published" | "draft") {
     try {
@@ -40,7 +194,6 @@ export async function toggleProjectStatusAction(id: string, _currentStatus?: "pu
         return { success: false, error: message }
     }
 }
-
 
 export async function reorderProjectsAction(projectIds: string[]) {
     try {
