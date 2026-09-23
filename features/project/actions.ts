@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache"
 import { isAdminAuthenticated } from "@/lib/auth/session"
 import { db } from "@/prisma/db"
+import { storage } from "@/lib/s3"
+import { ENV } from "@/config/env"
 import { projectSchema, type ProjectFormValues } from "./schema"
 
 export async function createProjectAction(data: ProjectFormValues) {
@@ -59,7 +61,8 @@ export async function createProjectAction(data: ProjectFormValues) {
 
         // Insert selected skills
         if (data.skillIds && data.skillIds.length > 0) {
-            for (const skillId of data.skillIds) {
+            const uniqueSkillIds = Array.from(new Set(data.skillIds))
+            for (const skillId of uniqueSkillIds) {
                 await db.orm.public.ProjectSkill.create({
                     projectId: project.id,
                     skillId: skillId,
@@ -116,6 +119,33 @@ export async function updateProjectAction(id: string, data: ProjectFormValues) {
             }
         }
 
+        // Clean up replaced or removed S3 assets
+        try {
+            const oldLogoKey = existingProject.logo
+            const newLogoKey = data.logo
+
+            // If the logo was changed or removed, delete the old logo from S3
+            if (oldLogoKey && oldLogoKey !== newLogoKey) {
+                await storage.delete(oldLogoKey)
+            }
+
+            // If any gallery images were removed or replaced, delete them from S3
+            if (Array.isArray(existingProject.images) && existingProject.images.length > 0) {
+                const currentImageKeys = new Set(
+                    (Array.isArray(data.images) ? data.images : [])
+                        .filter((k): k is string => Boolean(k))
+                )
+
+                for (const oldImg of existingProject.images) {
+                    if (oldImg && !currentImageKeys.has(oldImg)) {
+                        await storage.delete(oldImg)
+                    }
+                }
+            }
+        } catch (s3Err) {
+            console.error("Non-fatal error cleaning up old S3 assets in updateProjectAction:", s3Err)
+        }
+
         const updated = await db.orm.public.Project
             .where({ id })
             .update({
@@ -135,10 +165,11 @@ export async function updateProjectAction(id: string, data: ProjectFormValues) {
         // Sync skills
         await db.orm.public.ProjectSkill
             .where({ projectId: id })
-            .delete()
+            .deleteAll()
 
         if (data.skillIds && data.skillIds.length > 0) {
-            for (const skillId of data.skillIds) {
+            const uniqueSkillIds = Array.from(new Set(data.skillIds))
+            for (const skillId of uniqueSkillIds) {
                 await db.orm.public.ProjectSkill.create({
                     projectId: id,
                     skillId: skillId,
@@ -158,7 +189,7 @@ export async function updateProjectAction(id: string, data: ProjectFormValues) {
     }
 }
 
-export async function toggleProjectStatusAction(id: string, _currentStatus?: "published" | "draft") {
+export async function toggleProjectStatusAction(id: string) {
     try {
         if (!(await isAdminAuthenticated())) {
             return { success: false, error: "Unauthorized. Please log in to perform this action." }
@@ -223,5 +254,48 @@ export async function reorderProjectsAction(projectIds: string[]) {
             success: false,
             error: error instanceof Error ? error.message : "Failed to reorder projects",
         }
+    }
+}
+
+export async function deleteProjectAction(id: string) {
+    try {
+        if (!(await isAdminAuthenticated())) {
+            return { success: false, error: "Unauthorized. Please log in to perform this action." }
+        }
+
+        const project = await db.orm.public.Project.where({ id }).first()
+        if (!project) {
+            return { success: false, error: "Project not found." }
+        }
+
+        // Clean up S3 assets if any
+        try {
+            const logoKey = project.logo
+            if (logoKey) {
+                await storage.delete(logoKey)
+            }
+            if (Array.isArray(project.images)) {
+                for (const img of project.images) {
+                    await storage.delete(img)
+                }
+            }
+        } catch (s3Err) {
+            console.error("Non-fatal error deleting S3 assets for project:", s3Err)
+        }
+
+        // Clean up project skill relations first
+        await db.orm.public.ProjectSkill.where({ projectId: id }).deleteAll()
+
+        await db.orm.public.Project.where({ id }).delete()
+
+        revalidatePath("/console/projects")
+        revalidatePath("/projects")
+        revalidatePath("/")
+
+        return { success: true }
+    } catch (err: unknown) {
+        console.error("Error in deleteProjectAction:", err)
+        const message = err instanceof Error ? err.message : "Failed to delete project"
+        return { success: false, error: message }
     }
 }

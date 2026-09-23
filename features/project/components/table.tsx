@@ -7,12 +7,14 @@ import { DataTable, createDragColumn } from "@/components/data-table"
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import Image from "next/image"
+import { getMediaUrl } from "@/lib/utils"
 
 import { ProjectStatus } from "@/prisma/db"
 import { toast } from "@/components/ui/toast"
-import { reorderProjectsAction } from "../actions"
-import { useMemo } from "react"
+import { reorderProjectsAction, deleteProjectAction } from "../actions"
+import { useMemo, useState, useTransition } from "react"
 import { ProjectStatusBadge } from "./status-badge"
+import ConfirmDialog from "@/components/dialogs/confirm-dialog"
 
 export interface ProjectItem {
    id: string
@@ -31,14 +33,40 @@ export interface ProjectTableProps {
 }
 
 export default function ProjectTable({ projects }: ProjectTableProps) {
-   const handleDelete = (id: string, title: string) => {
-      toast.add({
-         title: "Project deleted",
-         description: "Project deleted successfully",
-         type: "success",
-      })
-   };
+   const [deleteTarget, setDeleteTarget] = useState<ProjectItem | null>(null)
+   const [isPending, startTransition] = useTransition()
 
+   const handleConfirmDelete = () => {
+      if (!deleteTarget) return
+      startTransition(async () => {
+         try {
+            const result = await deleteProjectAction(deleteTarget.id)
+            if (result.success) {
+               toast.add({
+                  type: "success",
+                  title: "Project deleted",
+                  description: `"${deleteTarget.title}" was deleted successfully.`,
+               })
+               setDeleteTarget(null)
+            } else {
+               toast.add({
+                  type: "error",
+                  title: "Delete failed",
+                  description: result.error || "Could not delete project.",
+               })
+            }
+         } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "Failed to delete project"
+            toast.add({
+               type: "error",
+               title: "Delete failed",
+               description: message,
+            })
+         }
+      })
+   }
+
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
    const columns = useMemo<ColumnDef<any, ProjectItem, unknown>[]>(
       () => [
          createDragColumn<ProjectItem>(),
@@ -52,7 +80,7 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                      <div className="h-10 w-10 rounded-lg border border-border bg-muted/60 shrink-0 overflow-hidden flex items-center justify-center p-1">
                         {p.logo ? (
                            <Image
-                              src={p.logo}
+                              src={getMediaUrl(p.logo)}
                               alt={p.title}
                               width={40}
                               height={40}
@@ -75,13 +103,13 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                                  variant="secondary"
                                  className="gap-1 text-[11px] py-0 px-1.5 text-amber-500 bg-amber-500/10 border-amber-500/20"
                               >
-                                 <Sparkles className="h-3 w-3" />
+                                 <Sparkles className="size-2.5" />
                                  <span>Featured</span>
                               </Badge>
                            )}
                         </div>
                         <p className="text-xs font-mono text-muted-foreground truncate max-w-xs sm:max-w-sm mt-0.5">
-                           /projects/{p.slug}
+                           /{p.slug}
                         </p>
                      </div>
                   </div>
@@ -91,6 +119,7 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
 
          {
             id: "role",
+            accessorKey: "role",
             header: "Role",
             cell: ({ row }) => (
                <span className="text-xs font-medium text-muted-foreground">
@@ -103,7 +132,8 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
             id: "skills",
             header: "Skills",
             cell: ({ row }) => {
-               const skills = row.original.skills || []
+               type SkillEntry = string | { id?: string; skillId?: string; name?: string; skill?: { id?: string; name?: string } }
+               const skills = (row.original.skills || []) as unknown as SkillEntry[]
                const maxVisible = 4
                const visibleSkills = skills.slice(0, maxVisible)
                const remainingCount = skills.length - maxVisible
@@ -111,14 +141,14 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                   remainingCount > 0
                      ? skills
                         .slice(maxVisible)
-                        .map((s: any) => (typeof s === "string" ? s : s.name || s.skill?.name || ""))
+                        .map((s) => (typeof s === "string" ? s : s.name || s.skill?.name || ""))
                         .filter(Boolean)
                         .join(", ")
                      : ""
 
                return (
                   <div className="flex flex-wrap items-center gap-1.5 max-w-72">
-                     {visibleSkills.map((skill: any, index) => {
+                     {visibleSkills.map((skill, index) => {
                         const name =
                            typeof skill === "string"
                               ? skill
@@ -186,7 +216,7 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                      <Button
                         variant="ghost"
                         size="icon-sm"
-                        onClick={() => handleDelete(p.id, p.title)}
+                        onClick={() => setDeleteTarget(p)}
                         className="hover:text-destructive hover:bg-destructive/10 cursor-pointer"
                         title="Delete Project"
                      >
@@ -207,15 +237,55 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
             data={projects}
             reorderable={true}
             getRowId={(p) => p.id}
-            onReorder={async (newItems) => {
-               const result = await reorderProjectsAction(newItems.map((p) => p.id))
-               toast.add({
-                  type: result.success ? "success" : "error",
-                  title: result.success ? "Success" : "Error",
-                  description: result.success ? "Projects reordered successfully" : result.error,
-               })
-            }}
+            onReorder={async (newItems, event) => {
+               const movedTitle = event?.movedItem?.title
+               const newPosition = (event?.newIndex ?? 0) + 1
 
+               const reorderPromise = new Promise<{ name: string }>(
+                  async (resolve, reject) => {
+                     try {
+                        const result = await reorderProjectsAction(
+                           newItems.map((p) => p.id)
+                        )
+                        if (!result.success) {
+                           reject(
+                              new Error(result.error || "Failed to update project order")
+                           )
+                        } else {
+                           resolve({
+                              name: movedTitle
+                                 ? `"${movedTitle}" moved to position #${newPosition}`
+                                 : "Project order",
+                           })
+                        }
+                     } catch (err) {
+                        reject(err)
+                     }
+                  }
+               )
+
+               toast.promise(reorderPromise, {
+                  loading: movedTitle ? `Reordering "${movedTitle}"…` : "Updating project order…",
+                  success: (data) => `${data.name} updated.`,
+                  error: (err) =>
+                     err instanceof Error
+                        ? err.message
+                        : "Could not update project order.",
+               })
+
+               await reorderPromise
+            }}
+         />
+
+         <ConfirmDialog
+            open={Boolean(deleteTarget)}
+            onOpenChange={(open) => !open && setDeleteTarget(null)}
+            title="Delete Project"
+            itemName={deleteTarget?.title}
+            variant="destructive"
+            confirmText="Delete"
+            isPending={isPending}
+            onConfirm={handleConfirmDelete}
          />
       </div>
    )

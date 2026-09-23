@@ -13,9 +13,10 @@ export const ENV = {
    AUTH_SECRET: process.env.AUTH_SECRET!,
    ADMIN_TOTP_SECRET: process.env.ADMIN_TOTP_SECRET!,
 
-   S3_ENDPOINT_URL_S3: process.env.S3_ENDPOINT_URL_S3!,
+   S3_ENDPOINT: process.env.S3_ENDPOINT!,
    S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID!,
    S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY!,
    S3_REGION: process.env.S3_REGION!,
    S3_BUCKET: process.env.S3_BUCKET!,
+   NEXT_PUBLIC_S3_URL: process.env.NEXT_PUBLIC_S3_URL!,
 };

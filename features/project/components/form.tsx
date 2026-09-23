@@ -1,11 +1,11 @@
 "use client";
 
-import { FC, useState } from 'react'
+import { FC, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from '@bprogress/next/app'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, Globe, Loader2, Save, Sparkles, FolderGit2, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Globe, Loader2, Save, Sparkles, FolderGit2, RefreshCw, Trash2 } from 'lucide-react'
 
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -26,8 +26,9 @@ import {
 import SkillSelector, { SkillSelectorItem } from '@/components/common/skill-selector'
 import LogoUploader from '@/features/project/components/logo-uploader'
 import GalleryUploader from '@/features/project/components/gallery-uploader'
+import ConfirmDialog from '@/components/dialogs/confirm-dialog'
 import { projectSchema, type ProjectFormValues } from '../schema'
-import { createProjectAction, updateProjectAction } from '../actions'
+import { createProjectAction, updateProjectAction, deleteProjectAction } from '../actions'
 
 const STATUS_OPTIONS = [
    { value: "published", label: "Published (Visible on site)" },
@@ -72,12 +73,21 @@ const ProjectForm: FC<ProjectFormProps> = ({
 }) => {
    const router = useRouter()
    const [isAutoSlug, setIsAutoSlug] = useState(!initialData?.slug)
+   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+   const [isDeleting, startDeleteTransition] = useTransition()
 
    // Extract initial skill IDs
    const initialSkillIds: string[] = (() => {
       if (!initialData?.skills || !Array.isArray(initialData.skills)) return []
       return initialData.skills
-         .map((s: any) => (typeof s === "string" ? s : s?.skillId || s?.id))
+         .map((s: unknown) => {
+            if (typeof s === "string") return s
+            if (s && typeof s === "object") {
+               const obj = s as { skillId?: string; id?: string }
+               return obj.skillId || obj.id
+            }
+            return undefined
+         })
          .filter((id): id is string => typeof id === "string")
    })()
 
@@ -101,6 +111,17 @@ const ProjectForm: FC<ProjectFormProps> = ({
 
    const { isSubmitting } = form.formState
    const watchedTitle = form.watch("title")
+   const watchedSlug = form.watch("slug")
+   const activeSlug = watchedSlug?.trim() || generateSlug(watchedTitle || "")
+
+   const handleRequireTitle = () => {
+      toast.add({
+         type: "warning",
+         title: "Project Title Required",
+         description: "Please enter a project title before uploading media.",
+      })
+      form.setFocus("title")
+   }
 
    // Handle title input with auto-slug sync
    const handleTitleChange = (newTitle: string) => {
@@ -119,6 +140,40 @@ const ProjectForm: FC<ProjectFormProps> = ({
       const currentTitle = form.getValues("title")
       form.setValue("slug", generateSlug(currentTitle), { shouldValidate: true })
       setIsAutoSlug(true)
+   }
+
+   const handleDeleteProject = () => {
+      const projectId = initialData?.id
+      if (!projectId) return
+
+      startDeleteTransition(async () => {
+         try {
+            const result = await deleteProjectAction(projectId)
+            if (result.success) {
+               setShowDeleteDialog(false)
+               toast.add({
+                  type: "success",
+                  title: "Project deleted",
+                  description: `"${initialData.title || "Project"}" was deleted successfully.`,
+               })
+               router.push("/console/projects")
+               router.refresh()
+            } else {
+               toast.add({
+                  type: "error",
+                  title: "Delete failed",
+                  description: result.error || "Could not delete project.",
+               })
+            }
+         } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "Failed to delete project"
+            toast.add({
+               type: "error",
+               title: "Delete failed",
+               description: message,
+            })
+         }
+      })
    }
 
    const onSubmit = async (values: ProjectFormValues) => {
@@ -173,13 +228,7 @@ const ProjectForm: FC<ProjectFormProps> = ({
                </div>
 
                <div className="flex items-center gap-2.5">
-                  <Link
-                     href="/console/projects"
-                     className={buttonVariants({ variant: "outline", size: "sm" })}
-                  >
-                     Cancel
-                  </Link>
-                  <Button type="submit" size="sm" disabled={isSubmitting} className="gap-2 cursor-pointer">
+                  <Button type="submit" size="sm" disabled={isSubmitting || isDeleting} className="gap-2 cursor-pointer">
                      {isSubmitting ? (
                         <>
                            <Loader2 className="h-4 w-4 animate-spin" />
@@ -220,6 +269,8 @@ const ProjectForm: FC<ProjectFormProps> = ({
                                     value={field.value}
                                     onChange={field.onChange}
                                     disabled={isSubmitting}
+                                    projectSlug={activeSlug}
+                                    onRequireTitle={handleRequireTitle}
                                     className="w-full h-full"
                                  />
                               </div>
@@ -497,6 +548,8 @@ const ProjectForm: FC<ProjectFormProps> = ({
                               name="images"
                               maxImages={10}
                               disabled={isSubmitting}
+                              projectSlug={activeSlug}
+                              onRequireTitle={handleRequireTitle}
                            />
                         </FormControl>
                         <FormMessage />
@@ -568,28 +621,59 @@ const ProjectForm: FC<ProjectFormProps> = ({
             </section>
 
             {/* Bottom Save / Action Bar */}
-            <div className="flex items-center justify-end gap-3 pt-6 border-t border-border">
-               <Link
-                  href="/console/projects"
-                  className={buttonVariants({ variant: "outline", size: "default" })}
-               >
-                  Cancel
-               </Link>
-               <Button type="submit" size="default" disabled={isSubmitting} className="gap-2 cursor-pointer">
-                  {isSubmitting ? (
-                     <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Saving...</span>
-                     </>
-                  ) : (
-                     <>
-                        <Save className="h-4 w-4" />
-                        <span>{isEditing ? "Save Changes" : "Publish Project"}</span>
-                     </>
-                  )}
-               </Button>
+            <div className="flex items-center justify-between gap-3 pt-6 border-t border-border">
+               {isEditing && initialData?.id ? (
+                  <Button
+                     type="button"
+                     variant="destructive"
+                     size="default"
+                     disabled={isSubmitting || isDeleting}
+                     onClick={() => setShowDeleteDialog(true)}
+                     className="gap-2 cursor-pointer"
+                  >
+                     <Trash2 className="h-4 w-4" />
+                     <span>Delete Project</span>
+                  </Button>
+               ) : (
+                  <div />
+               )}
+
+               <div className="flex items-center gap-3">
+                  <Link
+                     href="/console/projects"
+                     className={buttonVariants({ variant: "outline", size: "default" })}
+                  >
+                     Cancel
+                  </Link>
+                  <Button type="submit" size="default" disabled={isSubmitting || isDeleting} className="gap-2 cursor-pointer">
+                     {isSubmitting ? (
+                        <>
+                           <Loader2 className="h-4 w-4 animate-spin" />
+                           <span>Saving...</span>
+                        </>
+                     ) : (
+                        <>
+                           <Save className="h-4 w-4" />
+                           <span>{isEditing ? "Save Changes" : "Publish Project"}</span>
+                        </>
+                     )}
+                  </Button>
+               </div>
             </div>
          </form>
+
+         {isEditing && initialData?.id && (
+            <ConfirmDialog
+               open={showDeleteDialog}
+               onOpenChange={setShowDeleteDialog}
+               title="Delete Project"
+               itemName={initialData.title}
+               variant="destructive"
+               confirmText="Delete"
+               isPending={isDeleting}
+               onConfirm={handleDeleteProject}
+            />
+         )}
       </Form>
    )
 }

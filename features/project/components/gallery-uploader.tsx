@@ -1,17 +1,18 @@
 "use client"
 
-import { FC, useState, useId, useMemo, useCallback, useEffect } from "react"
+import { FC, useCallback, useEffect, useId, useMemo, useRef, useState } from "react"
 import { useDropzone } from "react-dropzone"
-import { DndContext, PointerSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent, type DragStartEvent, DragOverlay, closestCorners, pointerWithin, type CollisionDetection } from "@dnd-kit/core"
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, rectSortingStrategy } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import { GripVertical, Image as ImageIcon, Plus, Sparkles, Trash2, Upload } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { closestCorners, DndContext, DragOverlay, KeyboardSensor, pointerWithin, PointerSensor, useSensor, useSensors, type CollisionDetection, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core"
+import { arrayMove, rectSortingStrategy, SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable"
+import { restrictToParentElement } from "@dnd-kit/modifiers"
+import { GripVertical, Image as ImageIcon, Plus, Sparkles, Upload } from "lucide-react"
+import Image from "next/image"
+import { cn, generateGalleryItemId, getMediaUrl } from "@/lib/utils"
+import { uploadMediaToS3 } from "@/lib/upload"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "@/components/ui/toast"
-import Image from "next/image"
-import { restrictToParentElement } from "@dnd-kit/modifiers"
+import SortableGalleryCard from "./sortable-gallery-card"
 
 export interface GalleryUploaderProps {
    images?: string[]
@@ -20,171 +21,99 @@ export interface GalleryUploaderProps {
    maxImages?: number
    className?: string
    disabled?: boolean
+   projectSlug?: string
+   onRequireTitle?: () => void
 }
 
 interface GalleryItem {
    id: string
    url: string
+   isUploading?: boolean
+   progress?: number
+   error?: string
+   file?: File
+   isNewUpload?: boolean
 }
 
-function generateGalleryItemId(): string {
-   return `gallery_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
+
+function getValidUrls(items: GalleryItem[]): string[] {
+   return items
+      .filter((item) => !item.isUploading && !item.error)
+      .map((item) => item.url)
 }
 
-interface SortableGalleryCardProps {
-   id: string
-   url: string
-   index: number
-   isCover: boolean
-   disabled?: boolean
-   onSetCover: () => void
-   onRemove: () => void
-}
 
-const SortableGalleryCard: FC<SortableGalleryCardProps> = ({
-   id,
-   url,
-   index,
-   isCover,
+const GalleryUploader: FC<GalleryUploaderProps> = ({
+   images = [],
+   onChange,
+   name = "images",
+   maxImages = 10,
+   className,
    disabled = false,
-   onSetCover,
-   onRemove,
+   projectSlug = "",
+   onRequireTitle,
 }) => {
-   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled, transition: { duration: 150, easing: "cubic-bezier(0.2, 0, 0, 1)" }, })
-
-   if (isDragging) {
-      return (
-         <div
-            ref={setNodeRef}
-            className="aspect-video rounded-xl border-2 border-dashed border-primary/50 bg-primary/10 shadow-inner"
-         />
-      )
-   }
-
-   const style: React.CSSProperties = {
-      transform: CSS.Translate.toString(transform),
-      transition,
-   }
-
-   return (
-      <div
-         ref={setNodeRef}
-         style={style}
-         {...attributes}
-         {...listeners}
-         className={cn(
-            "group relative rounded-xl border bg-card overflow-hidden shadow-2xs transition-[border-color,box-shadow] touch-none select-none",
-            !disabled && "cursor-grab active:cursor-grabbing",
-            isCover ? "border-primary/50 ring-2 ring-primary/20" : "border-border hover:border-border/80 hover:shadow-md"
-         )}
-      >
-         <div className="aspect-video w-full bg-muted/40 relative overflow-hidden">
-            <Image
-               src={url}
-               alt={`Screenshot ${index + 1}`}
-               fill
-               unoptimized
-               className="object-cover transition-transform duration-300 group-hover:scale-105 select-none pointer-events-none"
-            />
-
-            {isCover ? (
-               <div className="absolute top-2 left-2 z-10">
-                  <Badge className="bg-amber-500 text-white gap-1 text-[10px] font-semibold py-0.5 px-2 shadow-xs border-none select-none">
-                     <Sparkles className="size-3" />
-                     <span>Cover Hero</span>
-                  </Badge>
-               </div>
-            ) : (
-               <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-black/60 text-white backdrop-blur-xs">
-                     #{index + 1}
-                  </span>
-               </div>
-            )}
-
-            {!disabled && (
-               <div
-                  title="Drag to reorder"
-                  className="absolute top-2 right-2 z-10 size-6 rounded-md bg-black/50 text-white/90 hover:text-white hover:bg-black/70 backdrop-blur-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-               >
-                  <GripVertical className="size-3.5" />
-               </div>
-            )}
-
-            <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-between gap-1 z-10 backdrop-blur-[1px]">
-               <div className="flex items-center gap-1">
-                  {!isCover && !disabled && (
-                     <Button
-                        type="button"
-                        size="xs"
-                        variant="secondary"
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onClick={(e) => {
-                           e.stopPropagation()
-                           onSetCover()
-                        }}
-                        className="h-6 text-[11px] px-2 font-medium bg-white/90 hover:bg-white text-black cursor-pointer"
-                     >
-                        Make Cover
-                     </Button>
-                  )}
-               </div>
-
-               {!disabled && (
-                  <Button
-                     type="button"
-                     size="icon-xs"
-                     variant="destructive"
-                     onPointerDown={(e) => e.stopPropagation()}
-                     onClick={(e) => {
-                        e.stopPropagation()
-                        onRemove()
-                     }}
-                     title="Delete screenshot"
-                     className="h-6 w-6 cursor-pointer"
-                  >
-                     <Trash2 className="size-3" />
-                  </Button>
-               )}
-            </div>
-         </div>
-      </div>
-   )
-}
-
-const GalleryUploader: FC<GalleryUploaderProps> = ({ images = [], onChange, name = "images", maxImages = 10, className, disabled = false }) => {
    const dndId = useId()
+
    const [activeId, setActiveId] = useState<string | null>(null)
+
    const [items, setItems] = useState<GalleryItem[]>(() =>
       images.map((url) => ({
          id: generateGalleryItemId(),
          url,
-      }))
+      })),
    )
 
+   const itemsRef = useRef<GalleryItem[]>(items)
+
+   const updateItems = useCallback((updater: GalleryItem[] | ((current: GalleryItem[]) => GalleryItem[]), notify = true) => {
+      const current = itemsRef.current
+      const next = typeof updater === "function" ? updater(current) : updater
+
+      itemsRef.current = next
+      setItems(next)
+
+      if (notify) {
+         onChange(getValidUrls(next))
+      }
+
+      return next
+   }, [onChange])
+
    useEffect(() => {
-      setItems((prevItems) => {
-         const currentUrls = prevItems.map((item) => item.url)
-         if (
-            currentUrls.length === images.length &&
-            currentUrls.every((url, idx) => url === images[idx])
-         ) {
-            return prevItems
+      const current = itemsRef.current
+
+      if (current.some((item) => item.isUploading)) {
+         return
+      }
+
+      const currentUrls = current.map((item) => item.url)
+
+      const isSame = currentUrls.length === images.length && currentUrls.every((url, index) => url === images[index])
+      if (isSame) {
+         return
+      }
+      const pool = [...current]
+
+      const next = images.map((url) => {
+         const matchIndex = pool.findIndex(
+            (item) => item.url === url,
+         )
+
+         if (matchIndex !== -1) {
+            const [matched] = pool.splice(matchIndex, 1)
+
+            return matched
          }
 
-         const pool = [...prevItems]
-         return images.map((url) => {
-            const matchIndex = pool.findIndex((item) => item.url === url)
-            if (matchIndex !== -1) {
-               const [matched] = pool.splice(matchIndex, 1)
-               return matched
-            }
-            return {
-               id: generateGalleryItemId(),
-               url,
-            }
-         })
+         return {
+            id: generateGalleryItemId(),
+            url,
+         }
       })
+
+      itemsRef.current = next
+      setItems(next)
    }, [images])
 
    const sensors = useSensors(
@@ -195,43 +124,79 @@ const GalleryUploader: FC<GalleryUploaderProps> = ({ images = [], onChange, name
       }),
       useSensor(KeyboardSensor, {
          coordinateGetter: sortableKeyboardCoordinates,
-      })
+      }),
    )
 
-   const collisionDetection: CollisionDetection = useCallback((args) => {
-      const pointerCollisions = pointerWithin(args)
-      if (pointerCollisions.length > 0) {
-         return pointerCollisions
-      }
-      return closestCorners(args)
-   }, [])
+   const collisionDetection: CollisionDetection = useCallback(
+      (args) => {
+         const pointerCollisions = pointerWithin(args)
+
+         if (pointerCollisions.length > 0) {
+            return pointerCollisions
+         }
+
+         return closestCorners(args)
+      }, [],)
 
    const itemIds = useMemo(() => items.map((item) => item.id), [items])
 
    const activeItem = useMemo(() => {
-      if (!activeId) return null
-      const idx = items.findIndex((item) => item.id === activeId)
-      if (idx === -1) return null
+      if (!activeId) {
+         return null
+      }
+
+      const index = items.findIndex((item) => item.id === activeId)
+
+      if (index === -1) {
+         return null
+      }
+
       return {
-         url: items[idx].url,
-         isCover: idx === 0,
+         url: items[index].url,
+         isCover: index === 0,
       }
    }, [activeId, items])
 
    const handleDropFiles = useCallback(
       async (acceptedFiles: File[]) => {
-         if (disabled || acceptedFiles.length === 0) return
+         if (disabled || acceptedFiles.length === 0) {
+            return
+         }
 
-         const availableSlots = maxImages - items.length
+         if (!projectSlug?.trim()) {
+            if (onRequireTitle) {
+               onRequireTitle()
+            } else {
+               toast.add({
+                  type: "warning",
+                  title: "Project Title Required",
+                  description:
+                     "Please enter a project title before uploading screenshots.",
+               })
+            }
+
+            return
+         }
+
+         const currentItems = itemsRef.current
+
+         const availableSlots =
+            maxImages - currentItems.length
+
          if (availableSlots <= 0) {
             toast.add({
                type: "error",
                description: `Maximum limit of ${maxImages} screenshots reached.`,
             })
+
             return
          }
 
-         const filesToProcess = acceptedFiles.slice(0, availableSlots)
+         const filesToProcess = acceptedFiles.slice(
+            0,
+            availableSlots,
+         )
+
          if (acceptedFiles.length > availableSlots) {
             toast.add({
                type: "info",
@@ -239,129 +204,418 @@ const GalleryUploader: FC<GalleryUploaderProps> = ({ images = [], onChange, name
             })
          }
 
-         try {
-            const readFile = (file: File): Promise<string> =>
-               new Promise((resolve, reject) => {
-                  const reader = new FileReader()
-                  reader.onload = () => resolve(reader.result as string)
-                  reader.onerror = reject
-                  reader.readAsDataURL(file)
-               })
+         const tempItems: GalleryItem[] = filesToProcess.map((file) => {
+            const objectUrl = URL.createObjectURL(file)
 
-            const newImages = await Promise.all(filesToProcess.map(readFile))
-            const newGalleryItems = newImages.map((url) => ({
+            return {
                id: generateGalleryItemId(),
-               url,
-            }))
+               url: objectUrl,
+               isUploading: true,
+               progress: 0,
+               file,
+               isNewUpload: true,
+            }
+         })
 
-            const next = [...items, ...newGalleryItems]
-            setItems(next)
-            onChange(next.map((item) => item.url))
+         updateItems((current) => [...current, ...tempItems], false)
 
-            toast.add({
-               type: "success",
-               description: `Added ${newImages.length} screenshot${newImages.length > 1 ? "s" : ""}.`,
-            })
-         } catch {
+         const folder = `projects/${projectSlug.trim().toLowerCase()}/gallery`
+
+         await Promise.all(
+            tempItems.map(async (tempItem) => {
+               try {
+                  const { key } = await uploadMediaToS3(tempItem.file!, {
+                     folder,
+                     onProgress: (pct) => {
+                        updateItems(
+                           (current) =>
+                              current.map((item) =>
+                                 item.id === tempItem.id
+                                    ? {
+                                       ...item,
+                                       progress: pct,
+                                    }
+                                    : item,
+                              ),
+                           false,
+                        )
+                     },
+                  });
+
+                  updateItems((current) =>
+                     current.map((item) =>
+                        item.id === tempItem.id
+                           ? {
+                              ...item,
+                              url: key,
+                              isUploading: false,
+                              progress: 100,
+                              error: undefined,
+                              file: undefined,
+                              isNewUpload: true,
+                           }
+                           : item,
+                     ),
+                  )
+
+                  if (tempItem.url.startsWith("blob:")) {
+                     URL.revokeObjectURL(tempItem.url)
+                  }
+               } catch (err: unknown) {
+                  const message = err instanceof Error ? err.message : "Upload failed"
+                  updateItems((current) =>
+                     current.map((item) =>
+                        item.id === tempItem.id
+                           ? {
+                              ...item,
+                              isUploading: false,
+                              error: message,
+                           }
+                           : item,
+                     ),
+                     false,
+                  )
+
+                  toast.add({
+                     type: "error",
+                     title: "Upload Failed",
+                     description: `${tempItem.file?.name}: ${message}`,
+                  })
+               }
+            }),
+         )
+      }, [disabled, maxImages, onRequireTitle, projectSlug, updateItems],
+   )
+
+   const handleRetry = useCallback(
+      async (itemId: string) => {
+         const item = itemsRef.current.find(
+            (current) => current.id === itemId,
+         )
+
+         if (
+            !item ||
+            !item.file ||
+            !projectSlug?.trim()
+         ) {
+            return
+         }
+
+         updateItems(
+            (current) =>
+               current.map((galleryItem) =>
+                  galleryItem.id === itemId
+                     ? {
+                        ...galleryItem,
+                        isUploading: true,
+                        error: undefined,
+                        progress: 0,
+                     }
+                     : galleryItem,
+               ),
+            false,
+         )
+
+         try {
+            const folder = `projects/${projectSlug
+               .trim()
+               .toLowerCase()}/gallery`
+
+            const { key } = await uploadMediaToS3(
+               item.file,
+               {
+                  folder,
+
+                  onProgress: (pct) => {
+                     updateItems(
+                        (current) =>
+                           current.map((galleryItem) =>
+                              galleryItem.id === itemId
+                                 ? {
+                                    ...galleryItem,
+                                    progress: pct,
+                                 }
+                                 : galleryItem,
+                           ),
+                        false,
+                     )
+                  },
+               },
+            )
+
+            /**
+             * Upload succeeded.
+             *
+             * onChange happens OUTSIDE the state updater.
+             */
+            updateItems((current) =>
+               current.map((galleryItem) =>
+                  galleryItem.id === itemId
+                     ? {
+                        ...galleryItem,
+                        url: key,
+                        isUploading: false,
+                        progress: 100,
+                        error: undefined,
+                        file: undefined,
+                        isNewUpload: true,
+                     }
+                     : galleryItem,
+               ),
+            )
+
+            /**
+             * Revoke old blob preview.
+             */
+            if (item.url.startsWith("blob:")) {
+               URL.revokeObjectURL(item.url)
+            }
+         } catch (err: unknown) {
+            const message =
+               err instanceof Error
+                  ? err.message
+                  : "Retry failed"
+
+            updateItems(
+               (current) =>
+                  current.map((galleryItem) =>
+                     galleryItem.id === itemId
+                        ? {
+                           ...galleryItem,
+                           isUploading: false,
+                           error: message,
+                        }
+                        : galleryItem,
+                  ),
+               false,
+            )
+
             toast.add({
                type: "error",
-               description: "An error occurred while reading images.",
+               title: "Retry Failed",
+               description: message,
             })
          }
       },
-      [disabled, items, maxImages, onChange]
+      [projectSlug, updateItems],
    )
 
-   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+   /**
+    * Dropzone.
+    */
+   const {
+      getRootProps,
+      getInputProps,
+      isDragActive,
+      open,
+   } = useDropzone({
       onDrop: handleDropFiles,
+
       accept: {
          "image/png": [".png"],
          "image/jpeg": [".jpg", ".jpeg"],
          "image/webp": [".webp"],
          "image/svg+xml": [".svg"],
       },
+
       maxSize: 5 * 1024 * 1024,
-      disabled: disabled || items.length >= maxImages,
+
+      disabled:
+         disabled || items.length >= maxImages,
+
       noClick: items.length > 0,
       noKeyboard: items.length > 0,
+
       onDropRejected: (fileRejections) => {
-         fileRejections.forEach((rej) => {
-            const err = rej.errors[0]
+         fileRejections.forEach((rejection) => {
+            const error = rejection.errors[0]
+
             const reason =
-               err?.code === "file-too-large"
+               error?.code === "file-too-large"
                   ? "Exceeds 5MB size limit"
-                  : err?.code === "file-invalid-type"
+                  : error?.code === "file-invalid-type"
                      ? "Unsupported file type (use PNG, JPG, WebP, or SVG)"
-                     : err?.message || "Invalid file"
+                     : error?.message || "Invalid file"
+
             toast.add({
                type: "error",
-               description: `"${rej.file.name}": ${reason}`,
+               description: `"${rejection.file.name}": ${reason}`,
             })
          })
       },
    })
 
-   const handleDragStart = (event: DragStartEvent) => {
-      setActiveId(event.active.id as string)
-   }
+   /**
+    * Drag start.
+    */
+   const handleDragStart = useCallback(
+      (event: DragStartEvent) => {
+         setActiveId(event.active.id as string)
+      },
+      [],
+   )
 
-   const handleDragEnd = (event: DragEndEvent) => {
-      const { active, over } = event
-      setActiveId(null)
+   /**
+    * Drag end / reorder.
+    */
+   const handleDragEnd = useCallback(
+      (event: DragEndEvent) => {
+         const { active, over } = event
 
-      if (over && active.id !== over.id) {
-         const oldIndex = items.findIndex((item) => item.id === active.id)
-         const newIndex = items.findIndex((item) => item.id === over.id)
-         if (oldIndex !== -1 && newIndex !== -1) {
-            const reordered = arrayMove(items, oldIndex, newIndex)
-            setItems(reordered)
-            onChange(reordered.map((item) => item.url))
+         setActiveId(null)
+
+         if (!over || active.id === over.id) {
+            return
          }
-      }
-   }
 
-   const handleDragCancel = () => {
+         const current = itemsRef.current
+
+         const oldIndex = current.findIndex(
+            (item) => item.id === active.id,
+         )
+
+         const newIndex = current.findIndex(
+            (item) => item.id === over.id,
+         )
+
+         if (oldIndex === -1 || newIndex === -1) {
+            return
+         }
+
+         const reordered = arrayMove(
+            current,
+            oldIndex,
+            newIndex,
+         )
+
+         updateItems(reordered)
+      },
+      [updateItems],
+   )
+
+   /**
+    * Drag cancel.
+    */
+   const handleDragCancel = useCallback(() => {
       setActiveId(null)
-   }
+   }, [])
 
-   const handleSetCover = (index: number) => {
-      if (disabled || index === 0 || index >= items.length) return
-      const target = items[index]
-      const remaining = items.filter((_, i) => i !== index)
-      const next = [target, ...remaining]
-      setItems(next)
-      onChange(next.map((item) => item.url))
-      toast.add({
-         type: "success",
-         description: "Set as Main Cover Hero.",
+   /**
+    * Move selected image to position 0.
+    */
+   const handleSetCover = useCallback(
+      (index: number) => {
+         if (disabled) {
+            return
+         }
+
+         const current = itemsRef.current
+
+         if (
+            index <= 0 ||
+            index >= current.length
+         ) {
+            return
+         }
+
+         const target = current[index]
+
+         const remaining = current.filter(
+            (_, currentIndex) => currentIndex !== index,
+         )
+
+         const next = [target, ...remaining]
+
+         updateItems(next)
+
+         toast.add({
+            type: "success",
+            description: "Set as Main Cover Hero.",
+         })
+      },
+      [disabled, updateItems],
+   )
+
+   /**
+    * Remove image.
+    */
+   const handleRemove = useCallback(
+      (index: number) => {
+         if (disabled) {
+            return
+         }
+
+         const current = itemsRef.current
+
+         if (
+            index < 0 ||
+            index >= current.length
+         ) {
+            return
+         }
+
+         const removed = current[index]
+
+         /**
+          * Revoke optimistic preview if necessary.
+          */
+         if (removed?.url?.startsWith("blob:")) {
+            URL.revokeObjectURL(removed.url)
+         }
+
+         const next = current.filter(
+            (_, currentIndex) => currentIndex !== index,
+         )
+
+         updateItems(next)
+      },
+      [disabled, updateItems],
+   )
+
+   /**
+    * Remove everything.
+    */
+   const handleClearAll = useCallback(() => {
+      if (disabled) {
+         return
+      }
+
+      const current = itemsRef.current
+
+      current.forEach((item) => {
+         if (item.url.startsWith("blob:")) {
+            URL.revokeObjectURL(item.url)
+         }
       })
-   }
 
-   const handleRemove = (index: number) => {
-      if (disabled || index < 0 || index >= items.length) return
-      const next = items.filter((_, i) => i !== index)
-      setItems(next)
-      onChange(next.map((item) => item.url))
-   }
-
-   const handleClearAll = () => {
-      if (disabled) return
-      setItems([])
-      onChange([])
-   }
+      updateItems([])
+   }, [disabled, updateItems])
 
    return (
-      <div className={cn("space-y-3 select-none", className)}>
+      <div
+         className={cn(
+            "space-y-3 select-none",
+            className,
+         )}
+      >
+         {/* Hidden form fields */}
          {name &&
-            items.map((item, idx) => (
-               <input key={item.id || idx} type="hidden" name={name} value={item.url} />
+            items.map((item, index) => (
+               <input
+                  key={item.id || index}
+                  type="hidden"
+                  name={name}
+                  value={item.url}
+               />
             ))}
 
-         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+         {/* Header */}
+         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
                <span className="text-xs font-semibold text-foreground">
                   Showcase Gallery ({items.length}/{maxImages})
                </span>
+
                <span className="text-[11px] text-muted-foreground">
                   • Drag to reorder • #1 is Cover Hero
                </span>
@@ -375,7 +629,7 @@ const GalleryUploader: FC<GalleryUploaderProps> = ({ images = [], onChange, name
                      size="xs"
                      onClick={handleClearAll}
                      disabled={disabled}
-                     className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
+                     className="h-7 cursor-pointer px-2 text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                   >
                      Clear all
                   </Button>
@@ -383,45 +637,60 @@ const GalleryUploader: FC<GalleryUploaderProps> = ({ images = [], onChange, name
             </div>
          </div>
 
+         {/* Empty state */}
          {items.length === 0 ? (
             <div
                {...getRootProps()}
                className={cn(
-                  "flex flex-col items-center justify-center py-10 px-4 rounded-xl border-2 border-dashed transition-all cursor-pointer text-center space-y-2 select-none outline-none",
+                  "flex cursor-pointer flex-col items-center justify-center space-y-2 rounded-xl border-2 border-dashed px-4 py-10 text-center outline-none transition-all select-none",
                   isDragActive
-                     ? "border-primary bg-primary/5 scale-[0.99]"
+                     ? "scale-[0.99] border-primary bg-primary/5"
                      : "border-border/80 bg-muted/20 hover:border-primary/50 hover:bg-muted/30",
-                  disabled && "opacity-50 cursor-not-allowed pointer-events-none"
+                  disabled &&
+                  "pointer-events-none cursor-not-allowed opacity-50",
                )}
             >
                <input {...getInputProps()} />
-               <div className="size-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+
+               <div className="flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
                   <ImageIcon className="size-5" />
                </div>
+
                <div>
                   <p className="text-sm font-medium text-foreground">
                      Drag & drop project screenshots here
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                     PNG, JPG, WebP, SVG up to 5MB each • Click to browse files
+
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                     PNG, JPG, WebP, SVG up to 5MB each •
+                     Click to browse files
                   </p>
                </div>
-               <span className="inline-flex items-center gap-1 text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full mt-1">
+
+               <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                   <Plus className="size-3.5" />
                   <span>Choose Screenshots</span>
                </span>
             </div>
          ) : (
-            <div {...getRootProps()} className="relative outline-none">
+            <div
+               {...getRootProps()}
+               className="relative outline-none"
+            >
                <input {...getInputProps()} />
 
+               {/* Drop overlay */}
                {isDragActive && (
-                  <div className="absolute inset-0 z-40 bg-background/85 backdrop-blur-xs border-2 border-dashed border-primary rounded-xl flex flex-col items-center justify-center gap-2 pointer-events-none animate-in fade-in duration-150">
-                     <Upload className="size-8 text-primary animate-bounce" />
+                  <div className="pointer-events-none absolute inset-0 z-40 flex animate-in flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary bg-background/85 backdrop-blur-xs fade-in duration-150">
+                     <Upload className="size-8 animate-bounce text-primary" />
+
                      <p className="text-sm font-semibold text-foreground">
                         Drop screenshots to add to gallery
                      </p>
-                     <p className="text-xs text-muted-foreground">PNG, JPG, WebP, SVG up to 5MB</p>
+
+                     <p className="text-xs text-muted-foreground">
+                        PNG, JPG, WebP, SVG up to 5MB
+                     </p>
                   </div>
                )}
 
@@ -435,59 +704,79 @@ const GalleryUploader: FC<GalleryUploaderProps> = ({ images = [], onChange, name
                   onDragCancel={handleDragCancel}
                >
                   <div className="relative rounded-xl p-1">
-                     <SortableContext items={itemIds} strategy={rectSortingStrategy}>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5">
-                           {items.map((item, idx) => (
+                     <SortableContext
+                        items={itemIds}
+                        strategy={rectSortingStrategy}
+                     >
+                        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                           {items.map((item, index) => (
                               <SortableGalleryCard
                                  key={item.id}
                                  id={item.id}
                                  url={item.url}
-                                 index={idx}
-                                 isCover={idx === 0}
+                                 index={index}
+                                 isCover={index === 0}
                                  disabled={disabled}
-                                 onSetCover={() => handleSetCover(idx)}
-                                 onRemove={() => handleRemove(idx)}
+                                 isUploading={item.isUploading}
+                                 progress={item.progress}
+                                 error={item.error}
+                                 onSetCover={() => handleSetCover(index)}
+                                 onRemove={() => handleRemove(index)}
+                                 onRetry={() => handleRetry(item.id)}
                               />
                            ))}
 
+                           {/* Add button */}
                            {items.length < maxImages && (
                               <button
                                  type="button"
                                  onClick={open}
                                  disabled={disabled}
                                  className={cn(
-                                    "aspect-video rounded-xl border-2 border-dashed flex flex-col items-center justify-center p-3 text-center transition-all cursor-pointer space-y-1 select-none outline-none",
+                                    "flex aspect-video cursor-pointer flex-col items-center justify-center space-y-1 rounded-xl border-2 border-dashed p-3 text-center outline-none transition-all select-none",
                                     "border-border/70 bg-muted/20 hover:border-primary/50 hover:bg-muted/40",
-                                    disabled && "opacity-50 cursor-not-allowed pointer-events-none"
+                                    disabled &&
+                                    "pointer-events-none cursor-not-allowed opacity-50",
                                  )}
                               >
                                  <Upload className="size-5 text-muted-foreground/70" />
-                                 <span className="text-xs font-medium text-foreground">Add Screenshot</span>
-                                 <span className="text-[10px] text-muted-foreground">Click or drop file</span>
+
+                                 <span className="text-xs font-medium text-foreground">
+                                    Add Screenshot
+                                 </span>
+
+                                 <span className="text-[10px] text-muted-foreground">
+                                    Click or drop file
+                                 </span>
                               </button>
                            )}
                         </div>
                      </SortableContext>
 
-                     <DragOverlay dropAnimation={null} zIndex={100}>
+                     {/* Drag overlay */}
+                     <DragOverlay
+                        dropAnimation={null}
+                        zIndex={100}
+                     >
                         {activeItem ? (
-                           <div className="aspect-video w-full rounded-xl border-2 border-primary bg-card overflow-hidden shadow-2xl scale-[1.03] rotate-1 ring-2 ring-primary/40 cursor-grabbing relative">
+                           <div className="relative aspect-video w-full scale-[1.03] rotate-1 overflow-hidden rounded-xl border-2 border-primary bg-card shadow-2xl ring-2 ring-primary/40">
                               <Image
-                                 src={activeItem.url}
+                                 src={getMediaUrl(activeItem.url)}
                                  alt="Dragging screenshot"
                                  fill
                                  unoptimized
-                                 className="object-cover select-none pointer-events-none"
+                                 className="pointer-events-none select-none object-cover"
                               />
+
                               {activeItem.isCover ? (
-                                 <div className="absolute top-2 left-2 z-10">
-                                    <Badge className="bg-amber-500 text-white gap-1 text-[10px] font-semibold py-0.5 px-2 shadow-xs border-none">
+                                 <div className="absolute left-2 top-2 z-10">
+                                    <Badge className="gap-1 border-none bg-amber-500 px-2 py-0.5 text-[10px] font-semibold text-white">
                                        <Sparkles className="size-3" />
                                        <span>Cover Hero</span>
                                     </Badge>
                                  </div>
                               ) : (
-                                 <div className="absolute top-2 right-2 z-10 size-6 rounded-md bg-black/60 text-white flex items-center justify-center">
+                                 <div className="absolute right-2 top-2 z-10 flex size-6 items-center justify-center rounded-md bg-black/60 text-white">
                                     <GripVertical className="size-3.5" />
                                  </div>
                               )}
