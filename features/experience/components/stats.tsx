@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
-import { CheckCircle2, Clock, FolderGit2, Sparkles, type LucideIcon } from 'lucide-react';
-import { projectQueries } from '../db/queries';
-import type { IStatsNumber, StatKey, ProjectStatsProps } from '../types/stats.type';
+import { Briefcase, Clock, Globe, Sparkles, type LucideIcon } from 'lucide-react';
+import { experienceQueries } from '../db/queries';
+import type { IExperienceStatsNumber, ExperienceStatKey, ExperienceStatsProps } from '../types/stats.type';
 
 type StatConfig = {
-   type: StatKey;
+   type: ExperienceStatKey;
    label: string;
    description: string;
    icon: LucideIcon;
@@ -14,33 +14,34 @@ type StatConfig = {
 const statConfig: StatConfig[] = [
    {
       type: 'total',
-      label: 'Total',
-      description: 'Systems in DB',
-      icon: FolderGit2,
+      label: 'Total Roles',
+      description: 'Career positions',
+      icon: Briefcase,
    },
    {
-      type: 'published',
-      label: 'Live',
-      description: 'Published to site',
-      icon: CheckCircle2,
+      type: 'current',
+      label: 'Current / Active',
+      description: 'Ongoing positions',
+      icon: Sparkles,
       iconClassName: 'text-emerald-500',
    },
    {
-      type: 'draft',
-      label: 'Drafts',
-      description: 'Hidden from public',
-      icon: Clock,
+      type: 'remote',
+      label: 'Remote',
+      description: 'Distributed roles',
+      icon: Globe,
+      iconClassName: 'text-sky-500',
    },
    {
-      type: 'featured',
-      label: 'Featured',
-      description: 'Spotlight systems',
-      icon: Sparkles,
-      iconClassName: 'text-amber-500',
+      type: 'fullTime',
+      label: 'Full-Time',
+      description: 'Primary employment',
+      icon: Clock,
+      iconClassName: 'text-indigo-500',
    },
 ];
 
-const StatsNumber = async ({ promise, type }: IStatsNumber) => {
+const StatsNumber = async ({ promise, type }: IExperienceStatsNumber) => {
    const stats = await promise;
 
    return (
@@ -51,7 +52,7 @@ const StatsNumber = async ({ promise, type }: IStatsNumber) => {
 };
 
 export const NumberSkeleton = () => (
-   <div className="h-7 w-5 animate-pulse rounded bg-muted" />
+   <div className="h-7 w-6 animate-pulse rounded bg-muted" />
 );
 
 export const StatsSkeleton = () => (
@@ -85,8 +86,8 @@ export const StatsSkeleton = () => (
    </div>
 );
 
-const Stats = ({ promise }: ProjectStatsProps = {}) => {
-   const statsPromise = promise ?? projectQueries.getStat();
+const Stats = ({ promise }: ExperienceStatsProps = {}) => {
+   const statsPromise = promise ?? experienceQueries.getStat();
 
    return (
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -126,3 +127,4 @@ const Stats = ({ promise }: ProjectStatsProps = {}) => {
 };
 
 export default Stats;
+

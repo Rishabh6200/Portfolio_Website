@@ -5,6 +5,7 @@ import { projectQueries } from '@/features/project/db/queries';
 
 const Page = () => {
    const projectsPromise = projectQueries.getProjects();
+   const statsPromise = projectQueries.getStat();
 
    return (
       <>
@@ -16,7 +17,7 @@ const Page = () => {
             actionSize="sm"
          />
          <div className="my-4">
-            <Stats />
+            <Stats promise={statsPromise} />
          </div>
          <ProjectTable projects={projectsPromise} />
       </>

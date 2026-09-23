@@ -8,6 +8,10 @@ export interface IStats {
 export type StatKey = keyof IStats;
 
 export interface IStatsNumber {
-   promise: Promise<IStats>;
+   promise: Promise<IStats> | IStats;
    type: StatKey;
+}
+
+export interface ProjectStatsProps {
+   promise?: Promise<IStats> | IStats;
 }

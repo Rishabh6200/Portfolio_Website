@@ -123,14 +123,14 @@ model EducationSkill {
 
 model Profile {
   id        String   @id @default(cuid(2))
-  name      String   @default("Rishabh")
-  role      String   @default("Full-Stack & Systems Developer")
-  tagline   String   @default("Architecting high-throughput systems & fluid web products.")
-  bio       String   @default("I’m a full-stack developer specializing in scalable backend architectures and dynamic web applications. I’ve architected modular APIs with NestJS, production web platforms with Laravel, and interactive frontend dashboards using React and Next.js.")
-  status    String   @default("Open for Work")
-  location  String   @default("Mohali, India (IST)")
-  timezone  String   @default("Asia/Kolkata")
-  email     String   @default("rc4556c@gmail.com")
+  name      String
+  role      String
+  tagline   String
+  bio       String
+  status    String
+  location  String
+  timezone  String
+  email     String
   socials   Json
   stats     Json
   createdAt TimestamptzString @default(now())

@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'fc2514a5f96e607958427d6e6ec4a372ffc5ce0ad17d8c4c12047b93886af421'>;
+  StorageHashBase<'7db805c42f9c5ee637772bba5ef7a5ce06f355dbc699bbaac456f326a6c1af03'>;
 export type ExecutionHash =
   ExecutionHashBase<'8851bae66ea8aac2f1a78248df2e139c5a892ba6114ebc66d12aa5dacfcfda1d'>;
 export type ProfileHash =
@@ -1174,82 +1174,41 @@ type ContractBase = Omit<
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/text@1', 'Rishabh'>;
-                  };
                 };
                 readonly role: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<
-                      'pg/text@1',
-                      'Full-Stack & Systems Developer'
-                    >;
-                  };
                 };
                 readonly tagline: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<
-                      'pg/text@1',
-                      'Architecting high-throughput systems & fluid web products.'
-                    >;
-                  };
                 };
                 readonly bio: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<
-                      'pg/text@1',
-                      'I’m a full-stack developer specializing in scalable backend architectures and dynamic web applications. I’ve architected modular APIs with NestJS, production web platforms with Laravel, and interactive frontend dashboards using React and Next.js.'
-                    >;
-                  };
                 };
                 readonly status: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/text@1', 'Open for Work'>;
-                  };
                 };
                 readonly location: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/text@1', 'Mohali, India (IST)'>;
-                  };
                 };
                 readonly timezone: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/text@1', 'Asia/Kolkata'>;
-                  };
                 };
                 readonly email: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/text@1', 'rc4556c@gmail.com'>;
-                  };
                 };
                 readonly socials: {
                   readonly nativeType: 'json';

@@ -1655,10 +1655,6 @@
               "columns": {
                 "bio": {
                   "codecId": "pg/text@1",
-                  "default": {
-                    "kind": "literal",
-                    "value": "I’m a full-stack developer specializing in scalable backend architectures and dynamic web applications. I’ve architected modular APIs with NestJS, production web platforms with Laravel, and interactive frontend dashboards using React and Next.js."
-                  },
                   "nativeType": "text",
                   "nullable": false
                 },
@@ -1673,10 +1669,6 @@
                 },
                 "email": {
                   "codecId": "pg/text@1",
-                  "default": {
-                    "kind": "literal",
-                    "value": "rc4556c@gmail.com"
-                  },
                   "nativeType": "text",
                   "nullable": false
                 },
@@ -1687,28 +1679,16 @@
                 },
                 "location": {
                   "codecId": "pg/text@1",
-                  "default": {
-                    "kind": "literal",
-                    "value": "Mohali, India (IST)"
-                  },
                   "nativeType": "text",
                   "nullable": false
                 },
                 "name": {
                   "codecId": "pg/text@1",
-                  "default": {
-                    "kind": "literal",
-                    "value": "Rishabh"
-                  },
                   "nativeType": "text",
                   "nullable": false
                 },
                 "role": {
                   "codecId": "pg/text@1",
-                  "default": {
-                    "kind": "literal",
-                    "value": "Full-Stack & Systems Developer"
-                  },
                   "nativeType": "text",
                   "nullable": false
                 },
@@ -1724,28 +1704,16 @@
                 },
                 "status": {
                   "codecId": "pg/text@1",
-                  "default": {
-                    "kind": "literal",
-                    "value": "Open for Work"
-                  },
                   "nativeType": "text",
                   "nullable": false
                 },
                 "tagline": {
                   "codecId": "pg/text@1",
-                  "default": {
-                    "kind": "literal",
-                    "value": "Architecting high-throughput systems & fluid web products."
-                  },
                   "nativeType": "text",
                   "nullable": false
                 },
                 "timezone": {
                   "codecId": "pg/text@1",
-                  "default": {
-                    "kind": "literal",
-                    "value": "Asia/Kolkata"
-                  },
                   "nativeType": "text",
                   "nullable": false
                 },
@@ -2125,7 +2093,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "fc2514a5f96e607958427d6e6ec4a372ffc5ce0ad17d8c4c12047b93886af421"
+    "storageHash": "7db805c42f9c5ee637772bba5ef7a5ce06f355dbc699bbaac456f326a6c1af03"
   },
   "execution": {
     "executionHash": "8851bae66ea8aac2f1a78248df2e139c5a892ba6114ebc66d12aa5dacfcfda1d",
