@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-   serverExternalPackages: ["@prisma/orm-postgres", "pg"],
    turbopack: {
       root: process.cwd(),
    },
