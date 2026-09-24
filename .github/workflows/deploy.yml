@@ -17,14 +17,14 @@ concurrency:
 jobs:
   build:
     name: Build Next.js
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           run_install: false
 
@@ -65,7 +65,7 @@ jobs:
   deploy:
     name: Deploy to Azure VM
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     environment:
       name: production
