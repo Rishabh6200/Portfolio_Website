@@ -1,5 +1,14 @@
+import type { Metadata } from 'next';
 import LoginForm from '@/components/admin/form/login-form';
 import { Suspense } from 'react'
+
+export const metadata: Metadata = {
+   title: "Access Console",
+   robots: {
+      index: false,
+      follow: false,
+   },
+}
 
 const page = () => {
    return (

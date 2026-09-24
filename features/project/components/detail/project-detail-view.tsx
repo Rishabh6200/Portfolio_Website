@@ -145,13 +145,13 @@ export function ProjectDetailView({
                {prevProject ? (
                   <Link
                      href={`/projects/${prevProject.slug}`}
-                     className="group flex flex-col items-start p-3 sm:p-0 rounded-xl sm:rounded-none bg-black/2 sm:bg-transparent dark:bg-white/2 sm:dark:bg-transparent border border-black/5 sm:border-none dark:border-white/5 sm:w-1/2 sm:max-w-[48%] transition-all hover:bg-black/4 sm:hover:bg-transparent dark:hover:bg-white/4"
+                     className="group flex flex-col items-start p-3.5 sm:p-4 rounded-xl border border-black/8 dark:border-white/8 bg-black/2 dark:bg-white/2 hover:bg-black/4 dark:hover:bg-white/4 hover:border-black/15 dark:hover:border-white/15 sm:w-1/2 sm:max-w-[48%] transition-all"
                   >
-                     <span className="flex items-center gap-1 text-[11px] font-mono text-neutral-500 uppercase group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                     <span className="flex items-center gap-1.5 text-[11px] font-mono text-neutral-500 uppercase tracking-wider group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                         <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" />
                         Previous Project
                      </span>
-                     <span className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white mt-1 line-clamp-1">
+                     <span className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white mt-1 line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">
                         {prevProject.title}
                      </span>
                   </Link>
@@ -162,13 +162,13 @@ export function ProjectDetailView({
                {nextProject && (
                   <Link
                      href={`/projects/${nextProject.slug}`}
-                     className="group flex flex-col items-start sm:items-end p-3 sm:p-0 rounded-xl sm:rounded-none bg-black/2 sm:bg-transparent dark:bg-white/2 sm:dark:bg-transparent border border-black/5 sm:border-none dark:border-white/5 sm:w-1/2 sm:max-w-[48%] sm:text-right sm:ml-auto transition-all hover:bg-black/4 sm:hover:bg-transparent dark:hover:bg-white/4"
+                     className="group flex flex-col items-start sm:items-end p-3.5 sm:p-4 rounded-xl border border-black/8 dark:border-white/8 bg-black/2 dark:bg-white/2 hover:bg-black/4 dark:hover:bg-white/4 hover:border-black/15 dark:hover:border-white/15 sm:w-1/2 sm:max-w-[48%] sm:text-right sm:ml-auto transition-all"
                   >
-                     <span className="flex items-center gap-1 text-[11px] font-mono text-neutral-500 uppercase group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors sm:justify-end">
+                     <span className="flex items-center gap-1.5 text-[11px] font-mono text-neutral-500 uppercase tracking-wider group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors sm:justify-end">
                         Next Project
                         <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
                      </span>
-                     <span className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white mt-1 line-clamp-1">
+                     <span className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white mt-1 line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">
                         {nextProject.title}
                      </span>
                   </Link>

@@ -1,0 +1,135 @@
+name: Deploy Portfolio
+
+on:
+  push:
+    branches:
+      - v3
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deployment
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Next.js
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.1
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Next.js
+        env:
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+        run: pnpm build
+
+      - name: Create deployment archive
+        run: |
+          tar \
+            --exclude=.git \
+            --exclude=node_modules \
+            --exclude=.next/cache \
+            -czf /tmp/portfolio.tar.gz \
+            -C "$GITHUB_WORKSPACE" .
+
+          cp /tmp/portfolio.tar.gz portfolio.tar.gz
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: portfolio
+          path: portfolio.tar.gz
+          retention-days: 1
+
+  deploy:
+    name: Deploy to Azure VM
+    needs: build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
+
+    steps:
+      - name: Download build
+        uses: actions/download-artifact@v7
+        with:
+          name: portfolio
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          echo "${{ secrets.AZURE_SSH_KEY }}" > ~/.ssh/portfolio_deploy
+          chmod 600 ~/.ssh/portfolio_deploy
+
+          ssh-keyscan -H "${{ secrets.AZURE_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Upload deployment
+        run: |
+          scp \
+            -i ~/.ssh/portfolio_deploy \
+            -o IdentitiesOnly=yes \
+            portfolio.tar.gz \
+            "${{ secrets.AZURE_USERNAME }}@${{ secrets.AZURE_HOST }}:/tmp/portfolio.tar.gz"
+
+      - name: Deploy and restart
+        run: |
+          ssh \
+            -i ~/.ssh/portfolio_deploy \
+            -o IdentitiesOnly=yes \
+            "${{ secrets.AZURE_USERNAME }}@${{ secrets.AZURE_HOST }}" << 'EOF'
+
+            set -e
+
+            APP_DIR="/var/www/portfolio"
+
+            if [ ! -d "$APP_DIR" ]; then
+              echo "ERROR: Application directory does not exist: $APP_DIR"
+              exit 1
+            fi
+
+            cd "$APP_DIR"
+
+            echo "Extracting deployment..."
+
+            tar -xzf /tmp/portfolio.tar.gz -C "$APP_DIR"
+
+            rm -f /tmp/portfolio.tar.gz
+
+            echo "Installing dependencies..."
+
+            pnpm install --frozen-lockfile
+
+            echo "Restarting PM2..."
+
+            pm2 restart ecosystem.config.cjs --update-env
+
+            pm2 save
+
+            echo "PM2 status:"
+            pm2 status
+
+            echo "Deployment completed successfully."
+
+          EOF

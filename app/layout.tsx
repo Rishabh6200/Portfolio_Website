@@ -6,6 +6,8 @@ import { ThemeProvider } from "@/providers/theme-provider"
 import { ProgressProvider } from "@/providers/progress-provider"
 import { Toaster } from "@/components/ui/toast"
 
+import { profileQueries } from "@/features/profile/db/queries"
+
 const inter = Inter({
    subsets: ["latin"],
    variable: "--font-sans",
@@ -20,9 +22,39 @@ const fontMono = Geist_Mono({
 
 export const dynamic = "force-dynamic"
 
-export const metadata: Metadata = {
-   title: "Portfolio Admin Console",
-   description: "Portfolio and Content Management System",
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+
+export async function generateMetadata(): Promise<Metadata> {
+   const profile = await profileQueries.getProfile()
+   const title = profile.name && profile.role ? `${profile.name} — ${profile.role}` : "Portfolio"
+   const description =
+      profile.bio ||
+      profile.tagline ||
+      "Portfolio and Content Management System"
+
+   return {
+      metadataBase: new URL(appUrl),
+      title: {
+         default: title,
+         template: `%s | ${profile.name || "Portfolio"}`,
+      },
+      description,
+      authors: profile.name ? [{ name: profile.name }] : undefined,
+      alternates: {
+         canonical: "/",
+      },
+      openGraph: {
+         title,
+         description,
+         type: "website",
+         locale: "en_US",
+      },
+      twitter: {
+         card: "summary_large_image",
+         title,
+         description,
+      },
+   }
 }
 
 export const viewport: Viewport = {

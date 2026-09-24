@@ -1,5 +1,10 @@
+import type { Metadata } from "next"
 import AdminSidebar from "@/components/layout/admin/sidebar"
 import AdminTopbar from "@/components/layout/admin/topbar"
+
+export const metadata: Metadata = {
+  title: "Console",
+}
 
 export default function AdminLayout({
   children,

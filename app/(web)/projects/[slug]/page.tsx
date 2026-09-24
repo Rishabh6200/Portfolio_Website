@@ -25,11 +25,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
    const { project } = data
 
+   const title = project.tagline
+      ? `${project.title} — ${project.tagline} | ${profile.name}`
+      : `${project.title} | ${profile.name}`
+
+   const ogTitle = project.tagline
+      ? `${project.title} — ${project.tagline}`
+      : project.title
+
    return {
-      title: `${project.title} — Case Study | ${profile.name}`,
+      title,
       description: project.tagline || project.description,
       openGraph: {
-         title: `${project.title} — Case Study`,
+         title: ogTitle,
          description: project.tagline || project.description,
          images: project.images?.[0] ? [project.images[0]] : undefined,
       },
