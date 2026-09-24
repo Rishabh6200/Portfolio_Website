@@ -1,0 +1,338 @@
+[
+  {
+    "id": "dropDefault.profile.bio",
+    "label": "Drop default on \"profile\".\"bio\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "bio",
+        "table": "profile"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"bio\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "bio"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop default on \"bio\"",
+        "sql": "ALTER TABLE \"public\".\"profile\" ALTER COLUMN \"bio\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"bio\" has no default",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "bio"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropDefault.profile.email",
+    "label": "Drop default on \"profile\".\"email\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "email",
+        "table": "profile"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"email\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "email"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop default on \"email\"",
+        "sql": "ALTER TABLE \"public\".\"profile\" ALTER COLUMN \"email\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"email\" has no default",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "email"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropDefault.profile.location",
+    "label": "Drop default on \"profile\".\"location\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "location",
+        "table": "profile"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"location\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "location"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop default on \"location\"",
+        "sql": "ALTER TABLE \"public\".\"profile\" ALTER COLUMN \"location\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"location\" has no default",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "location"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropDefault.profile.name",
+    "label": "Drop default on \"profile\".\"name\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "name",
+        "table": "profile"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"name\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "name"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop default on \"name\"",
+        "sql": "ALTER TABLE \"public\".\"profile\" ALTER COLUMN \"name\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"name\" has no default",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "name"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropDefault.profile.role",
+    "label": "Drop default on \"profile\".\"role\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "role",
+        "table": "profile"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"role\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "role"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop default on \"role\"",
+        "sql": "ALTER TABLE \"public\".\"profile\" ALTER COLUMN \"role\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"role\" has no default",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "role"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropDefault.profile.status",
+    "label": "Drop default on \"profile\".\"status\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "status",
+        "table": "profile"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"status\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "status"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop default on \"status\"",
+        "sql": "ALTER TABLE \"public\".\"profile\" ALTER COLUMN \"status\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"status\" has no default",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "status"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropDefault.profile.tagline",
+    "label": "Drop default on \"profile\".\"tagline\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "tagline",
+        "table": "profile"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"tagline\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "tagline"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop default on \"tagline\"",
+        "sql": "ALTER TABLE \"public\".\"profile\" ALTER COLUMN \"tagline\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"tagline\" has no default",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "tagline"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropDefault.profile.timezone",
+    "label": "Drop default on \"profile\".\"timezone\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "timezone",
+        "table": "profile"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"timezone\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "timezone"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop default on \"timezone\"",
+        "sql": "ALTER TABLE \"public\".\"profile\" ALTER COLUMN \"timezone\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"timezone\" has no default",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "profile",
+          "timezone"
+        ]
+      }
+    ]
+  }
+]

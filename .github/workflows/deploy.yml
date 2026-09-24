@@ -112,7 +112,12 @@ jobs:
 
             cd "$APP_DIR"
 
-            echo "Extracting deployment..."
+            echo "Pulling latest code from git..."
+
+            git fetch origin v3
+            git reset --hard origin/v3
+
+            echo "Extracting deployment build artifacts..."
 
             tar -xzf /tmp/portfolio.tar.gz -C "$APP_DIR"
 
