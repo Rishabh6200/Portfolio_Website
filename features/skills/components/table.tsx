@@ -65,7 +65,6 @@ export default function SkillTable({ skills, activeCategoryId }: SkillTableProps
       });
    };
 
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
    const columns = useMemo<ColumnDef<any, SkillItem, unknown>[]>(
       () => [
          createDragColumn<SkillItem>(),

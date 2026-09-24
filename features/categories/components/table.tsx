@@ -46,7 +46,6 @@ export default function CategoryTable({ categories }: CategoryTableProps) {
       })
    }
 
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
    const columns = useMemo<ColumnDef<any, CategoryItem, unknown>[]>(
       () => [
          createDragColumn<CategoryItem>(),

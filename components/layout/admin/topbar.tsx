@@ -6,17 +6,18 @@ import Link from 'next/link'
 import { useTransition } from 'react'
 import AdminBreadcrumb from './breadcrumb'
 import { toggleSidebar } from '@/hooks/use-sidebar'
+import { logoutAdminAction } from '@/app/console/access/actions'
 
 const AdminTopbar = () => {
     const [isLoggingOut, startLogout] = useTransition()
 
     const handleLogout = () => {
-        startLogout(() => {
-            // await logoutAdminAction()
+        startLogout(async () => {
             toast.add({
                 type: "success",
-                description: "logged out successfully",
+                description: "Logged out successfully",
             })
+            await logoutAdminAction()
         })
     }
 

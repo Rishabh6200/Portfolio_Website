@@ -31,7 +31,6 @@ const LogoUploader: FC<LogoUploaderProps> = ({
    const [isUploading, setIsUploading] = useState(false)
    const [uploadProgress, setUploadProgress] = useState(0)
    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-   const [sessionUploadedKey, setSessionUploadedKey] = useState<string | null>(null)
 
    const handleFile = async (file?: File) => {
       if (!file) return
@@ -76,7 +75,6 @@ const LogoUploader: FC<LogoUploaderProps> = ({
             onProgress: (pct) => setUploadProgress(pct),
          })
 
-         setSessionUploadedKey(key)
          onChange(key)
          setPreviewUrl(null)
          toast.add({

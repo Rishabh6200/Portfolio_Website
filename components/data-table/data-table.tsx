@@ -10,13 +10,13 @@ import { cn } from "@/lib/utils"
 import { DataTableRow } from "./data-table-row"
 import { DataTableSkeleton, DataTableSkeletonRows } from "./data-table-skeleton"
 import type { DataTableProps } from "./types"
-import { Suspense, use, useCallback, useEffect, useId, useMemo, useState } from "react"
+import { Suspense, use, useCallback, useId, useMemo, useState } from "react"
 
-function isPromise<T>(value: any): value is Promise<T> {
-   return Boolean(value && typeof value.then === "function")
+function isPromise<T>(value: unknown): value is Promise<T> {
+   return Boolean(value && typeof (value as { then?: unknown })?.then === "function")
 }
 
-export function DataTable<TData extends RowData = Record<string, any>>({
+export function DataTable<TData extends RowData = Record<string, unknown>>({
    data,
    columns,
    skeletonRowCount = 5,
@@ -64,7 +64,7 @@ export function DataTable<TData extends RowData = Record<string, any>>({
    )
 }
 
-function DataTableAsync<TData extends RowData = Record<string, any>>({
+function DataTableAsync<TData extends RowData = Record<string, unknown>>({
    dataPromise,
    ...props
 }: Omit<DataTableProps<TData>, "data"> & { dataPromise: Promise<TData[]> }) {
@@ -72,7 +72,7 @@ function DataTableAsync<TData extends RowData = Record<string, any>>({
    return <DataTableResolved {...props} data={resolvedData ?? []} />
 }
 
-function DataTableResolved<TData extends RowData = Record<string, any>>({
+function DataTableResolved<TData extends RowData = Record<string, unknown>>({
    columns,
    data,
    getRowId,
@@ -89,18 +89,22 @@ function DataTableResolved<TData extends RowData = Record<string, any>>({
    const dndId = useId()
    const isReorderEnabled = reorderable ?? Boolean(onReorder)
 
-   // Local state for immediate smooth optimistic reordering
+   // Local state for immediate smooth optimistic reordering with render-time sync
+   const [prevData, setPrevData] = useState(data)
    const [items, setItems] = useState<TData[]>(data)
 
-   useEffect(() => {
+   if (data !== prevData) {
+      setPrevData(data)
       setItems(data)
-   }, [data])
+   }
 
    const resolveRowId = useCallback(
       (row: TData, index: number): string => {
          if (getRowId) return getRowId(row, index)
-         const record = row as Record<string, any>
-         return record?.id ?? record?._id ?? String(index)
+         const record = row as Record<string, unknown>
+         const id = typeof record?.id === "string" ? record.id : undefined
+         const underscoreId = typeof record?._id === "string" ? record._id : undefined
+         return id ?? underscoreId ?? String(index)
       },
       [getRowId]
    )
@@ -202,13 +206,13 @@ function DataTableResolved<TData extends RowData = Record<string, any>>({
                {rows.map((row) => {
                   const rowClass =
                      typeof rowClassName === "function"
-                        ? rowClassName(row as any)
+                        ? rowClassName(row)
                         : rowClassName
 
                   return (
                      <DataTableRow
                         key={row.id}
-                        row={row as any}
+                        row={row}
                         rowId={row.id}
                         reorderable={true}
                         className={rowClass}
@@ -222,13 +226,13 @@ function DataTableResolved<TData extends RowData = Record<string, any>>({
       return rows.map((row) => {
          const rowClass =
             typeof rowClassName === "function"
-               ? rowClassName(row as any)
+               ? rowClassName(row)
                : rowClassName
 
          return (
             <DataTableRow
                key={row.id}
-               row={row as any}
+               row={row}
                rowId={row.id}
                reorderable={false}
                className={rowClass}

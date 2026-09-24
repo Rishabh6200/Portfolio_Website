@@ -7,7 +7,7 @@ interface FormSkeletonProps {
    isEditing?: boolean
 }
 
-const FormSkeleton: FC<FormSkeletonProps> = ({ isEditing = false }) => {
+const FormSkeleton: FC<FormSkeletonProps> = () => {
    return (
       <div className="w-full space-y-6">
          <div className="pb-4 border-b border-border space-y-2">

@@ -6,6 +6,7 @@ import { CSS } from "@dnd-kit/utilities"
 import { TableRow, TableCell } from "@/components/ui/table"
 import { FlexRender } from "@tanstack/react-table"
 import type { Row, RowData } from "@tanstack/react-table"
+import type { DraggableAttributes } from "@dnd-kit/core"
 import { cn } from "@/lib/utils"
 import type { DataTableRowContextValue } from "./types"
 
@@ -17,7 +18,7 @@ export function useDataTableRow(): DataTableRowContextValue {
   const context = React.useContext(DataTableRowContext)
   if (!context) {
     return {
-      attributes: {} as any,
+      attributes: {} as DraggableAttributes,
       listeners: undefined,
       isDragging: false,
     }
@@ -87,7 +88,7 @@ export function DataTableRow<TData extends RowData = Record<string, any>>({
         )}
         {...props}
       >
-        {cells.map((cell: any) => (
+        {cells.map((cell) => (
           <TableCell
             key={cell.id}
             style={{

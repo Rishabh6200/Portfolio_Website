@@ -70,7 +70,7 @@ function renderColumnSkeletonCell<TData extends RowData>(
    return <Skeleton className={cn("h-4", widthClass)} />
 }
 
-export function DataTableSkeletonRows<TData extends RowData = Record<string, any>>({
+export function DataTableSkeletonRows<TData extends RowData = Record<string, unknown>>({
    columns,
    rowCount = 5,
 }: DataTableSkeletonRowsProps<TData>) {
@@ -119,7 +119,7 @@ export function DataTableSkeleton<TData extends RowData = Record<string, any>>({
                   {columns.map((col, idx) => {
                      const headerContent =
                         typeof col.header === "function"
-                           ? (col.header as any)({} as any)
+                           ? (col.header as (context: unknown) => React.ReactNode)({} as never)
                            : col.header
 
                      return (

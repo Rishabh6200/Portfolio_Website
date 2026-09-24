@@ -3,7 +3,7 @@
 import { FC, useState, useTransition } from "react"
 import Link from "next/link"
 import { useRouter } from "@bprogress/next/app"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowLeft, Loader2, Save, Trash2 } from "lucide-react"
 
@@ -105,7 +105,8 @@ const ExperienceForm: FC<ExperienceFormProps> = ({
       register,
       handleSubmit,
       setValue,
-      watch,
+      getValues,
+      control,
       clearErrors,
       formState: { errors, isSubmitting },
    } = useForm<ExperienceFormValues>({
@@ -124,7 +125,7 @@ const ExperienceForm: FC<ExperienceFormProps> = ({
       },
    })
 
-   const currentType = watch("type") || "Full-Time"
+   const currentType = useWatch({ control, name: "type" }) || "Full-Time"
 
    const onSubmit = async (values: ExperienceFormValues) => {
       const cleanedAchievements = achievements.map((a) => a.trim()).filter(Boolean)
@@ -329,7 +330,7 @@ const ExperienceForm: FC<ExperienceFormProps> = ({
                               if (val === "Remote") {
                                  setValue("location", "Remote")
                                  clearErrors("location")
-                              } else if (watch("location") === "Remote") {
+                              } else if (getValues("location") === "Remote") {
                                  setValue("location", "")
                               }
                            }

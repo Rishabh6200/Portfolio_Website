@@ -2,12 +2,13 @@
 import Link from "next/link"
 import { useTransition } from "react"
 import { Badge } from "../../ui/badge"
-import { ExternalLink, X, Terminal, Database, LogOut } from "lucide-react"
+import { ExternalLink, X, Terminal, LogOut } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { Button } from "../../ui/button"
 import { toast } from "../../ui/toast"
 import { navItems } from "./nav-config";
 import { useSidebar } from "@/hooks/use-sidebar";
+import { logoutAdminAction } from "@/app/console/access/actions";
 
 const AdminSidebar = () => {
     const pathname = usePathname();
@@ -15,12 +16,12 @@ const AdminSidebar = () => {
     const { isOpen, close } = useSidebar()
 
     const handleLogout = () => {
-        startLogout(() => {
-            // await logoutAdminAction()
+        startLogout(async () => {
             toast.add({
                 type: "success",
-                description: "logged out successfully",
+                description: "Logged out successfully",
             })
+            await logoutAdminAction()
         })
     }
     return (

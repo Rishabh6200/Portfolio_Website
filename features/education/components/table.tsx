@@ -52,7 +52,6 @@ export default function EducationTable({ educationList }: EducationTableProps) {
       })
    }
 
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
    const columns = useMemo<ColumnDef<any, EducationItem, unknown>[]>(
       () => [
          createDragColumn<EducationItem>(),

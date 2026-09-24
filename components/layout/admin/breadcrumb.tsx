@@ -9,6 +9,7 @@ import { navItems } from "./nav-config";
 // Default user-friendly labels for common admin routes
 const ROUTE_LABELS: Record<string, string> = {
   admin: "Admin",
+  console: "Overview",
   projects: "Projects",
   categories: "Categories",
   skills: "Skills",

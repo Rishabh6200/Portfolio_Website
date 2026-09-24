@@ -3,7 +3,7 @@
 import { FC, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from '@bprogress/next/app'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowLeft, Globe, Loader2, Save, Sparkles, FolderGit2, RefreshCw, Trash2 } from 'lucide-react'
 
@@ -110,8 +110,8 @@ const ProjectForm: FC<ProjectFormProps> = ({
    })
 
    const { isSubmitting } = form.formState
-   const watchedTitle = form.watch("title")
-   const watchedSlug = form.watch("slug")
+   const watchedTitle = useWatch({ control: form.control, name: "title" })
+   const watchedSlug = useWatch({ control: form.control, name: "slug" })
    const activeSlug = watchedSlug?.trim() || generateSlug(watchedTitle || "")
 
    const handleRequireTitle = () => {

@@ -3,7 +3,7 @@
 import { FC, useState, useTransition } from "react"
 import Link from "next/link"
 import { useRouter } from "@bprogress/next/app"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowLeft, Loader2, Save, Trash2 } from "lucide-react"
 
@@ -102,7 +102,7 @@ const EducationForm: FC<EducationFormProps> = ({
       register,
       handleSubmit,
       setValue,
-      watch,
+      control,
       formState: { errors, isSubmitting },
    } = useForm<EducationFormValues>({
       resolver: zodResolver(educationSchema),
@@ -122,8 +122,8 @@ const EducationForm: FC<EducationFormProps> = ({
       },
    })
 
-   const currentType = watch("type") || "Degree"
-   const currentStatus = watch("status") || "published"
+   const currentType = useWatch({ control, name: "type" }) || "Degree"
+   const currentStatus = useWatch({ control, name: "status" }) || "published"
 
    const onSubmit = async (values: EducationFormValues) => {
       const cleanedHighlights = highlights.map((h) => h.trim()).filter(Boolean)

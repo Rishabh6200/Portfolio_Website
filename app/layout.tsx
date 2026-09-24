@@ -20,6 +20,11 @@ const fontMono = Geist_Mono({
 
 export const dynamic = "force-dynamic"
 
+export const metadata: Metadata = {
+  title: "Portfolio Admin Console",
+  description: "Portfolio and Content Management System",
+}
+
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: dark)", color: "#07090e" },

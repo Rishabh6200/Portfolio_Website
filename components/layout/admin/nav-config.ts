@@ -1,4 +1,4 @@
-import { FolderGit2, Layers, Sparkles, Briefcase, GraduationCap, UserCircle, LucideIcon } from "lucide-react";
+import { LayoutDashboard, FolderGit2, Layers, Sparkles, Briefcase, GraduationCap, UserCircle, LucideIcon } from "lucide-react";
 
 export interface NavItem {
    title: string;
@@ -10,6 +10,12 @@ export interface NavItem {
 export const PREFIX = "/console"
 
 export const navItems: NavItem[] = [
+   {
+      title: "Overview",
+      href: PREFIX,
+      icon: LayoutDashboard,
+      exact: true,
+   },
    {
       title: "All Projects",
       href: PREFIX + "/projects",
