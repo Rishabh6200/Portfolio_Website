@@ -6,6 +6,8 @@ import { motion } from "motion/react"
 import { ArrowRight, ExternalLink } from "lucide-react"
 import { GithubIcon } from "@/components/custom-ui/icons"
 import { SpotlightCard } from "@/components/custom-ui/spotlight-card"
+import Image from "next/image"
+import { getMediaUrl } from "@/lib/utils"
 
 export interface ProjectCardData {
   id?: string
@@ -27,7 +29,8 @@ export interface ProjectCardProps {
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
-  const projectLogo = project.logo || (project.images && project.images[0]) || null
+  const rawLogo = project.logo || (project.images && project.images[0]) || null
+  const projectLogo = getMediaUrl(rawLogo)
   const firstSkill = project.skills?.[0]
   const primaryColor =
     (typeof firstSkill === "object" && firstSkill?.categoryId?.color) || "#6366f1"
@@ -35,7 +38,6 @@ export function ProjectCard({ project }: ProjectCardProps) {
   const maxSkills = 3
   const visibleSkills = skills.slice(0, maxSkills)
   const remainingSkillsCount = skills.length - maxSkills
-
   return (
     <motion.div
       layout
@@ -57,10 +59,11 @@ export function ProjectCard({ project }: ProjectCardProps) {
               className="relative h-12 w-12 sm:h-13 sm:w-13 rounded-xl sm:rounded-2xl border border-black/8 dark:border-white/10 bg-neutral-100 dark:bg-[#121826] p-2 flex items-center justify-center shrink-0 shadow-xs group-hover:border-indigo-500/40 group-hover:shadow-indigo-500/10 group-hover:scale-105 transition-all duration-300"
             >
               {projectLogo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={projectLogo}
                   alt={`${project.title} logo`}
+                  height={48}
+                  width={48}
                   className="h-full w-full object-contain rounded-lg"
                 />
               ) : (

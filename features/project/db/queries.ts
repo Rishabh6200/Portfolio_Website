@@ -2,6 +2,7 @@ import { db, ProjectStatus } from "@/prisma/db";
 import { IStats } from "../types/stats.type";
 import { ProjectItem } from "../components/table";
 import type { WebProjectDetail, ProjectDetailContext } from "../types/detail.type";
+import { getMediaUrl } from "@/lib/utils";
 
 class ProjectQueries {
    async getStat(): Promise<IStats> {
@@ -115,8 +116,8 @@ class ProjectQueries {
          role: p.role,
          tagline: p.tagline,
          description: p.description,
-         logo: p.logo,
-         images: p.images as string[],
+         logo: getMediaUrl(p.logo),
+         images: (p.images as string[])?.map(getMediaUrl) || [],
          featured: p.featured,
          githubUrl: p.githubUrl,
          liveUrl: p.liveUrl,

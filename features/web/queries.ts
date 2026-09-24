@@ -6,6 +6,7 @@ import type { ExperienceItem } from "@/features/experience/db/queries"
 import type { EducationItem } from "@/features/education/db/queries"
 import { experienceQueries } from "@/features/experience/db/queries"
 import { educationQueries } from "@/features/education/db/queries"
+import { getMediaUrl } from "@/lib/utils"
 
 class WebQueries {
    async getProfile() {
@@ -80,8 +81,8 @@ class WebQueries {
             role: p.role,
             tagline: p.tagline,
             description: p.description,
-            logo: p.logo,
-            images: p.images,
+            logo: getMediaUrl(p.logo),
+            images: (p.images as string[])?.map(getMediaUrl) || [],
             featured: p.featured,
             githubUrl: p.githubUrl,
             liveUrl: p.liveUrl,
@@ -171,8 +172,8 @@ class WebQueries {
             role: p.role,
             tagline: p.tagline,
             description: p.description,
-            logo: p.logo,
-            images: p.images as string[],
+            logo: getMediaUrl(p.logo),
+            images: (p.images as string[])?.map(getMediaUrl) || [],
             featured: p.featured,
             githubUrl: p.githubUrl,
             liveUrl: p.liveUrl,
