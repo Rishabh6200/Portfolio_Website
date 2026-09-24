@@ -13,7 +13,7 @@ export const OverviewHeader = ({ profile }: OverviewHeaderProps) => {
    const displayRole = profile.role || "Full-Stack Engineer"
 
    return (
-      <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-gradient-to-br from-card via-card/90 to-accent/10 p-6 sm:p-8 shadow-xs">
+      <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-linear-to-br from-card via-card/90 to-accent/10 p-6 sm:p-8 shadow-xs">
          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 relative z-10">
             <div className="space-y-2">
                <div className="flex items-center gap-2.5 flex-wrap">

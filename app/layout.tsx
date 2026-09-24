@@ -7,49 +7,51 @@ import { ProgressProvider } from "@/providers/progress-provider"
 import { Toaster } from "@/components/ui/toast"
 
 const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
+   subsets: ["latin"],
+   variable: "--font-sans",
+   display: "swap",
 })
 
 const fontMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  display: "swap",
+   subsets: ["latin"],
+   variable: "--font-mono",
+   display: "swap",
 })
 
 export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
-  title: "Portfolio Admin Console",
-  description: "Portfolio and Content Management System",
+   title: "Portfolio Admin Console",
+   description: "Portfolio and Content Management System",
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#07090e" },
-    { media: "(prefers-color-scheme: light)", color: "#6366f1" },
-  ],
+   themeColor: [
+      { media: "(prefers-color-scheme: dark)", color: "#07090e" },
+      { media: "(prefers-color-scheme: light)", color: "#6366f1" },
+   ],
 }
 
 export default function RootLayout({
-  children,
+   children,
 }: Readonly<{
-  children: React.ReactNode
+   children: React.ReactNode
 }>) {
-  return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      data-scroll-behavior="smooth"
-      className={cn("antialiased bg-background text-foreground", fontMono.variable, inter.variable)}
-    >
-      <body className="min-h-screen bg-background font-sans text-foreground selection:bg-indigo-500/20 selection:text-indigo-300">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <ProgressProvider>{children}</ProgressProvider>
-          <Toaster />
-        </ThemeProvider>
-      </body>
-    </html>
-  )
+   return (
+      <html
+         lang="en"
+         suppressHydrationWarning
+         data-scroll-behavior="smooth"
+         className={cn("antialiased bg-background text-foreground", fontMono.variable, inter.variable)}
+      >
+         <body className="min-h-screen bg-background font-sans text-foreground selection:bg-indigo-500/20 selection:text-indigo-300">
+            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+               <ProgressProvider>
+                  {children}
+                  <Toaster />
+               </ProgressProvider>
+            </ThemeProvider>
+         </body>
+      </html>
+   )
 }
