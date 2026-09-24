@@ -26,7 +26,6 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 12.4.1
           run_install: false
 
       - name: Setup Node.js
@@ -47,6 +46,8 @@ jobs:
         run: |
           tar \
             --exclude=.git \
+            --exclude=.env \
+            --exclude=.env.* \
             --exclude=node_modules \
             --exclude=.next/cache \
             -czf /tmp/portfolio.tar.gz \
@@ -121,9 +122,19 @@ jobs:
 
             pnpm install --frozen-lockfile
 
-            echo "Restarting PM2..."
+            echo "Running database migrations..."
 
-            pm2 restart ecosystem.config.cjs --update-env
+            pnpm migrate
+
+            echo "Starting / restarting PM2..."
+
+            # Clean up old v2 process name if it exists to avoid port 3000 conflict
+            if pm2 describe portfolio > /dev/null 2>&1; then
+              echo "Stopping old portfolio process..."
+              pm2 delete portfolio || true
+            fi
+
+            pm2 startOrRestart ecosystem.config.cjs --update-env
 
             pm2 save
 
