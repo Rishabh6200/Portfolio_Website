@@ -6,3 +6,4 @@ dist/
 /.prisma-composer
 *.tsbuildinfo
 .DS_Store
+next-env.d.ts

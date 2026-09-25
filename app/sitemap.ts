@@ -1,12 +1,14 @@
 import type { MetadataRoute } from "next"
 import { projectQueries } from "@/features/project/db/queries"
 
+export const dynamic = "force-dynamic"
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL!;
 
   let projects: { slug: string; updatedAt?: Date | string }[] = []
   try {
-    projects = await projectQueries.getPublishedProjects()
+    projects = await projectQueries.getProjectsForSitemap()
   } catch (error) {
     console.error("Sitemap: Failed to load published projects", error)
   }

@@ -151,6 +151,18 @@ class ProjectQueries {
          project: projects[projectIndex],
          prevProject: projectIndex > 0 ? projects[projectIndex - 1] : null,
          nextProject: projectIndex < projects.length - 1 ? projects[projectIndex + 1] : null,
+      };
+   }
+
+   async getProjectsForSitemap(): Promise<{ slug: string; updatedAt?: string | Date }[]> {
+      try {
+         return await db.orm.public.Project
+            .where((p) => p.status.eq("PUBLISHED"))
+            .select("slug", "updatedAt")
+            .all();
+      } catch (error) {
+         console.error("ProjectQueries.getProjectsForSitemap error:", error);
+         return [];
       }
    }
 }
